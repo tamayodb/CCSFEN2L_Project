@@ -1,30 +1,38 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css";
 import AssuranceElement from "@/components/homepage/AssuranceElement";
+import Image from "next/image";
 import { images } from "@/utils/homepage/constantsHomepage";
+import { hot_picks } from "@/utils/homepage/constantsHotpicks";
+import Card from "@/components/homepage/Card";
+import CardWithDetails from "@/components/homepage/CardWithDetails";
 
 const Page = () => {
-  const [hoveredItem, setHoveredItem] = useState(null); // Track hovered item
-  const [playVideo, setPlayVideo] = useState(false); // Track if video should play
-  const videoTimeoutRef = React.useRef(null); // Timeout reference
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [playVideo, setPlayVideo] = useState(false);
+  const videoTimeoutRef = useRef(null);
 
   const handleMouseEnter = (id) => {
     setHoveredItem(id);
     videoTimeoutRef.current = setTimeout(() => {
-      setPlayVideo(true); // Start playing video after 3 seconds
+      setPlayVideo(true);
     }, 3000);
   };
 
   const handleMouseLeave = () => {
     setHoveredItem(null);
-    setPlayVideo(false); // Stop video playback
-    clearTimeout(videoTimeoutRef.current); // Clear timeout
+    setPlayVideo(false);
+    clearTimeout(videoTimeoutRef.current);
   };
 
+  useEffect(() => {
+    return () => clearTimeout(videoTimeoutRef.current);
+  }, []);
+
   return (
-    <div className="relative h-[200vh]">
+    <div className="relative h-[300vh]">
       {/* Highlight Carousel */}
       <AliceCarousel
         autoPlay
@@ -32,32 +40,18 @@ const Page = () => {
         infinite
         renderPrevButton={({ isDisabled }) => (
           <button
-            className={`absolute left-4 top-1/2 transform -translate-y-1/2 z-10 ${
+            className={`absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-blue-900 text-white rounded-md p-3 shadow-md hover:bg-blue-700 ${
               isDisabled ? "opacity-50" : ""
             }`}
-            style={{
-              background: "#0D3B66",
-              color: "#fff",
-              border: "none",
-              borderRadius: "20%",
-              padding: "10px",
-            }}
           >
             ◀
           </button>
         )}
         renderNextButton={({ isDisabled }) => (
           <button
-            className={`absolute right-4 top-1/2 transform -translate-y-1/2 z-10 ${
+            className={`absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-blue-900 text-white rounded-md p-3 shadow-md hover:bg-blue-700 ${
               isDisabled ? "opacity-50" : ""
             }`}
-            style={{
-              background: "#0D3B66",
-              color: "#fff",
-              border: "none",
-              borderRadius: "20%",
-              padding: "10px",
-            }}
           >
             ▶
           </button>
@@ -71,12 +65,16 @@ const Page = () => {
             onMouseLeave={handleMouseLeave}
           >
             {/* Image */}
-            <div
-              className={`h-[70vh] bg-cover bg-center ${
-                hoveredItem === image.id && playVideo ? "hidden" : ""
-              }`}
-              style={{ backgroundImage: `url(${image.src})` }}
-            ></div>
+            {!(hoveredItem === image.id && playVideo) && (
+              <div className="h-[70vh] w-full relative">
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  style={{ objectFit: 'cover' }} 
+                  />
+              </div>
+            )}
 
             {/* Video */}
             {hoveredItem === image.id && playVideo && (
@@ -86,6 +84,7 @@ const Page = () => {
                 autoPlay
                 loop
                 muted
+                preload="auto"
               />
             )}
           </div>
@@ -143,6 +142,53 @@ const Page = () => {
               title="100% Safe and Secure"
               description="All Transactions are Fully Encrypted with State of the Art Technology!"
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Hot Picks Section */}
+      <div className="relative mt-10 flex justify-center">
+        {/* Yellow Background Container */}
+        <div className="absolute top-0 w-[60%] h-[220px] bg-[#F4D35E] left-1/2 -translate-x-1/2 z-0 rounded-2xl"></div>
+
+        {/* Content Section */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+          <h2 className="text-3xl font-bold mb-6 text-black tracking-widest text-left">
+            HOT PICKS
+          </h2>
+          <div className="flex space-x-4 overflow-x-auto justify-center items-center gap-9">
+            <Card key={1} image="/homepage/hotpicks_game1.jpg" />
+            <Card
+              key={2}
+              image="/homepage/hotpicks_game1.jpg"
+            />
+            <Card key={3} image="/homepage/hotpicks_game1.jpg" />
+            <Card key={4} image="/homepage/hotpicks_game1.jpg" />
+            <Card
+              key={5}
+              title="Cyberpunk 2077"
+              image="/homepage/hotpicks_game1.jpg"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* New Arrivals Section */}
+      <div className="relative mt-10 flex justify-center">
+        {/* Yellow Background Container */}
+        <div className="absolute top-0 w-[60%] h-[220px] bg-[#FAF0CA] left-1/2 -translate-x-1/2 z-0 rounded-2xl"></div>
+
+        {/* Content Section */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+          <h2 className="text-3xl font-bold mb-6 text-black tracking-widest text-left">
+            NEW ARRIVALS
+          </h2>
+          <div className="flex space-x-4 overflow-x-auto justify-center items-center gap-9">
+            <CardWithDetails key={1} name="Mouse Corsair" price="123.00" image="/homepage/product_sample.webp"/>
+            <CardWithDetails key={2} name="Mouse Corsair" price="123.00" image="/homepage/product_sample.webp"/>
+            <CardWithDetails key={3} name="Mouse Corsair" price="123.00" image="/homepage/product_sample.webp"/>
+            <CardWithDetails key={4} name="Mouse Corsair" price="123.00" image="/homepage/product_sample.webp"/>
+            <CardWithDetails key={5} name="Mouse Corsair" price="123.00" image="/homepage/product_sample.webp"/>
           </div>
         </div>
       </div>
