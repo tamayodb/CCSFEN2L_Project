@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 
+{/* Card All Space Picture only */}
 const Card = ({ image }) => {
   return (
     <div className="relative h-56 w-40">
