@@ -118,7 +118,7 @@ const Page = () => {
       `}</style>
 
       {/* Assurance Section */}
-      <div className="flex justify-center mt-10">
+      <div className="flex justify-center mt-3">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 px-3 pb-10">
           <div className="relative pr-6 md:pr-8">
             <AssuranceElement

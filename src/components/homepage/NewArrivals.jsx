@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ProductCard from "./CardWithDetails"; // Adjust the path as necessary
 
 const NewArrivals = () => {
@@ -39,32 +39,12 @@ const NewArrivals = () => {
         image: "/homepage/plush_samplepic2.jpeg",
       },
       {
-        name: "RGB Headset1 testtttttttttttasdasdjnasdjnjsadjsajnnasdkas asndjn",
+        name: "RGB Headset1",
         price: 2799,
         image: "/homepage/plush_samplepic2.jpeg",
       },
       {
         name: "Gaming Chair1",
-        price: 5999,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Gaming Mouse2",
-        price: 1999,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Mechanical Keyboard2",
-        price: 3499,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "RGB Headset2",
-        price: 2799,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Gaming Chair2",
         price: 5999,
         image: "/homepage/plush_samplepic2.jpeg",
       },
@@ -93,20 +73,20 @@ const NewArrivals = () => {
     ],
   };
 
+  useEffect(() => {
+    // Reset scroll position to the start of the carousel
+    if (carouselRef.current) {
+      carouselRef.current.scrollLeft = 0;
+    }
+  }, [activeCategory]);
+
   const scrollCarousel = (direction) => {
     if (carouselRef.current) {
       const scrollAmount = carouselRef.current.clientWidth;
-      if (direction === "left") {
-        carouselRef.current.scrollBy({
-          left: -scrollAmount,
-          behavior: "smooth",
-        });
-      } else {
-        carouselRef.current.scrollBy({
-          left: scrollAmount,
-          behavior: "smooth",
-        });
-      }
+      carouselRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -139,7 +119,7 @@ const NewArrivals = () => {
         </div>
 
         {/* Product Carousel */}
-        <div className="relative">
+        <div className="relative mx-20">
           {/* Left Navigation Button */}
           <button
             className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700 z-10"
@@ -151,7 +131,7 @@ const NewArrivals = () => {
           {/* Carousel Container */}
           <div
             ref={carouselRef}
-            className="flex justify-center space-x-2 overflow-x-scroll scrollbar-hide"
+            className="flex overflow-x-scroll scrollbar-hide mx-24"
           >
             {products[activeCategory]?.map((product) => (
               <div key={product.name} className="flex-shrink-0 w-48 mb-10">

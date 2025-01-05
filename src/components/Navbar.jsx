@@ -132,7 +132,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white text-black pt-1 fixed top-0 left-0 right-0 shadow-md z-50 w-full">
-      <div className="container mx-auto flex items-center justify-between">
+      <div className="container mx-auto flex items-center justify-between px-12">
         <div className="flex items-center flex-shrink-0">
           <Link href="/" passHref>
             <Image
@@ -155,12 +155,12 @@ export default function Navbar() {
               className="relative hover:text-bg[#0D3B66] hover:font-semibold transition-all duration-200 ease-in-out cursor-pointer"
               style={{ minWidth: "max-content" }}
             >
-              <Link href="/" className="block">
+              <Link href="/" className="block text-sm">
                 Home
               </Link>
             </li>
             <li
-              className="relative hover:text-bg[#0D3B66] hover:font-semibold transition-all duration-200 ease-in-out cursor-pointer"
+              className="relative hover:text-bg[#0D3B66] hover:font-semibold transition-all duration-200 ease-in-out cursor-pointer text-sm"
               style={{ minWidth: "max-content" }}
               onMouseEnter={handleMouseEnterExplore}
               onMouseLeave={handleMouseLeaveExplore}
@@ -171,7 +171,7 @@ export default function Navbar() {
               className="relative hover:text-bg[#0D3B66] hover:font-semibold transition-all duration-200 ease-in-out cursor-pointer"
               style={{ minWidth: "max-content" }}
             >
-              <Link href="/user/purchase/all" className="block">
+              <Link href="/user/purchase/all" className="block text-sm">
                 Orders
               </Link>
             </li>
@@ -179,7 +179,7 @@ export default function Navbar() {
               className="relative hover:text-bg[#0D3B66] hover:font-semibold transition-all duration-200 ease-in-out cursor-pointer"
               style={{ minWidth: "max-content" }}
             >
-              <Link href="/discover" className="block">
+              <Link href="/discover" className="block text-sm">
                 Discover
               </Link>
             </li>

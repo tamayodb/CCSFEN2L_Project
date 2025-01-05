@@ -75,7 +75,7 @@ const GameCarouselHotpicks = ({ games }) => {
   };
 
   return (
-    <div className="relative flex justify-center py-6">
+    <div className="relative flex justify-center py-3">
       <div className="relative flex items-center overflow-hidden w-full max-w-6xl">
         <div
           ref={carouselRef}
