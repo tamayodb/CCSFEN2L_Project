@@ -9,7 +9,7 @@ export const FGames = [
     description: [
       "Explore Viking-era England",
       "Engaging combat and stealth",
-      "Beautiful open-world landscapes",
+      "Beautiful open-world landscapess",
     ],
   },
   {
