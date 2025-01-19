@@ -226,7 +226,7 @@ export default function Navbar() {
       >
         <input
           type="text"
-          className="w-full p-2 border border-gray-300 rounded-md"
+          className="w-full p-1 border border-gray-300 rounded-md text-xs"
           placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
