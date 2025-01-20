@@ -34,11 +34,11 @@ const creators = [
     linkedin: "https://www.linkedin.com/in/rodneyleiestrada/",
   },
   {
-    name: "Reinier Odarve",
+    name: "Renaire Odarve",
     position: "COM223",
     image: "/discover/creator-5.jpeg",
-    github: "https://github.com/reinier-odarve",
-    linkedin: "https://www.linkedin.com/in/rodneyleiestrada/",
+    github: "https://github.com/rbodarve",
+    linkedin: "https://www.linkedin.com/in/renaire-odarve-b82117345/",
   },
   {
     name: "Danyssa Tamayo",
