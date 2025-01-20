@@ -12,7 +12,16 @@ export default function Profile() {
   const [phone, setPhone] = useState('1234567890');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
+  const [selectedGender, setSelectedGender] = useState('Select Gender');
   const [isEditing, setIsEditing] = useState(false); // Added isEditing state
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false); 
+  const [isEditingGender, setIsEditingGender] = useState(false); 
+
+  const [isEditingEmails, setIsEditingEmails] = useState(
+    Array(emails.length).fill(false)
+  );
+
   const isLeapYear = (year) => {
     return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
   };
@@ -36,6 +45,13 @@ export default function Profile() {
   };
   
   const [days, setDays] = useState([]);
+
+  // Function to handle email edit/save
+  const handleEmailEditToggle = (index) => {
+    const newEditingState = [...isEditingEmails];
+    newEditingState[index] = !newEditingState[index];
+    setIsEditingEmails(newEditingState);
+  };
   
   const handleMonthChange = (month) => {
     setSelectedMonth(month);
@@ -102,55 +118,137 @@ export default function Profile() {
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 Username
               </label>
-              <input
-                type="text"
-                id="username"
-                className="w-full p-2 border rounded-md"
-                placeholder="Enter username"
-              />
-              <p className="text-sm text-gray-500">Note: Username can only be changed once</p>
+              {/* Conditional rendering: label or input field */}
+              <div className="flex items-center gap-2">
+                {isEditingUsername ? (
+                  <input
+                    type="text"
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                    placeholder="Enter username"
+                  />
+                ) : (
+                  <span className="w-full p-2">{username}</span>
+                )}
+                
+                {/* Edit/Save Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isEditing) {
+                      // Save the new username and revert to label
+                      setIsEditingUsername(false);
+                    } else {
+                      // Switch to edit mode
+                      setIsEditingUsername(true);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                >
+                  {isEditing ? 'Save' : 'Edit'}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Name
               </label>
-              <input
-                type="text"
-                id="name"
-                className="w-full p-2 border rounded-md"
-                placeholder="Enter your full name"
-              />
+              {/* Flex container to align the name input/label and button */}
+              <div className="flex items-center gap-2">
+                {/* Conditional rendering: label or input field */}
+                {isEditingName ? (
+                  <input
+                    type="text"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                    placeholder="Enter your full name"
+                  />
+                ) : (
+                  <span className="w-full p-2">{name}</span>
+                )}
+
+                {/* Edit/Save Button for Name */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isEditingName) {
+                      // Save the new name and revert to label
+                      setIsEditingName(false);
+                    } else {
+                      // Switch to edit mode
+                      setIsEditingName(true);
+                    }
+                  }}
+                  className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                >
+                  {isEditingName ? 'Save' : 'Edit'}
+                </button>
+              </div>
             </div>
 
             {/* Email section with Add button */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label htmlFor="emails" className="block text-sm font-medium text-gray-700">
                 Email Addresses
               </label>
               {emails.map((email, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                      const newEmails = [...emails];
-                      newEmails[index] = e.target.value;
-                      setEmails(newEmails);
+                <div key={index} className="flex items-center gap-2">
+                  {/* Conditional rendering for each email: input or label */}
+                  {isEditingEmails[index] ? (
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => {
+                        const newEmails = [...emails];
+                        newEmails[index] = e.target.value;
+                        setEmails(newEmails);
+                      }}
+                      className="w-full p-2  border rounded-md"
+                      placeholder="Enter email address"
+                    />
+                  ) : (
+                    <span className="w-full p-2 ">{email}</span>
+                  )}
+
+                  {/* Edit/Save Button for each email */}
+                  <button
+                    type="button"
+                    onClick={() => handleEmailEditToggle(index)}
+                    className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                  >
+                    {isEditingEmails[index] ? 'Save' : 'Edit'}
+                  </button>
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newEmails = emails.filter((_, i) => i !== index); // Remove email at the specified index
+                      setEmails(newEmails); // Update the state with the new list
                     }}
-                    className="w-full p-2 border rounded-md"
-                    placeholder="Enter email address"
-                  />
+                    className="px-3 py-1 text-sm border rounded-md text-red-600 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
                 </div>
               ))}
+
+              {/* Add Email Button */}
               <button
                 type="button"
-                onClick={() => setEmails([...emails, ''])}
+                onClick={() => {
+                  setEmails([...emails, '']); // Add an empty email to the emails list
+                  setIsEditingEmails([...isEditingEmails, true]); // Set the new email to be in editable state
+                }}
                 className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
               >
-                <Plus className="h-4 w-4" /> Add Email
+                <Plus className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap" /> Add Email
               </button>
-            </div>
+            </div>  
 
             {/* Phone number with masked digits */}
             <div className="space-y-2">
@@ -211,12 +309,37 @@ export default function Profile() {
               <label className="block text-sm font-medium text-gray-700">
                 Gender
               </label>
-              <select className="w-full p-2 border rounded-md">
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+              {/* Conditional rendering for Gender: dropdown or label */}
+              <div className="flex items-center gap-2">
+                {isEditingGender ? (
+                  <select
+                    className="w-full p-2 border rounded-md"
+                    value={selectedGender}
+                    onChange={(e) => setSelectedGender(e.target.value)}
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                ) : (
+                  <span className="w-full p-2">{selectedGender || "Not selected"}</span>
+                )}
+
+                {/* Edit/Save Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isEditingGender) {
+                      setIsEditingGender(false); // Save the selected gender and revert to label
+                    } else {
+                      setIsEditingGender(true); // Switch to edit mode
+                    }
+                  }}
+                  className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                >
+                  {isEditingGender ? 'Save' : 'Edit'}
+                </button>
+              </div>
             </div>
 
             {/* Date of Birth dropdowns */}
@@ -300,12 +423,12 @@ export default function Profile() {
                 htmlFor="image-upload" 
                 className="cursor-pointer inline-flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
               >
-                Upload Photo
+                Set Photo
               </label>
             </div>
 
             <div className="border rounded-md p-3 bg-blue-50 text-xs text-center">
-              Maximum file size: 1MB<br />
+              Maximum file size: 1 megabyte<br />
               Supported formats: JPEG, PNG
             </div>
           </div>
