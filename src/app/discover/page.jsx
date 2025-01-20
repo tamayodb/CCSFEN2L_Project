@@ -36,7 +36,7 @@ const creators = [
   {
     name: "Renaire Odarve",
     position: "COM223",
-    image: "/discover/creator-5.jpeg",
+    image: "/discover/Odarve.jpg",
     github: "https://github.com/rbodarve",
     linkedin: "https://www.linkedin.com/in/renaire-odarve-b82117345/",
   },
