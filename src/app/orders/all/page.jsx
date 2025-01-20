@@ -114,7 +114,9 @@ export default function Page() {
                 <button className="px-4 py-2 bg-green-500 text-white rounded mr-2">Add to Cart</button>
                 <button className="px-4 py-2 bg-yellow-500 text-white rounded">Buy Now</button>
               </div>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setIsRating(true)}>Rate Product</button>
+              {selectedProduct && filteredOrders.find(order => order.items.some(item => item.product === selectedProduct.product) && order.status === 'Completed') && (
+                <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setIsRating(true)}>Rate Product</button>
+              )}
               {isRating && (
                 <div className="mt-4 p-4 border rounded bg-gray-100">
                   <h3 className="text-lg font-bold mb-2">Rate {selectedProduct.product}</h3>
