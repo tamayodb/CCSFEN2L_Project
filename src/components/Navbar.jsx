@@ -171,7 +171,7 @@ export default function Navbar() {
               className="relative hover:text-bg[#0D3B66] hover:font-semibold transition-all duration-200 ease-in-out cursor-pointer"
               style={{ minWidth: "max-content" }}
             >
-              <Link href="/user/purchase/all" className="block text-xs">
+              <Link href="/orders/all" className="block text-xs">
                 Orders
               </Link>
             </li>
