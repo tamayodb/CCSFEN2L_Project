@@ -4,14 +4,15 @@ import { useState } from 'react';
 import { UserCircle, Plus, Edit2 } from 'lucide-react';
 
 export default function Profile() {
-  const [emails, setEmails] = useState(['']);
+  const [emails, setEmails] = useState(['john.doe@example.com']);
   const [showPhone, setShowPhone] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
-  const [username, setUsername] = useState('');
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [username, setUsername] = useState('john_doe');
+  const [name, setName] = useState('John Doe');
+  const [phone, setPhone] = useState('1234567890');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
+  const [isEditing, setIsEditing] = useState(false); // Added isEditing state
   const isLeapYear = (year) => {
     return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
   };
@@ -157,21 +158,51 @@ export default function Profile() {
                 Phone Number
               </label>
               <div className="flex gap-2 items-center">
-                <input
-                  type="text"
-                  id="phone"
-                  value={showPhone ? "1234567890" : "********90"}
-                  readOnly={!showPhone}
-                  className="w-full p-2 border rounded-md"
-                />
+                {/* If isEditing is true, show the input field */}
+                {isEditing ? (
+                  <input
+                    type="text"
+                    id="phone"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  />
+                ) : (
+                  // Else, show the label with censored or full phone number
+                  <span className="w-full p-2 ">
+                    {showPhone ? phone : `********${phone.slice(-2)}`}
+                  </span>
+                )}
+
+                {/* Edit/Save Button */}
                 <button
                   type="button"
-                  onClick={() => setShowPhone(!showPhone)}
+                  onClick={() => {
+                    if (isEditing) {
+                      // Save phone number, revert to label and censor
+                      setIsEditing(false);
+                      setPhone(phone); // Update phone to be saved
+                      setShowPhone(false); // Ensure phone is hidden after saving
+                    } else {
+                      // Switch to edit mode
+                      setIsEditing(true);
+                    }
+                  }}
                   className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
                 >
-                  <Edit2 className="h-4 w-4" />
-                  {showPhone ? 'Hide' : 'Show'}
+                  {isEditing ? 'Save' : 'Edit'}
                 </button>
+
+                {/* Show/Hide Button */}
+                {!isEditing && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPhone(!showPhone)}
+                    className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
+                  >
+                    {showPhone ? 'Hide' : 'Show'}
+                  </button>
+                )}
               </div>
             </div>
 
