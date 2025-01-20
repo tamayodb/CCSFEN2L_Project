@@ -9,7 +9,7 @@ const exploreCategories = [
   {
     label: "Peripherals",
     items: [
-      { label: "Mouse", href: "/peripherals/mice" },
+      { label: "Mice", href: "/peripherals/mice" },
       { label: "Keyboards", href: "/peripherals/keyboards" },
       { label: "Headsets", href: "/peripherals/headsets" },
       { label: "Microphones", href: "/peripherals/microphones" },
@@ -171,7 +171,7 @@ export default function Navbar() {
               className="relative hover:text-bg[#0D3B66] hover:font-semibold transition-all duration-200 ease-in-out cursor-pointer"
               style={{ minWidth: "max-content" }}
             >
-              <Link href="/orders/all" className="block text-xs">
+              <Link href="/user/purchase/all" className="block text-xs">
                 Orders
               </Link>
             </li>
@@ -215,7 +215,7 @@ export default function Navbar() {
       <div className="bg-[#0D3B66] h-1 w-full mt-1"></div>
 
       <motion.div
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white shadow-lg h-8" // Decreased height by another 10% and centered vertically
+        className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-white shadow-lg pt-2"
         initial={{ width: "0%", opacity: 0 }}
         animate={{
           width: isSearchOpen ? "50rem" : "0%",
@@ -226,7 +226,7 @@ export default function Navbar() {
       >
         <input
           type="text"
-          className="w-full h-full p-2 border border-gray-300 rounded-md" // Adjusted height to match the navbar
+          className="w-full p-1 border border-gray-300 rounded-md text-xs"
           placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
