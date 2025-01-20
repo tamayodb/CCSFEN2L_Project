@@ -196,14 +196,14 @@ export default function Profile() {
                 </select>
               </div>
             </div>
+            {/* Submit Button */}
             <div>
               <button
-                  type="button"
-                  onClick={() => setShowPhone(!showPhone)}
-                  className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
+                type="button"
+                onClick={handleSaveToFile} // Call the handleSaveToFile function when clicked
+                className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
               >
-                <Edit2 className="h-4 w-4" />
-                  {showPhone ? 'Hide' : 'Show'}
+                Submit Profile
               </button>
             </div>
           </div>
