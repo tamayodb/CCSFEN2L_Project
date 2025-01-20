@@ -9,14 +9,16 @@ export default function Profile() {
   const [imagePreview, setImagePreview] = useState('');
   const [username, setUsername] = useState('john_doe');
   const [name, setName] = useState('John Doe');
-  const [phone, setPhone] = useState('1234567890');
+  const [phone, setPhone] = useState('');
+  const [selectedDay, setSelectedDay] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
-  const [selectedGender, setSelectedGender] = useState('Select Gender');
+  const [selectedGender, setSelectedGender] = useState('');
   const [isEditing, setIsEditing] = useState(false); // Added isEditing state
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false); 
   const [isEditingGender, setIsEditingGender] = useState(false); 
+  const [isEditingDOB, setIsEditingDOB] = useState(false)
 
   const [isEditingEmails, setIsEditingEmails] = useState(
     Array(emails.length).fill(false)
@@ -83,6 +85,27 @@ export default function Profile() {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = () => {
+    const missingFields = [];
+  
+    // Check for required fields
+    if (!username) missingFields.push("Username");
+    if (!name) missingFields.push("Name");
+    if (emails.length === 0 || !emails.some(email => email)) missingFields.push("Email Addresses");
+    if (!selectedMonth || !selectedDay || !selectedYear) missingFields.push("Date of Birth");
+    
+    // You can also add checks for gender and phone, based on your requirements
+    if (!selectedGender) missingFields.push("Gender");
+    if (!showPhone && !isEditing) missingFields.push("Phone Number");
+  
+    // If there are missing fields, show an alert
+    if (missingFields.length > 0) {
+      alert(`Please fill in the following fields: ${missingFields.join(", ")}`);
+    } else {
+      handleSaveToFile(); // Proceed with file saving if no fields are missing
     }
   };
 
@@ -266,9 +289,9 @@ export default function Profile() {
                     className="w-full p-2 border rounded-md"
                   />
                 ) : (
-                  // Else, show the label with censored or full phone number
+                  // Else, show the label with censored or None
                   <span className="w-full p-2 ">
-                    {showPhone ? phone : `********${phone.slice(-2)}`}
+                    {showPhone ? "None" : `********${phone.slice(-2)}`}
                   </span>
                 )}
 
@@ -348,48 +371,76 @@ export default function Profile() {
                 Date of Birth
               </label>
               <div className="flex gap-2">
-                <select
-                  className="w-full p-2 border rounded-md"
-                  value={selectedMonth}
-                  onChange={(e) => handleMonthChange(Number(e.target.value))}
+                {isEditingDOB ? (
+                  <>
+                    <select
+                      className="w-full p-2 border rounded-md"
+                      value={selectedMonth}
+                      onChange={(e) => handleMonthChange(Number(e.target.value))}
+                    >
+                      <option value="">Month</option>
+                      {months.map((month, index) => (
+                        <option key={month} value={index + 1}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      className="w-full p-2 border rounded-md"
+                      value={selectedYear}
+                      onChange={(e) => handleYearChange(Number(e.target.value))}
+                    >
+                      <option value="">Year</option>
+                      {years.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select 
+                      className="w-full p-2 border rounded-md" 
+                      value={selectedDay}
+                      onChange={(e) => setSelectedDay(Number(e.target.value))}
+                    >
+                      <option value="">Day</option>
+                      {days.map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                ) : (
+                  <span className="w-full p-2">
+                    {selectedMonth && selectedDay && selectedYear
+                      ? `${months[selectedMonth - 1]} ${selectedDay}, ${selectedYear}`
+                      : "None"}
+                  </span>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isEditingDOB) {
+                      setIsEditingDOB(false); // Save the selected date and revert to label
+                    } else {
+                      setIsEditingDOB(true); // Switch to edit mode
+                    }
+                  }}
+                  className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
                 >
-                  <option value="">Month</option>
-                  {months.map((month, index) => (
-                    <option key={month} value={index + 1}>
-                      {month}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className="w-full p-2 border rounded-md"
-                  value={selectedYear}
-                  onChange={(e) => handleYearChange(Number(e.target.value))}
-                >
-                  <option value="">Year</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-
-                <select className="w-full p-2 border rounded-md">
-                  <option value="">Day</option>
-                  {days.map(day => (
-                    <option key={day} value={day}>
-                      {day}
-                    </option>
-                  ))}
-                </select>
-
+                  {isEditingDOB ? 'Save' : 'Edit'}
+                </button>
               </div>
             </div>
+
             {/* Submit Button */}
             <div>
               <button
                 type="button"
-                onClick={handleSaveToFile} // Call the handleSaveToFile function when clicked
+                onClick={handleSubmit} // Use handleSubmit to validate before saving
                 className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
               >
                 Submit Profile
