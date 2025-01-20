@@ -1,13 +1,13 @@
 "use client"
 import React, { useState } from 'react';
 import Image from "next/image";
-import { peripheralProducts } from "@/utils/peripherals/constantsPeripherals";
+import { gameProducts } from "@/utils/games/constantsGames";
 
-export default function SpecificPeripheral({ params }) {
+export default function SpecificGame({ params }) {
   const unwrappedParams = React.use(params);
   const { id } = unwrappedParams;
 
-  const product = peripheralProducts.find((item) => item.slug === id);
+  const product = gameProducts.find((item) => item.slug === id);
 
   const [quantity, setQuantity] = useState(1);
 
@@ -43,7 +43,7 @@ export default function SpecificPeripheral({ params }) {
 
           <div className="space-y-6">
             <h1 className="text-3xl font-semibold text-gray-900">{product.name}</h1>
-            <p className="text-xl text-gray-600">Keyboard | Peripherals</p>
+            <p className="text-xl text-gray-600">Actions | Games</p>
 
             <p>
               <span className="mt-4 text-2xl font-bold text-blue-600">₱{product.price}.00</span>
