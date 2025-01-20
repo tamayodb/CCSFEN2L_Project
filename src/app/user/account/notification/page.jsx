@@ -6,13 +6,13 @@ export default function Notification() {
   const [smsEnabled, setSmsEnabled] = useState(false);
 
   const emailOptions = [
-    { label: 'Order updates', description: 'Get notified when there are updates to your orders.' },
-    { label: 'Promotions', description: 'Receive special offers and promotional content.' },
-    { label: 'Customer surveys', description: 'Participate in surveys to provide feedback.' }
+    { label: 'Order Updates', description: 'Updates on shipping and delivery status of all orders' },
+    { label: 'Promotions', description: 'Exclusive updates on upcoming deals and campaign' },
+    { label: 'Customer surveys', description: 'Receive survey to help LOOP serve you better' }
   ];
 
   const smsOptions = [
-    { label: 'Promotions', description: 'Receive special offers and promotions via SMS.' }
+    { label: 'Promotions', description: 'Exclusive updates on upcoming deals and campaign' }
   ];
 
   const [emailSettings, setEmailSettings] = useState(
@@ -65,7 +65,7 @@ export default function Notification() {
           </div>
           {/* Section description */}
           <p className="text-sm text-gray-500">
-              Manage your email notification preferences. Enable or disable updates for orders, promotions, and customer surveys.
+              Important account notifications and reminders cannot be turned off
           </p>
           <div className="space-y-2">
             {emailOptions.map((option) => (
@@ -121,7 +121,7 @@ export default function Notification() {
           </div>
           {/* Section description */}
           <p className="text-sm text-gray-500">
-            Control your SMS notification preferences. Receive updates on promotions and special offers via text message.
+            Important account notifications and reminders cannot be turned off
           </p>
           <div className="space-y-2">
             {smsOptions.map((option) => (
