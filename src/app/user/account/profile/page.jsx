@@ -10,19 +10,45 @@ export default function Profile() {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const isLeapYear = (year) => {
+    return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
+  };
 
   // Generate year options from 1900 to current year
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i);
-  
-  // Generate days 1-31
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
   
   // Generate months
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
+
+  const getDaysInMonth = (month, year) => {
+    if (month === 2) {
+      return isLeapYear(year) ? 29 : 28; // February logic
+    }
+    const monthsWith31Days = [1, 3, 5, 7, 8, 10, 12]; // January, March, May, July, August, October, December
+    return monthsWith31Days.includes(month) ? 31 : 30;
+  };
+  
+  const [days, setDays] = useState([]);
+  
+  const handleMonthChange = (month) => {
+    setSelectedMonth(month);
+    if (selectedYear) {
+      setDays(Array.from({ length: getDaysInMonth(month, selectedYear) }, (_, i) => i + 1));
+    }
+  };
+  
+  const handleYearChange = (year) => {
+    setSelectedYear(year);
+    if (selectedMonth) {
+      setDays(Array.from({ length: getDaysInMonth(selectedMonth, year) }, (_, i) => i + 1));
+    }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -168,6 +194,32 @@ export default function Profile() {
                 Date of Birth
               </label>
               <div className="flex gap-2">
+                <select
+                  className="w-full p-2 border rounded-md"
+                  value={selectedMonth}
+                  onChange={(e) => handleMonthChange(Number(e.target.value))}
+                >
+                  <option value="">Month</option>
+                  {months.map((month, index) => (
+                    <option key={month} value={index + 1}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="w-full p-2 border rounded-md"
+                  value={selectedYear}
+                  onChange={(e) => handleYearChange(Number(e.target.value))}
+                >
+                  <option value="">Year</option>
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+
                 <select className="w-full p-2 border rounded-md">
                   <option value="">Day</option>
                   {days.map(day => (
@@ -177,23 +229,6 @@ export default function Profile() {
                   ))}
                 </select>
 
-                <select className="w-full p-2 border rounded-md">
-                  <option value="">Month</option>
-                  {months.map((month, index) => (
-                    <option key={month} value={index + 1}>
-                      {month}
-                    </option>
-                  ))}
-                </select>
-
-                <select className="w-full p-2 border rounded-md">
-                  <option value="">Year</option>
-                  {years.map(year => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
             {/* Submit Button */}
