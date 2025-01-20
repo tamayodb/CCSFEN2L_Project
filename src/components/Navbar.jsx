@@ -33,11 +33,11 @@ const exploreCategories = [
   {
     label: "Collectibles",
     items: [
-      { label: "Action Figures", href: "/collectibles/action-figures" },
-      { label: "Amiibo", href: "/collectibles/amiibo" },
-      { label: "Badges", href: "/collectibles/badges" },
-      { label: "Cards", href: "/collectibles/cards" },
-      { label: "Plush", href: "/collectibles/plush" },
+      { label: "Action Figures", href: "/collectibles" },
+      { label: "Amiibo", href: "/collectibles" },
+      { label: "Badges", href: "/collectibles" },
+      { label: "Cards", href: "/collectibles" },
+      { label: "Plush", href: "/collectibles" },
     ],
   },
 ];
