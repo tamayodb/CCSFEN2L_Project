@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc"; // Google icon
 import { FaFacebook } from "react-icons/fa"; // Facebook icon
 import IconButton from "@/components/signup/IconButton";
+import axios from "axios";
 
 const SignupPage = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +16,9 @@ const SignupPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const response = await axios.post('/api/register', {email, password});
+    console.log(response)
+
     router.push("/login"); // Redirect to the login page on form submission
   };
 
@@ -33,16 +37,16 @@ const SignupPage = () => {
       </div>
 
       {/* Login Form Section */}
-      <div className="flex-1 w-1/4 flex justify-center bg-white shadow-lg mt-20">
+      <div className="flex-1 w-1/4 flex justify-center bg-white shadow-lg">
         <div className="w-full max-w-md p-8">
-          <h2 className="text-4xl font-semibold text-left mt-6 mb-3">
+          <h2 className="text-3xl font-semibold text-left mb-3">
             <span>Create an</span>
             <br />
             <span>account</span>
           </h2>
 
           {/* 3rd source Button */}
-          <div className="flex space-x-4 justify-start mb-12">
+          <div className="flex space-x-3 justify-start mb-8">
             {/* Google Button */}
             <IconButton Icon={FcGoogle} color="#000" />
 
@@ -50,11 +54,11 @@ const SignupPage = () => {
             <IconButton Icon={FaFacebook} color="#4267B2" />
           </div>
 
-          <div className="mb-12">
+          <div className="mb-6">
             <h2>
               <span className="font-semibold text-lg">Sign up with email</span>
               <br />
-              <div className="flex gap-2 mt-2 text-sm">
+              <div className="flex gap-2 text-sm">
                 <span>Already have an account?</span>
                 <Link href="/login">
                   <h2 className="text-[#0D3B66] font-medium cursor-pointer hover:underline">
@@ -69,7 +73,7 @@ const SignupPage = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-xs font-medium text-gray-700"
               >
                 Email Address
               </label>
@@ -78,7 +82,7 @@ const SignupPage = () => {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-xs"
                 placeholder="user@example.com"
                 required
               />
@@ -86,7 +90,7 @@ const SignupPage = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-xs font-medium text-gray-700"
               >
                 Password
               </label>
@@ -95,7 +99,7 @@ const SignupPage = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-xs"
                 placeholder="********"
                 required
               />
@@ -103,7 +107,7 @@ const SignupPage = () => {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-xs font-medium text-gray-700"
               >
                 Confirm Password
               </label>
@@ -112,7 +116,7 @@ const SignupPage = () => {
                 id="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`mt-1 block w-full px-4 py-2 border rounded-md ${
+                className={`mt-1 block w-full px-4 py-2 border rounded-md text-xs ${
                   confirmPassword && confirmPassword !== password
                     ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                     : "focus:ring-blue-500 focus:border-blue-500"
@@ -132,7 +136,7 @@ const SignupPage = () => {
 
             <button
               type="submit"
-              className="w-full mt-12 bg-[#0D3B66] text-white py-2 rounded-lg hover:bg-[#145EA8] transition-colors"
+              className="w-full mt-12 bg-[#0D3B66] text-sm text-white py-2 rounded-lg hover:bg-[#145EA8] transition-colors"
             >
               Sign Up
             </button>
