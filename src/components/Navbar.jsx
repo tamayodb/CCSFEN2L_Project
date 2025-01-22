@@ -197,6 +197,7 @@ export default function Navbar() {
           />
           <Image
             src="/navbar/Shopping Cart.png"
+            onClick={() => router.push("/cart")}
             alt="Shopping Cart"
             width={18}
             height={18}
