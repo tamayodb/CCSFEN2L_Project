@@ -9,35 +9,35 @@ const exploreCategories = [
   {
     label: "Peripherals",
     items: [
-      { label: "Mice", href: "/peripherals/mice" },
-      { label: "Keyboards", href: "/peripherals/keyboards" },
-      { label: "Headsets", href: "/peripherals/headsets" },
-      { label: "Microphones", href: "/peripherals/microphones" },
-      { label: "Webcams", href: "/peripherals/webcams" },
-      { label: "Gamepads", href: "/peripherals/gamepads" },
-      { label: "Gaming Chairs", href: "/peripherals/chairs" },
+      { label: "Mice", href: "/peripherals" },
+      { label: "Keyboards", href: "/peripherals" },
+      { label: "Headsets", href: "/peripherals" },
+      { label: "Microphones", href: "/peripherals" },
+      { label: "Webcams", href: "/peripherals" },
+      { label: "Gamepads", href: "/peripherals" },
+      { label: "Gaming Chairs", href: "/peripherals" },
     ],
   },
   {
     label: "Games",
     items: [
-      { label: "Action", href: "/games/action" },
-      { label: "Adventure", href: "/games/adventure" },
-      { label: "Casual", href: "/games/casual" },
-      { label: "Fighting", href: "/games/fighting" },
-      { label: "Puzzle", href: "/games/puzzle" },
-      { label: "Racing", href: "/games/racing" },
-      { label: "Role Playing", href: "/games/role-playing" },
+      { label: "Action", href: "/games" },
+      { label: "Adventure", href: "/games" },
+      { label: "Casual", href: "/games" },
+      { label: "Fighting", href: "/games" },
+      { label: "Puzzle", href: "/games" },
+      { label: "Racing", href: "/games" },
+      { label: "Role Playing", href: "/games" },
     ],
   },
   {
     label: "Collectibles",
     items: [
-      { label: "Action Figures", href: "/collectibles/action-figures" },
-      { label: "Amiibo", href: "/collectibles/amiibo" },
-      { label: "Badges", href: "/collectibles/badges" },
-      { label: "Cards", href: "/collectibles/cards" },
-      { label: "Plush", href: "/collectibles/plush" },
+      { label: "Action Figures", href: "/collectibles" },
+      { label: "Amiibo", href: "/collectibles" },
+      { label: "Badges", href: "/collectibles" },
+      { label: "Cards", href: "/collectibles" },
+      { label: "Plush", href: "/collectibles" },
     ],
   },
 ];
@@ -171,7 +171,7 @@ export default function Navbar() {
               className="relative hover:text-bg[#0D3B66] hover:font-semibold transition-all duration-200 ease-in-out cursor-pointer"
               style={{ minWidth: "max-content" }}
             >
-              <Link href="/user/purchase/all" className="block text-xs">
+              <Link href="/orders/all" className="block text-xs">
                 Orders
               </Link>
             </li>
@@ -197,6 +197,7 @@ export default function Navbar() {
           />
           <Image
             src="/navbar/Shopping Cart.png"
+            onClick={() => router.push("/cart")}
             alt="Shopping Cart"
             width={18}
             height={18}

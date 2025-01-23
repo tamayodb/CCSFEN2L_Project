@@ -2,9 +2,9 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const PeripheralCard = ({ name, price, image, slug }) => {
+const SearchCard = ({ name, price, image, slug }) => {
   return (
-    <Link legacyBehavior href={`/peripherals/${slug}`}>
+    <Link legacyBehavior href={`/product/${slug}`}>
       <a className="relative bg-white rounded-xl shadow-lg p-4 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300 ease-in-out group">
         {/* Product Image */}
         <div className="flex justify-center items-center aspect-w-1 aspect-h-1 overflow-hidden rounded-md">
@@ -28,7 +28,7 @@ const PeripheralCard = ({ name, price, image, slug }) => {
             }}
           >
             {name}
-          </h3>
+          </h3> 
         </div>
         {/* Price */}
         <p className="font-bold text-[#0D3B66] mt-2 text-left text-lg">₱{price}</p>
@@ -41,4 +41,4 @@ const PeripheralCard = ({ name, price, image, slug }) => {
   );
 };
 
-export default PeripheralCard;
+export default SearchCard;
