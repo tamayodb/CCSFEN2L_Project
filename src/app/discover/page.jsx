@@ -7,7 +7,7 @@ const creators = [
   {
     name: "Michaela Angela Cailing",
     position: "COM223",
-    image: "/discover/creator-1.jpeg",
+    image: "/discover/dionela.jpg",
     github: "https://github.com/michaela-cailing",
     linkedin:
       "https://www.linkedin.com/in/michaela-angela-e-cailing-a503332a2/",
@@ -22,29 +22,29 @@ const creators = [
   {
     name: "Blix Foryasen",
     position: "COM223",
-    image: "/discover/creator-3.jpeg",
-    github: "https://github.com/blix-foryasen",
+    image: "/discover/foryasen.jpeg",
+    github: "https://github.com/machiwao",
     linkedin: "https://www.linkedin.com/in/blix-machiwao-foryasen/",
   },
   {
     name: "Jerico Lim",
     position: "COM223",
-    image: "/discover/creator-4.jpeg",
+    image: "/discover/dionela.jpg",
     github: "https://github.com/jerico-lim",
     linkedin: "https://www.linkedin.com/in/rodneyleiestrada/",
   },
   {
-    name: "Reinier Odarve",
+    name: "Renaire Odarve",
     position: "COM223",
-    image: "/discover/creator-5.jpeg",
-    github: "https://github.com/reinier-odarve",
-    linkedin: "https://www.linkedin.com/in/rodneyleiestrada/",
+    image: "/discover/dionela.jpg",
+    github: "https://github.com/rbodarve",
+    linkedin: "https://www.linkedin.com/in/renaire-odarve-b82117345/",
   },
   {
     name: "Danyssa Tamayo",
     position: "COM223",
-    image: "/discover/creator-6.jpeg",
-    github: "https://github.com/danyssa-tamayo",
+    image: "/discover/tamayo.jpeg",
+    github: "https://github.com/tamayodb",
     linkedin: "https://www.linkedin.com/in/danyssa-tamayo-5970a4280/",
   },
 ];

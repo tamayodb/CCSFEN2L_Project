@@ -8,14 +8,14 @@ export default function AssuranceElement({ src, title, description }) {
         <img
           src={src}
           alt={title}
-          className="h-10 w-10"
+          className="h-8 w-8"
         />
       </div>
 
       {/* Title and Description */}
       <div className="flex flex-col">
-        <h1 className="text-xs font-bold">{title}</h1>
-        <p className="text-xs text-gray-600" style={{ maxWidth: "250px", wordWrap: "break-word" }}>
+        <h1 className="text-[0.625rem] font-bold">{title}</h1>
+        <p className="text-[0.5rem] text-gray-600" style={{ maxWidth: "250px", wordWrap: "break-word" }}>
           {description}
         </p>
       </div>
