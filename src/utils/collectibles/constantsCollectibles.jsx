@@ -5,7 +5,7 @@ export const collectibleProducts = [
       image: "/homepage/amiibo_samplepic.webp",
       slug: "iron-man-action-figure",
       stock: "In stock",
-      description: "This highly detailed Iron Man action figure features intricate armor details and multiple points of articulation for dynamic poses. A must-have for Marvel fans and collectors."
+      description: "Thiss highly detailed Iron Man action figure features intricate armor details and multiple points of articulation for dynamic poses. A must-have for Marvel fans and collectors."
     },
     {
       name: "Batman Action Figure",
