@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export default function Payment() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showCardForm, setShowCardForm] = useState(false);
   const [showBankForm, setShowBankForm] = useState(false);
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
   const [savedCards, setSavedCards] = useState([]);
   const [savedBanks, setSavedBanks] = useState([]);
 
@@ -24,34 +24,34 @@ export default function Payment() {
 
   const handleCancelCard = () => {
     setShowCardForm(false);
-    setCardNumber('');
-    setExpiry('');
-    setCvv('');
+    setCardNumber("");
+    setExpiry("");
+    setCvv("");
   };
 
   const handleCancelBank = () => {
     setShowBankForm(false);
-    setBankName('');
-    setAccountNumber('');
+    setBankName("");
+    setAccountNumber("");
   };
 
   const handleSaveCard = () => {
     const newCard = { cardNumber, expiry, cvv };
     setSavedCards([...savedCards, newCard]);
-    console.log('Card saved:', newCard);
+    console.log("Card saved:", newCard);
     setShowCardForm(false);
-    setCardNumber('');
-    setExpiry('');
-    setCvv('');
+    setCardNumber("");
+    setExpiry("");
+    setCvv("");
   };
 
   const handleSaveBank = () => {
     const newBank = { bankName, accountNumber };
     setSavedBanks([...savedBanks, newBank]);
-    console.log('Bank account saved:', newBank);
+    console.log("Bank account saved:", newBank);
     setShowBankForm(false);
-    setBankName('');
-    setAccountNumber('');
+    setBankName("");
+    setAccountNumber("");
   };
 
   const handleDeleteCard = (index) => {
@@ -84,14 +84,10 @@ export default function Payment() {
   return (
     <div className="flex gap-6">
       <div className="w-2/3">
-        <div className="h-4"></div>
-        <div className="h-4"></div>
         <h1 className="font-bold text-lg text-left">Banks and Cards</h1>
-        <div className="h-4"></div>
-        <div className="h-4"></div>
-        <div className="border-t border-gray-300"></div>
-        <div className="h-4"></div>
-        <div className="h-4"></div>
+        <div className="border-t border-gray-300 my-4"></div>
+
+        {/* Card Section */}
         <div className="flex items-center">
           <label className="text-md font-medium text-left flex-grow">Credit/Debit Card</label>
           <button
@@ -150,39 +146,36 @@ export default function Payment() {
           </div>
         )}
 
-        {/* Display saved cards or a message */}
+        {/* Saved Cards */}
         <div className="mt-6">
           {savedCards.length > 0 ? (
-            <div>
-              <h3 className="font-medium text-md">Saved Credit/Debit Cards:</h3>
-              <ul className="mt-2">
-                {savedCards.map((card, index) => (
-                  <li key={index} className="flex justify-between items-center text-sm">
-                    <span>{card.cardNumber} (Exp: {card.expiry})</span>
-                    <div className="flex gap-2">
-                      <button
-                        className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600"
-                        onClick={() => handleEditCard(index)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
-                        onClick={() => handleDeleteCard(index)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ul className="mt-2">
+              {savedCards.map((card, index) => (
+                <li key={index} className="flex justify-between items-center text-sm">
+                  <span>{card.cardNumber} (Exp: {card.expiry})</span>
+                  <div className="flex gap-2">
+                    <button
+                      className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600"
+                      onClick={() => handleEditCard(index)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
+                      onClick={() => handleDeleteCard(index)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <p className="text-sm text-gray-600">You don't have cards yet.</p>
+            <p className="text-sm text-gray-600">You don&apos;t have cards yet.</p>
           )}
         </div>
 
-        {/* Add bank account section */}
+        {/* Bank Section */}
         <div className="mt-6">
           <div className="flex items-center">
             <label className="text-md font-medium text-left flex-grow">My Bank Accounts</label>
@@ -194,6 +187,7 @@ export default function Payment() {
             </button>
           </div>
 
+          {/* Add Bank Form */}
           {showBankForm && (
             <div className="mt-4">
               <div>
@@ -233,35 +227,32 @@ export default function Payment() {
             </div>
           )}
 
-          {/* Display saved bank accounts or a message */}
+          {/* Saved Banks */}
           <div className="mt-6">
             {savedBanks.length > 0 ? (
-              <div>
-                <h3 className="font-medium text-md">Saved Bank Accounts:</h3>
-                <ul className="mt-2">
-                  {savedBanks.map((bank, index) => (
-                    <li key={index} className="flex justify-between items-center text-sm">
-                      <span>{bank.bankName} (Account: {bank.accountNumber})</span>
-                      <div className="flex gap-2">
-                        <button
-                          className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600"
-                          onClick={() => handleEditBank(index)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
-                          onClick={() => handleDeleteBank(index)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="mt-2">
+                {savedBanks.map((bank, index) => (
+                  <li key={index} className="flex justify-between items-center text-sm">
+                    <span>{bank.bankName} (Account: {bank.accountNumber})</span>
+                    <div className="flex gap-2">
+                      <button
+                        className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600"
+                        onClick={() => handleEditBank(index)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
+                        onClick={() => handleDeleteBank(index)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             ) : (
-              <p className="text-sm text-gray-600">You don't have bank accounts yet.</p>
+              <p className="text-sm text-gray-600">You don&apos;t have bank accounts yet.</p>
             )}
           </div>
         </div>
