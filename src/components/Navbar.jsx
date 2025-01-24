@@ -203,13 +203,15 @@ export default function Navbar() {
             height={18}
             className="object-contain cursor-pointer"
           />
-          <Image
-            src="/navbar/User.png"
-            alt="User"
-            width={18}
-            height={18}
-            className="object-contain cursor-pointer"
-          />
+          <Link href="/user/account/profile">
+            <Image
+              src="/navbar/User.png"
+              alt="User"
+              width={18}
+              height={18}
+              className="object-contain cursor-pointer"
+            />
+          </Link>
         </div>
       </div>
 
