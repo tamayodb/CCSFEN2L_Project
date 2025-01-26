@@ -2,10 +2,10 @@ import React from "react";
 
 export default function DeliveryAddress({ name, contactNumber, address }) {
   return (
-    <div className="border border-gray-300 rounded-lg shadow-md p-4 flex items-center justify-between bg-white">
+    <div className="border border-gray-300 rounded-lg shadow-md p-4 flex items-center justify-between bg-white px-8">
       <div>
         {/* Header */}
-        <div className="text-md text-gray-500 font-medium mb-2">
+        <div className="text-sm text-gray-500 font-medium mb-2 tracking-widest">
           Delivery Address
         </div>
 
