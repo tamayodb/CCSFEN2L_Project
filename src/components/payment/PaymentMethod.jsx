@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";  // Importing Image component
 
 const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
-  // Calculate total product price, safely handling undefined or empty products array
   const totalProductPrice = products.reduce((total, product) => total + (product.price * product.qty), 0);
   const finalPrice = totalProductPrice + shippingFee;
 
@@ -78,9 +78,11 @@ const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
                   onChange={() => handleWalletSelection(wallet.id)}
                   className="form-radio text-blue-500"
                 />
-                <img
+                <Image
                   src={wallet.logo}
                   alt={`${wallet.label} Logo`}
+                  width={32}  // Adjust the width and height as needed
+                  height={32}
                   className="h-8 w-8"
                 />
                 <span className="font-medium">{wallet.label}</span>
@@ -105,7 +107,7 @@ const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
               <option value="UnionBank">UnionBank</option>
             </select>
             <p className="text-sm">
-              Once you confirm, you'll be redirected to your bank's website to
+              Once you confirm, you&apos;ll be redirected to your bank&apos;s website to
               complete the payment.
             </p>
           </div>
