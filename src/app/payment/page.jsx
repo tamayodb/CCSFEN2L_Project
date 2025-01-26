@@ -9,7 +9,7 @@ import ProductOrderComponent from "@/components/payment/ProdOrderComponent";
 export default function Payment() {
   const [products] = useState([
     { id: 1, itemName: "Logitech G915 X", qty: 1, price: 53795, image: "/homepage/product_sample.webp" },
-    { id: 2, itemName: "Razer DeathAdder", qty: 1, price: 7495, image: "/homepage/product_sample.webp" },
+    { id: 2, itemName: "Razer DeathAdder", qty: 1, price: 27495, image: "/homepage/product_sample.webp" },
     { id: 3, itemName: "SteelSeries Headset", qty: 1, price: 14995, image: "/homepage/product_sample.webp" },
   ]);
 
