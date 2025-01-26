@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from "react";
 
-const PaymentComponent = ({ productPrice }) => {
-  const shippingFee = 40; // Fixed shipping fee
-  const totalPrice = productPrice + shippingFee;
+const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
+  // Calculate total product price, safely handling undefined or empty products array
+  const totalProductPrice = products.reduce((total, product) => total + (product.price * product.qty), 0);
+  const totalPrice = totalProductPrice + shippingFee;
 
   const [activeTab, setActiveTab] = useState("COD");
   const [selectedWallet, setSelectedWallet] = useState("");
@@ -33,9 +34,7 @@ const PaymentComponent = ({ productPrice }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "COD":
-        return (
-          <p className="text-sm">You will pay the courier upon delivery.</p>
-        );
+        return <p className="text-sm">You will pay the courier upon delivery.</p>;
       case "Credit/Debit Card":
         return (
           <div className="space-y-4">
@@ -133,10 +132,9 @@ const PaymentComponent = ({ productPrice }) => {
           <button
             key={tab}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap 
-              ${
-                activeTab === tab
-                  ? "bg-[#F4D35E] text-black"
-                  : "bg-white text-gray-500 border border-[#F4D35E] hover:bg-gray-100"
+              ${activeTab === tab
+                ? "bg-[#F4D35E] text-black"
+                : "bg-white text-gray-500 border border-[#F4D35E] hover:bg-gray-100"
               }`}
             onClick={() => handleTabClick(tab)}
           >
@@ -148,41 +146,28 @@ const PaymentComponent = ({ productPrice }) => {
       <div className="mt-4">{renderTabContent()}</div>
       <div className="w-full h-[2px] bg-[#F4D35E] my-6"></div>
 
-      {/* Payment Summary with Horizontal Containers */}
+      {/* Payment Summary */}
       <div className="mt-6 flex justify-between items-start">
-        {/* Left Container (Empty or Placeholder) */}
         <div className="w-1/3"></div>
-
-        {/* Middle Container (Empty for Spacing or Future Use) */}
         <div className="w-1/3"></div>
-
-        {/* Right Container (Payment Details) */}
         <div className="w-1/3 space-y-4 text-right">
           <div className="flex justify-between items-center">
             <div className="text-sm">Product Subtotal:</div>
-            <div className="text-sm font-semibold">
-              ₱{productPrice.toFixed(2)}
-            </div>
+            <div className="text-sm font-semibold">₱{totalProductPrice.toFixed(2)}</div>
           </div>
           <div className="flex justify-between items-center">
             <div className="text-sm">Shipping Subtotal:</div>
-            <div className="text-sm font-semibold">
-              ₱{shippingFee.toFixed(2)}
-            </div>
+            <div className="text-sm font-semibold">₱{shippingFee.toFixed(2)}</div>
           </div>
           <div className="flex justify-between items-center">
-            <div className="text-lg font-semibold text-green-500">
-              Total Payment:
-            </div>
-            <div className="text-lg font-semibold text-green-500">
-              ₱{totalPrice.toFixed(2)}
-            </div>
+            <div className="text-lg font-semibold text-[#0D3B66]">Total Payment:</div>
+            <div className="text-lg font-semibold text-[#0D3B66]">₱{totalPrice.toFixed(2)}</div>
           </div>
         </div>
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button className="py-3 px-8 bg-[#F4D35E] text-black font-semibold rounded-lg shadow-md hover:bg-[#F1C232] transition duration-300 w-1/4">
+        <button className="py-3 px-8 bg-[#F4D35E] text-[#0D3B66] font-semibold rounded-lg shadow-md hover:bg-[#F1C232] transition duration-300 w-1/4">
           Place Order
         </button>
       </div>
