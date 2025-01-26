@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-const PaymentComponent = ({ products = [], shippingFee = 0, totalPrice }) => {
+const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
+  // Calculate total product price, safely handling undefined or empty products array
   const totalProductPrice = products.reduce((total, product) => total + (product.price * product.qty), 0);
   const finalPrice = totalProductPrice + shippingFee;
 
@@ -23,7 +24,7 @@ const PaymentComponent = ({ products = [], shippingFee = 0, totalPrice }) => {
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
-    setSelectedWallet("");
+    setSelectedWallet(""); // Reset selected wallet when switching tabs
   };
 
   const handleWalletSelection = (wallet) => {
@@ -34,7 +35,90 @@ const PaymentComponent = ({ products = [], shippingFee = 0, totalPrice }) => {
     switch (activeTab) {
       case "COD":
         return <p className="text-sm">You will pay the courier upon delivery.</p>;
-      // Add other cases for different payment methods
+      case "Credit/Debit Card":
+        return (
+          <div className="space-y-4">
+            <input
+              type="text"
+              placeholder="Card Number"
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+            <div className="flex space-x-4">
+              <input
+                type="text"
+                placeholder="Expiration Date (MM/YY)"
+                className="w-1/2 p-2 border border-gray-300 rounded-md"
+              />
+              <input
+                type="text"
+                placeholder="CVV"
+                className="w-1/2 p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <input
+              type="text"
+              placeholder="Cardholder Name"
+              className="w-full p-2 border border-gray-300 rounded-md"
+            />
+          </div>
+        );
+      case "Payment Center/E-Wallet":
+        return (
+          <div className="space-y-4">
+            {wallets.map((wallet) => (
+              <label
+                key={wallet.id}
+                className="flex items-center space-x-4 text-sm border border-gray-300 rounded-md p-2 hover:shadow-md cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="wallet"
+                  value={wallet.id}
+                  checked={selectedWallet === wallet.id}
+                  onChange={() => handleWalletSelection(wallet.id)}
+                  className="form-radio text-blue-500"
+                />
+                <img
+                  src={wallet.logo}
+                  alt={`${wallet.label} Logo`}
+                  className="h-8 w-8"
+                />
+                <span className="font-medium">{wallet.label}</span>
+              </label>
+            ))}
+            {selectedWallet && (
+              <p className="text-sm mt-2">
+                Selected Wallet:{" "}
+                <span className="font-semibold">{selectedWallet}</span>
+              </p>
+            )}
+          </div>
+        );
+      case "Online Banking":
+        return (
+          <div className="space-y-4">
+            <select className="w-full p-2 border border-gray-300 rounded-md">
+              <option value="">Select Your Bank</option>
+              <option value="BPI">BPI</option>
+              <option value="BDO">BDO</option>
+              <option value="Metrobank">Metrobank</option>
+              <option value="UnionBank">UnionBank</option>
+            </select>
+            <p className="text-sm">
+              Once you confirm, you'll be redirected to your bank's website to
+              complete the payment.
+            </p>
+          </div>
+        );
+      case "Linked Bank Account":
+        return (
+          <p className="text-xs">
+            No linked bank accounts found. Please link a bank account in your
+            profile settings to use this option.
+          </p>
+        );
+      default:
+        return null;
     }
   };
 
