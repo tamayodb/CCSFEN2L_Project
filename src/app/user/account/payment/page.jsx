@@ -171,11 +171,11 @@ export default function Payment() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-600">You don&apos;t have cards yet.</p>
+            <p className="text-sm text-gray-600">You don't have cards yet.</p>
           )}
         </div>
 
-        {/* Bank Section */}
+        {/* Add bank account section */}
         <div className="mt-6">
           <div className="flex items-center">
             <label className="text-md font-medium text-left flex-grow">My Bank Accounts</label>
@@ -252,7 +252,7 @@ export default function Payment() {
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-600">You don&apos;t have bank accounts yet.</p>
+              <p className="text-sm text-gray-600">You don't have bank accounts yet.</p>
             )}
           </div>
         </div>
