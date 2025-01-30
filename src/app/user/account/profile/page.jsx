@@ -7,8 +7,8 @@ export default function Profile() {
   const [emails, setEmails] = useState(['john.doe@example.com']);
   const [showPhone, setShowPhone] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
-  const [username, setUsername] = useState('john_doe');
-  const [name, setName] = useState('John Doe');
+  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
