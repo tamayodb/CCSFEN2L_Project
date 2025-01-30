@@ -171,7 +171,7 @@ export default function Payment() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-600">You don't have cards yet.</p>
+            <p className="text-sm text-gray-600">You do not have cards yet.</p>
           )}
         </div>
 
@@ -252,7 +252,7 @@ export default function Payment() {
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-600">You don't have bank accounts yet.</p>
+              <p className="text-sm text-gray-600">You do not have bank accounts yet.</p>
             )}
           </div>
         </div>
