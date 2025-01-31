@@ -129,30 +129,6 @@ const LoginPage = () => {
               Forgot Password?
             </a>
           </p>
-
-          {/* Social Login Buttons */}
-          <div className="mt-16 space-y-4">
-            <button
-              type="button"
-              className="w-full flex items-center justify-center bg-white text-black py-2 border rounded-md shadow-sm hover:bg-gray-100 transition-colors"
-              onClick={() => alert("Google login clicked!")}
-            >
-              <FcGoogle className="h-6 w-6 mr-2" />
-              <span className="text-xs leading-none text-gray-700">
-                Continue with Google
-              </span>
-            </button>
-            <button
-              type="button"
-              className="w-full flex items-center justify-center bg-white text-black py-2 border rounded-md shadow-sm hover:bg-gray-100 transition-colors"
-              onClick={() => alert("Facebook login clicked!")}
-            >
-              <FaFacebook className="h-6 w-6 mr-2 text-blue-600" />
-              <span className="text-xs leading-none text-gray-700">
-                Continue with Facebook
-              </span>
-            </button>
-          </div>
         </div>
       </div>
     </div>

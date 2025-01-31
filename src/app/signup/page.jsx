@@ -45,15 +45,6 @@ const SignupPage = () => {
             <span>account</span>
           </h2>
 
-          {/* 3rd source Button */}
-          <div className="flex space-x-3 justify-start mb-8">
-            {/* Google Button */}
-            <IconButton Icon={FcGoogle} color="#000" />
-
-            {/* Facebook Button */}
-            <IconButton Icon={FaFacebook} color="#4267B2" />
-          </div>
-
           <div className="mb-6">
             <h2>
               <span className="font-semibold text-lg">Sign up with email</span>
