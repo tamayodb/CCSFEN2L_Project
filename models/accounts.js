@@ -1,10 +1,17 @@
 import mongoose from "mongoose";
 
-const AccountSchema = new mongoose.Schema({
-    email: {type: String, required: true},
-    password: {type: String, required: true},
+const CustomerSchema = new mongoose.Schema({
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+  email: { type: String, required: false },
+  contact_num: { type: String, required: false },
+  street_num: { type: String, required: false },
+  barangay: { type: String, required: false },
+  city: { type: String, required: false },
+  zip_code: { type: Number, required: false },
 });
 
-const account = mongoose.models.accounts || mongoose.model("accounts", AccountSchema);
+const Customer =
+  mongoose.models.Customer || mongoose.model("Customer", CustomerSchema);
 
-export default account;
+export default Customer;
