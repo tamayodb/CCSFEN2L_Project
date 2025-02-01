@@ -1,5 +1,5 @@
-import connectToDatabase from "../../../../../lib/db";
-import Product from "@/models/product";
+import connectToDatabase from "../../../../../../lib/db";
+import Product from "../../../../../../models/product";
 import mongoose from "mongoose";
 
 export default async function handler(req, res) {

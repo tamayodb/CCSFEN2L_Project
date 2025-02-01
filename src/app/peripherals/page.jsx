@@ -8,7 +8,7 @@ export default function Peripherals() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch("/api/product"); // Fetch from your API route
+        const response = await fetch("/api/product/peripherals"); // Fetch from your API route
         const data = await response.json();
         setProducts(data);
       } catch (error) {

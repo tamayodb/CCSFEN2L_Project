@@ -1,8 +1,23 @@
-import React from 'react'
-import { collectibleProducts } from "@/utils/collectibles/constantsCollectibles";
+'use client'
+import React, { useEffect, useState } from 'react'
 import CollectiblesGrid from "@/components/collectibles/collectiblesGrid";
 
 export default function Collectibles() {
+    const [products, setProducts] = useState([]);
+  
+    useEffect(() => {
+      async function fetchProducts() {
+        try {
+          const response = await fetch("/api/product/collectibles"); // Fetch from your API route
+          const data = await response.json();
+          setProducts(data);
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        }
+      }
+  
+      fetchProducts();
+    }, []);
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto p-6">
@@ -38,7 +53,7 @@ export default function Collectibles() {
 
           {/* Games Grid */}
           <section className="col-span-3">
-            <CollectiblesGrid products = {collectibleProducts} />
+            <CollectiblesGrid products = {products} />
           </section>
         </div>
       </main>

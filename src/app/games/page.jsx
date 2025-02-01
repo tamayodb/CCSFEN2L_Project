@@ -1,8 +1,23 @@
-import React from 'react'
-import { gameProducts } from "@/utils/games/constantsGames";
+'use client'
+import React, { useState, useEffect } from 'react'
 import GamesGrid from "@/components/games/gamesGrid";
 
 export default function Games() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const response = await fetch("/api/product/games"); // Fetch from your API route
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    }
+
+    fetchProducts();
+  }, []);
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto p-6">
@@ -38,7 +53,7 @@ export default function Games() {
 
           {/* Games Grid */}
           <section className="col-span-3">
-            <GamesGrid products = {gameProducts} />
+            <GamesGrid products = {products} />
           </section>
         </div>
       </main>
