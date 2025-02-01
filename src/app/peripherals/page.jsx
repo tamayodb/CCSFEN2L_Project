@@ -1,8 +1,24 @@
-import React from 'react'
-import { peripheralProducts } from "@/utils/peripherals/constantsPeripherals";
+'use client'
+import React, { useEffect, useState } from "react";
 import PeripheralGrid from "@/components/peripherals/peripheralGrid";
 
 export default function Peripherals() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const response = await fetch("/api/product"); // Fetch from your API route
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    }
+
+    fetchProducts();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto p-6">
@@ -38,7 +54,7 @@ export default function Peripherals() {
 
           {/* Peripherals Grid */}
           <section className="col-span-3">
-            <PeripheralGrid products = {peripheralProducts} />
+            <PeripheralGrid products={products} /> {/* Pass fetched products */}
           </section>
         </div>
       </main>
