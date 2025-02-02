@@ -29,10 +29,15 @@ export default function Peripherals() {
             <div className="mb-4">
               <h3 className="font-medium">Category</h3>
               <ul className="space-y-2 mt-2">
-                <li><input type="checkbox" id="mouse" /> <label htmlFor="mouse">Mouse</label></li>
-                <li><input type="checkbox" id="keyboards" /> <label htmlFor="keyboards">Keyboards</label></li>
-                <li><input type="checkbox" id="controllers" /> <label htmlFor="controllers">Joystick & Game Controllers</label></li>
-                <li><input type="checkbox" id="headphones" /> <label htmlFor="headphones">Headphones & Speakers</label></li>
+                <li><input type="checkbox" id="Mouse" /> <label htmlFor="Mouse">Mouse</label></li>
+                <li><input type="checkbox" id="Keyboard" /> <label htmlFor="Keyboard">Keyboards</label></li>
+                <li><input type="checkbox" id="Headset" /> <label htmlFor="Headset">Headsets</label></li>
+                <li><input type="checkbox" id="Microphone" /> <label htmlFor="Microphone">Microphones</label></li>
+                <li><input type="checkbox" id="Webcam" /> <label htmlFor="Webcam">Webcams</label></li>
+                <li><input type="checkbox" id="Mouse Pad" /> <label htmlFor="Mouse Pad">Gamepads</label></li>
+                <li><input type="checkbox" id="Gaming Chairs" /> <label htmlFor="Gaming Chairs">Gaming Chairs</label></li>
+                <li><input type="checkbox" id="Speaker" /> <label htmlFor="Speaker">Speaker</label></li>
+                <li><input type="checkbox" id="Monitor" /> <label htmlFor="Monitor">Monitor</label></li>
               </ul>
             </div>
             <div className="mb-4">

@@ -26,12 +26,29 @@ export default function Games() {
           <aside className="col-span-1 bg-white p-4 shadow-md rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Filters</h2>
             <div className="mb-4">
-              <h3 className="font-medium">Category</h3>
+              <h3 className="font-medium">Platform</h3>
               <ul className="space-y-2 mt-2">
-                <li><input type="checkbox" id="xbox" /> <label htmlFor="xbox">Xbox</label></li>
-                <li><input type="checkbox" id="ps5" /> <label htmlFor="ps5">PS5</label></li>
-                <li><input type="checkbox" id="pc_android" /> <label htmlFor="pc_android">PC & Android</label></li>
-                <li><input type="checkbox" id="nintendo" /> <label htmlFor="nintendo">Nintendo Switch</label></li>
+                <li><input type="checkbox" id="XBOX" /> <label htmlFor="XBOX">XBOX</label></li>
+                <li><input type="checkbox" id="PlayStation" /> <label htmlFor="PlayStation">PlayStation</label></li>
+                <li><input type="checkbox" id="PC/Android" /> <label htmlFor="PC/Android">PC/Android</label></li>
+                <li><input type="checkbox" id="Nintendo Switch" /> <label htmlFor="Nintendo Switch">Nintendo Switch</label></li>
+              </ul>
+            </div>
+            <div className="mb-4">
+              <h3 className="font-medium">Categories</h3>
+              <ul className="space-y-2 mt-2">
+                <li><input type="checkbox" id="Action" /> <label htmlFor="Action">Action</label></li>
+                <li><input type="checkbox" id="Adventure" /> <label htmlFor="Adventure">Adventure</label></li>
+                <li><input type="checkbox" id="Casual" /> <label htmlFor="Casual">Casual</label></li>
+                <li><input type="checkbox" id="Fighting" /> <label htmlFor="Fighting">Fighting</label></li>
+                <li><input type="checkbox" id="Puzzle" /> <label htmlFor="Puzzle">Puzzle</label></li>
+                <li><input type="checkbox" id="Rhythm" /> <label htmlFor="Rhythm">Rhythm</label></li>
+                <li><input type="checkbox" id="Racing" /> <label htmlFor="Racing">Racing</label></li>
+                <li><input type="checkbox" id="Sports" /> <label htmlFor="Sports">Sports</label></li>
+                <li><input type="checkbox" id="Simulation" /> <label htmlFor="Simulation">Simulation</label></li>
+                <li><input type="checkbox" id="Shooter" /> <label htmlFor="Shooter">Shooter</label></li>
+                <li><input type="checkbox" id="Sci-Fi" /> <label htmlFor="Sci-Fi">Sci-Fi</label></li>
+                <li><input type="checkbox" id="Role-Playing" /> <label htmlFor="Role-Playing">Role-Playing</label></li>
               </ul>
             </div>
             <div className="mb-4">

@@ -28,10 +28,12 @@ export default function Collectibles() {
             <div className="mb-4">
               <h3 className="font-medium">Category</h3>
               <ul className="space-y-2 mt-2">
-                <li><input type="checkbox" id="figures" /> <label htmlFor="figures">Action Figures</label></li>
-                <li><input type="checkbox" id="cards" /> <label htmlFor="cards">Trading Cards</label></li>
-                <li><input type="checkbox" id="badge" /> <label htmlFor="badge">Badge</label></li>
-                <li><input type="checkbox" id="funko" /> <label htmlFor="funko">Funko Pops</label></li>
+                <li><input type="checkbox" id="Action Figures" /> <label htmlFor="Action Figure">Action Figures</label></li>
+                <li><input type="checkbox" id="Amiibo" /> <label htmlFor="Amiibo">Amiibo</label></li>
+                <li><input type="checkbox" id="Badges" /> <label htmlFor="Badges">Badges</label></li>
+                <li><input type="checkbox" id="Rubber Straps" /> <label htmlFor="Rubber Straps">Rubber Straps</label></li>
+                <li><input type="checkbox" id="Cards" /> <label htmlFor="Cards">Cards</label></li>
+                <li><input type="checkbox" id="Plush" /> <label htmlFor="Plush">Plush</label></li>
               </ul>
             </div>
             <div className="mb-4">
