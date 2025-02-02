@@ -15,12 +15,7 @@ const LeftNavigationBar = () => {
           <Link href="/user/account/payment" className="block p-2 hover:bg-gray-200 rounded">
             Payment
           </Link>
-        </li>
-        <li>
-          <Link href="/user/account/address" className="block p-2 hover:bg-gray-200 rounded">
-            Address
-          </Link>
-        </li>
+        </li>        
         <li>
           <Link href="/user/account/changepassword" className="block p-2 hover:bg-gray-200 rounded">
             Change Password
