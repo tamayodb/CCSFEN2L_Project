@@ -10,7 +10,7 @@ export async function GET(req, context) {
 
         const formattedCategory = category.charAt(0).toUpperCase() + category.slice(1);
     
-        const products = await Product.find({ tags: formattedCategory });
+        const products = await Product.find({ "tag.type": formattedCategory });
         if (products.length === 0) {
           console.warn("⚠️ No ${formattedCategory} found in the database.");
         } else {

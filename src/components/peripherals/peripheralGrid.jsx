@@ -19,7 +19,7 @@ const PeripheralGrid = ({ products }) => {
               key={product._id} // Use _id as the unique key
               name={product.productName} // Match MongoDB field
               price={product.price}
-              image={product.photo} // Ensure this is a valid URL or file path
+              image={product.photo[0]} // Ensure this is a valid URL or file path
               slug={product._id} // Use ObjectID for navigation
             />
           ))
