@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from 'react';
-import { UserCircle, Plus, Edit2 } from 'lucide-react';
 
 export default function Profile() {
-  const [emails, setEmails] = useState(['john.doe@example.com']);
+  const [email, setEmail] = useState('');
   const [showPhone, setShowPhone] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
   const [username, setUsername] = useState('');
@@ -14,25 +13,28 @@ export default function Profile() {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
-  const [isEditing, setIsEditing] = useState(false); // Added isEditing state
+  const [isEditing, setIsEditing] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false); 
-  const [isEditingGender, setIsEditingGender] = useState(false); 
-  const [isEditingDOB, setIsEditingDOB] = useState(false)
-
-  const [isEditingEmails, setIsEditingEmails] = useState(
-    Array(emails.length).fill(false)
-  );
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingGender, setIsEditingGender] = useState(false);
+  const [isEditingDOB, setIsEditingDOB] = useState(false);
+  const [barangay, setBarangay] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [isEditingBarangay, setIsEditingBarangay] = useState(false);
+  const [isEditingCity, setIsEditingCity] = useState(false);
+  const [isEditingStreet, setIsEditingStreet] = useState(false);
+  const [isEditingZipCode, setIsEditingZipCode] = useState(false);
 
   const isLeapYear = (year) => {
     return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
   };
 
-  // Generate year options from 1900 to current year
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i);
   
-  // Generate months
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -40,15 +42,14 @@ export default function Profile() {
 
   const getDaysInMonth = (month, year) => {
     if (month === 2) {
-      return isLeapYear(year) ? 29 : 28; // February logic
+      return isLeapYear(year) ? 29 : 28;
     }
-    const monthsWith31Days = [1, 3, 5, 7, 8, 10, 12]; // January, March, May, July, August, October, December
+    const monthsWith31Days = [1, 3, 5, 7, 8, 10, 12];
     return monthsWith31Days.includes(month) ? 31 : 30;
   };
   
   const [days, setDays] = useState([]);
 
-  // Function to handle email edit/save
   const handleEmailEditToggle = (index) => {
     const newEditingState = [...isEditingEmails];
     newEditingState[index] = !newEditingState[index];
@@ -91,49 +92,46 @@ export default function Profile() {
   const handleSubmit = () => {
     const missingFields = [];
   
-    // Check for required fields
     if (!username) missingFields.push("Username");
     if (!name) missingFields.push("Name");
-    if (emails.length === 0 || !emails.some(email => email)) missingFields.push("Email Addresses");
+    if (!email) missingFields.push("Email Address");
+    if (!barangay) missingFields.push("Barangay");
+    if (!street) missingFields.push("Street");
+    if (!city) missingFields.push("City");
+    if (!zipCode) missingFields.push("ZIP Code");
     if (!selectedMonth || !selectedDay || !selectedYear) missingFields.push("Date of Birth");
-    
-    // You can also add checks for gender and phone, based on your requirements
     if (!selectedGender) missingFields.push("Gender");
     if (!showPhone && !isEditing) missingFields.push("Phone Number");
   
-    // If there are missing fields, show an alert
     if (missingFields.length > 0) {
       alert(`Please fill in the following fields: ${missingFields.join(", ")}`);
     } else {
-      handleSaveToFile(); // Proceed with file saving if no fields are missing
+      handleSaveToFile();
     }
   };
 
-   // Function to save form data to a .txt file
-   const handleSaveToFile = () => {
-    // Prepare the text content from form data
+  const handleSaveToFile = () => {
     const fileContent = `
       Username: ${username}
       Name: ${name}
-      Email Addresses: ${emails.join(', ')}
+      Email Address: ${email}
+      Billing Address:
+        Barangay: ${barangay}
+        Street: ${street}
+        City: ${city}
+        ZIP Code: ${zipCode}
       Phone: ${showPhone ? phone : "Hidden"}
     `;
-
-    // Create a Blob with the content
+  
     const blob = new Blob([fileContent], { type: 'text/plain' });
-
-    // Create an anchor tag to trigger download
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'profile_data.txt'; // Filename for download
-
-    // Trigger the download by simulating a click
+    link.download = 'profile_data.txt';
     link.click();
   };
 
   return (
     <div className="flex gap-6">
-      {/* Left section - Forms (2/3) */}
       <div className="w-2/3">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="space-y-4">
@@ -141,7 +139,6 @@ export default function Profile() {
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 Username
               </label>
-              {/* Conditional rendering: label or input field */}
               <div className="flex items-center gap-2">
                 {isEditingUsername ? (
                   <input
@@ -156,15 +153,12 @@ export default function Profile() {
                   <span className="w-full p-2">{username}</span>
                 )}
                 
-                {/* Edit/Save Button */}
                 <button
                   type="button"
                   onClick={() => {
                     if (isEditing) {
-                      // Save the new username and revert to label
                       setIsEditingUsername(false);
                     } else {
-                      // Switch to edit mode
                       setIsEditingUsername(true);
                     }
                   }}
@@ -179,9 +173,7 @@ export default function Profile() {
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Name
               </label>
-              {/* Flex container to align the name input/label and button */}
               <div className="flex items-center gap-2">
-                {/* Conditional rendering: label or input field */}
                 {isEditingName ? (
                   <input
                     type="text"
@@ -195,15 +187,12 @@ export default function Profile() {
                   <span className="w-full p-2">{name}</span>
                 )}
 
-                {/* Edit/Save Button for Name */}
                 <button
                   type="button"
                   onClick={() => {
                     if (isEditingName) {
-                      // Save the new name and revert to label
                       setIsEditingName(false);
                     } else {
-                      // Switch to edit mode
                       setIsEditingName(true);
                     }
                   }}
@@ -214,72 +203,150 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Email section with Add button */}
             <div className="space-y-2">
-              <label htmlFor="emails" className="block text-sm font-medium text-gray-700">
-                Email Addresses
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email Address
               </label>
-              {emails.map((email, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  {/* Conditional rendering for each email: input or label */}
-                  {isEditingEmails[index] ? (
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => {
-                        const newEmails = [...emails];
-                        newEmails[index] = e.target.value;
-                        setEmails(newEmails);
-                      }}
-                      className="w-full p-2  border rounded-md"
-                      placeholder="Enter email address"
-                    />
-                  ) : (
-                    <span className="w-full p-2 ">{email}</span>
-                  )}
+              <div className="flex items-center gap-2">
+                {isEditingEmail ? (
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                    placeholder="Enter email address"
+                  />
+                ) : (
+                  <span className="w-full p-2">{email}</span>
+                )}
 
-                  {/* Edit/Save Button for each email */}
-                  <button
-                    type="button"
-                    onClick={() => handleEmailEditToggle(index)}
-                    className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
-                  >
-                    {isEditingEmails[index] ? 'Save' : 'Edit'}
-                  </button>
-                  {/* Delete Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newEmails = emails.filter((_, i) => i !== index); // Remove email at the specified index
-                      setEmails(newEmails); // Update the state with the new list
-                    }}
-                    className="px-3 py-1 text-sm border rounded-md text-red-600 hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-
-              {/* Add Email Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setEmails([...emails, '']); // Add an empty email to the emails list
-                  setIsEditingEmails([...isEditingEmails, true]); // Set the new email to be in editable state
-                }}
-                className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
-              >
-                <Plus className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap" /> Add Email
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingEmail(!isEditingEmail)}
+                  className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                >
+                  {isEditingEmail ? 'Save' : 'Edit'}
+                </button>
+              </div>
             </div>  
-
-            {/* Phone number with masked digits */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Billing Address
+              </label>
+              <div className="flex gap-4">
+                <div className="w-1/2 space-y-2">
+                  <label htmlFor="barangay" className="block text-sm font-medium text-gray-700">
+                    Barangay
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {isEditingBarangay ? (
+                      <input
+                        type="text"
+                        id="barangay"
+                        value={barangay}
+                        onChange={(e) => setBarangay(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Enter barangay"
+                      />
+                    ) : (
+                      <span className="w-full p-2">{barangay || " "}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingBarangay(!isEditingBarangay)}
+                      className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                    >
+                      {isEditingBarangay ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                </div>
+                <div className="w-1/2 space-y-2">
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                    City
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {isEditingCity ? (
+                      <input
+                        type="text"
+                        id="city"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Enter city"
+                      />
+                    ) : (
+                      <span className="w-full p-2">{city || " "}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingCity(!isEditingCity)}
+                      className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                    >
+                      {isEditingCity ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-1/2 space-y-2">
+                  <label htmlFor="street" className="block text-sm font-medium text-gray-700">
+                    Street
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {isEditingStreet ? (
+                      <input
+                        type="text"
+                        id="street"
+                        value={street}
+                        onChange={(e) => setStreet(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Enter street"
+                      />
+                    ) : (
+                      <span className="w-full p-2">{street || " "}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingStreet(!isEditingStreet)}
+                      className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                    >
+                      {isEditingStreet ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                </div>
+                <div className="w-1/2 space-y-2">
+                  <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+                    ZIP Code
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {isEditingZipCode ? (
+                      <input
+                        type="text"
+                        id="zipCode"
+                        value={zipCode}
+                        onChange={(e) => setZipCode(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Enter ZIP code"
+                      />
+                    ) : (
+                      <span className="w-full p-2">{zipCode || " "}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingZipCode(!isEditingZipCode)}
+                      className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                    >
+                      {isEditingZipCode ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>  
             <div className="space-y-2">
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
                 Phone Number
               </label>
               <div className="flex gap-2 items-center">
-                {/* If isEditing is true, show the input field */}
                 {isEditing ? (
                   <input
                     type="text"
@@ -289,23 +356,19 @@ export default function Profile() {
                     className="w-full p-2 border rounded-md"
                   />
                 ) : (
-                  // Else, show the label with censored or None
-                  <span className="w-full p-2 ">
-                    {showPhone ? "None" : `********${phone.slice(-2)}`}
+                  <span className="w-full p-2">
+                    {phone ? (showPhone ? phone : `********${phone.slice(-2)}`) : " "}
                   </span>
                 )}
 
-                {/* Edit/Save Button */}
                 <button
                   type="button"
                   onClick={() => {
                     if (isEditing) {
-                      // Save phone number, revert to label and censor
                       setIsEditing(false);
-                      setPhone(phone); // Update phone to be saved
-                      setShowPhone(false); // Ensure phone is hidden after saving
+                      setPhone(phone);
+                      setShowPhone(false);
                     } else {
-                      // Switch to edit mode
                       setIsEditing(true);
                     }
                   }}
@@ -314,7 +377,6 @@ export default function Profile() {
                   {isEditing ? 'Save' : 'Edit'}
                 </button>
 
-                {/* Show/Hide Button */}
                 {!isEditing && (
                   <button
                     type="button"
@@ -327,12 +389,10 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Gender selection */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 Gender
               </label>
-              {/* Conditional rendering for Gender: dropdown or label */}
               <div className="flex items-center gap-2">
                 {isEditingGender ? (
                   <select
@@ -345,17 +405,16 @@ export default function Profile() {
                     <option value="Other">Other</option>
                   </select>
                 ) : (
-                  <span className="w-full p-2">{selectedGender || "Not selected"}</span>
+                  <span className="w-full p-2">{selectedGender || " "}</span>
                 )}
 
-                {/* Edit/Save Button */}
                 <button
                   type="button"
                   onClick={() => {
                     if (isEditingGender) {
-                      setIsEditingGender(false); // Save the selected gender and revert to label
+                      setIsEditingGender(false);
                     } else {
-                      setIsEditingGender(true); // Switch to edit mode
+                      setIsEditingGender(true);
                     }
                   }}
                   className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
@@ -365,7 +424,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Date of Birth dropdowns */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 Date of Birth
@@ -416,7 +474,7 @@ export default function Profile() {
                   <span className="w-full p-2">
                     {selectedMonth && selectedDay && selectedYear
                       ? `${months[selectedMonth - 1]} ${selectedDay}, ${selectedYear}`
-                      : "None"}
+                      : " "}
                   </span>
                 )}
 
@@ -424,9 +482,9 @@ export default function Profile() {
                   type="button"
                   onClick={() => {
                     if (isEditingDOB) {
-                      setIsEditingDOB(false); // Save the selected date and revert to label
+                      setIsEditingDOB(false);
                     } else {
-                      setIsEditingDOB(true); // Switch to edit mode
+                      setIsEditingDOB(true);
                     }
                   }}
                   className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
@@ -436,11 +494,10 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Submit Button */}
             <div>
               <button
                 type="button"
-                onClick={handleSubmit} // Use handleSubmit to validate before saving
+                onClick={handleSubmit}
                 className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
               >
                 Submit Profile
@@ -458,7 +515,10 @@ export default function Profile() {
               {imagePreview ? (
                 <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <UserCircle className="w-32 h-32 text-gray-400" />
+                /* User Circle Icon using Tailwind SVG */
+                <svg className="w-32 h-32 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
               )}
             </div>
             
