@@ -50,6 +50,4 @@ NEXT_PUBLIC_API_BASE_URL=your_api_base_url
 vercel deploy
 ```
 
----
-This README provides a concise overview of **Loop**. Modify as needed! 🚀
 
