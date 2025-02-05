@@ -7,7 +7,7 @@ export default function Peripherals() {
   const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products
   const [filters, setFilters] = useState({
     category: [],
-    price: 8999,
+    price: 100000,
     ratings: [],
   });
 
@@ -93,6 +93,7 @@ export default function Peripherals() {
                   "Headset",
                   "Microphone",
                   "Webcam",
+                  "Laptop",
                   "Mouse Pad",
                   "Gaming Chairs",
                   "Speaker",
@@ -116,7 +117,7 @@ export default function Peripherals() {
               <input
                 type="range"
                 min="30"
-                max="8999"
+                max="100000"
                 value={filters.price}
                 onChange={handlePriceChange}
                 className="w-full mt-2"
