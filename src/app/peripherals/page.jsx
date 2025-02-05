@@ -122,7 +122,7 @@ export default function Peripherals() {
                 onChange={handlePriceChange}
                 className="w-full mt-2"
               />
-              <p>Up to: ${filters.price}</p>
+              <p>Up to: ₱{filters.price}</p>
             </div>
 
             {/* Ratings Filter */}
