@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios"; // Import Axios
 import ProductCard from "./CardWithDetails";
 
 const NewArrivals = () => {
@@ -13,18 +14,14 @@ const NewArrivals = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("/api/homepage");
+        const response = await axios.get("/api/homepage/newArrivals"); // Axios GET request
 
-        console.log("API Response:", response);
+        console.log("Fetched Data:", response.data); // Log the fetched data
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setProducts(data);
+        // Set the response data to the state
+        setProducts(response.data);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching products:", error.message); // Log error message
       }
     };
 
