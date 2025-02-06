@@ -5,60 +5,82 @@ import React, { useState } from 'react';
 const orders = [
   {
     id: '12345',
-    date: '2023-10-01',
+    order_date: '2023-10-01',
     status: 'To Ship',
-    total: '$150.00',
+    totalAmount: '₱150.00',
+    address: '123 Main St, City, Country',
+    paymentMode: 'Credit Card',
     items: [
-      { product: 'Product A', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$50.00', brand: 'Brand A' },
-      { product: 'Product B', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$50.00', brand: 'Brand B' },
-      { product: 'Product H', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$50.00', brand: 'Brand H' },
+      { product: 'Product A', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand A' },
+      { product: 'Product B', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand B' },
+      { product: 'Product H', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand H' },
     ],
   },
   {
     id: '12346',
-    date: '2023-10-02',
-    status: 'To Pay',
-    total: '$200.00',
+    order_date: '2023-10-02',
+    status: 'To Ship',
+    totalAmount: '₱200.00',
+    address: '456 Another St, City, Country',
+    paymentMode: 'PayPal',
     items: [
-      { product: 'Product C', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$100.00', brand: 'Brand C' },
-      { product: 'Product I', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$100.00', brand: 'Brand I' },
+      { product: 'Product C', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱100.00', brand: 'Brand C', amount: 2 },
+      { product: 'Product I', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱100.00', brand: 'Brand I', amount: 1 },
     ],
   },
   {
     id: '12347',
-    date: '2023-10-03',
+    order_date: '2023-10-03',
     status: 'Completed',
-    total: '$100.00',
+    totalAmount: '₱100.00',
+    address: '789 Some St, City, Country',
+    paymentMode: 'Bank Transfer',
     items: [
-      { product: 'Product D', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$50.00', brand: 'Brand D' },
-      { product: 'Product E', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$50.00', brand: 'Brand E' },
-      { product: 'Product J', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$50.00', brand: 'Brand J' },
+      { product: 'Product D', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand D' },
+      { product: 'Product E', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand E' },
+      { product: 'Product J', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand J' },
     ],
   },
   {
     id: '12348',
-    date: '2023-10-04',
+    order_date: '2023-10-04',
     status: 'Cancelled',
-    total: '$50.00',
+    totalAmount: '₱50.00',
+    address: '101 Another St, City, Country',
+    paymentMode: 'Cash on Delivery',
     items: [
-      { product: 'Product F', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$25.00', brand: 'Brand F' },
-      { product: 'Product K', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$25.00', brand: 'Brand K' },
+      { product: 'Product F', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱25.00', brand: 'Brand F' },
+      { product: 'Product K', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱25.00', brand: 'Brand K' },
     ],
   },
   {
     id: '12349',
-    date: '2023-10-05',
-    status: 'Return/Refund',
-    total: '$75.00',
+    order_date: '2023-10-05',
+    status: 'Cancelled',
+    totalAmount: '₱75.00',
+    address: '202 Another St, City, Country',
+    paymentMode: 'Credit Card',
     items: [
-      { product: 'Product G', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$37.50', brand: 'Brand G' },
-      { product: 'Product L', imageUrl: '/homepage/amiibo_samplepic.webp', price: '$37.50', brand: 'Brand L' },
+      { product: 'Product G', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱37.50', brand: 'Brand G' },
+      { product: 'Product L', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱37.50', brand: 'Brand L' },
+    ],
+  },
+  {
+    id: '12350',
+    order_date: '2023-10-06',
+    status: 'To Receive',
+    totalAmount: '₱120.00',
+    address: '303 Another St, City, Country',
+    paymentMode: 'PayPal',
+    items: [
+      { product: 'Product M', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱60.00', brand: 'Brand M' },
+      { product: 'Product N', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱60.00', brand: 'Brand N' },
     ],
   },
   // Add more orders as needed
 ];
 
-const tabs = ['All', 'To Pay', 'To Ship', 'To Receive', 'Completed', 'Cancelled', 'Return/Refund'];
+const tabs = ['All', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState('All');
@@ -68,6 +90,7 @@ export default function Page() {
   const [isRating, setIsRating] = useState(false);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
+  const [orderList, setOrderList] = useState(orders);
 
   const toggleExpandOrder = (orderId) => {
     setExpandedOrders((prev) => ({
@@ -88,7 +111,15 @@ export default function Page() {
     setReview('');
   };
 
-  const filteredOrders = orders.filter(order => {
+  const cancelOrder = (orderId) => {
+    setOrderList((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId ? { ...order, status: 'Cancelled' } : order
+      )
+    );
+  };
+
+  const filteredOrders = orderList.filter(order => {
     const matchesStatus = activeTab === 'All' || order.status === activeTab;
     const matchesSearch = order.items.some(item => item.product.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesStatus && matchesSearch;
@@ -174,14 +205,17 @@ export default function Page() {
               <div key={order.id} className="border rounded-lg p-4 bg-white shadow">
                 <h2 className="text-lg font-bold mb-2">Order ID: {order.id}</h2>
                 <div className="text-sm text-gray-600 mb-2">
-                  <p>Date: {order.date}</p>
+                  <p>Order Date: {order.order_date}</p>
                   <p>Status: {order.status}</p>
-                  <p>Total: {order.total}</p>
+                  <p>Total: {order.totalAmount}</p>
+                  <p>Address: {order.address}</p>
+                  <p>Payment Mode: {order.paymentMode}</p>
                 </div>
                 <div className="flex items-center mb-4">
                   <img src={order.items[0].imageUrl} alt={order.items[0].product} className="w-12 h-12 object-cover rounded mr-4" />
                   <div>
                     <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(order.items[0])}>{order.items[0].product}</h3>
+                    <p className="text-sm text-gray-600">Amount: {order.items[0].amount || 1}</p>
                   </div>
                 </div>
                 {expandedOrders[order.id] && order.items.slice(1).map((item, index) => (
@@ -189,16 +223,27 @@ export default function Page() {
                     <img src={item.imageUrl} alt={item.product} className="w-12 h-12 object-cover rounded mr-4" />
                     <div>
                       <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(item)}>{item.product}</h3>
+                      <p className="text-sm text-gray-600">Amount: {item.amount || 1}</p>
                     </div>
                   </div>
                 ))}
                 {order.items.length > 1 && (
-                  <button
-                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded block mx-auto"
-                    onClick={() => toggleExpandOrder(order.id)}
-                  >
-                    {expandedOrders[order.id] ? 'View Less' : 'View More'}
-                  </button>
+                  <div className="flex justify-center mt-2">
+                    <button
+                      className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
+                      onClick={() => toggleExpandOrder(order.id)}
+                    >
+                      {expandedOrders[order.id] ? 'View Less' : 'View More'}
+                    </button>
+                    {order.status === 'To Ship' && (
+                      <button
+                        className="px-4 py-2 bg-red-500 text-white rounded"
+                        onClick={() => cancelOrder(order.id)}
+                      >
+                        Cancel Order
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ))}

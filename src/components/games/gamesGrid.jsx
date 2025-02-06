@@ -13,19 +13,15 @@ const GamesGrid = ({ products }) => {
       </div>
       {/* Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {Array.isArray(products) && products.length > 0 ? (
-          products.map((product) => (
-            <GamesCard
-              key={product._id} // Use _id as the unique key
-              name={product.productName} // Match MongoDB field
-              price={product.price}
-              image={product.photo[0]} // Ensure this is a valid URL or file path
-              slug={product._id} // Use ObjectID for navigation
-            />
-          ))
-        ) : (
-          <p>No products available</p>
-        )}
+        {products.map((product, index) => (
+          <GamesCard
+            key={index}
+            name={product.name}
+            price={product.price}
+            image={product.image}
+            slug={product.slug}
+          />
+        ))}
       </div>
     </div>
   );
