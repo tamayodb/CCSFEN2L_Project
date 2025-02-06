@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Loop - E-commerce Platform
 
-## Getting Started
+## Introduction
+**Loop** is an e-commerce platform specializing in peripherals, games, and collectibles. It enables users to browse, filter, and purchase products, with authentication, cart management, and order placement. Orders are stored in the database without payment processing.
 
-First, run the development server:
+## Features
+### **User Authentication**
+- Sign up, log in, log out, password reset, and account updates.
 
+### **Product Browsing & Filtering**
+- Categories: **Peripherals, Games, Collectibles**.
+- Search by name/keyword, filter by price, category, and reviews.
+
+### **Shopping Cart & Orders**
+- Add, modify, and persist cart contents.
+- Checkout with shipping details.
+- View order history and leave reviews.
+
+## **Technical Overview**
+- **MongoDB** – NoSQL database.
+- **Next.js** – Frontend framework.
+- **Axios** – API requests.
+- **Node.js** – Backend logic.
+- **Mongoose** – ODM for MongoDB.
+- **Tailwind CSS** – Styling.
+- **Vercel** – Hosting.
+
+## **Setup & Deployment**
+### **Clone & Install**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/loop-ecommerce.git
+cd loop-ecommerce
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### **Run Development Server**
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### **Environment Variables**
+Create a `.env.local` file:
+```
+MONGODB_URI=your_mongodb_connection
+NEXT_PUBLIC_API_BASE_URL=your_api_base_url
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### **Deploy to Vercel**
+```bash
+vercel deploy
+```
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
