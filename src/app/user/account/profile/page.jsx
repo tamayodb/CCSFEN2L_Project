@@ -8,9 +8,9 @@ export default function Profile() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [barangay, setBarangay] = useState('');
-  const [street, setStreet] = useState('');
+  const [street_num, setStreet] = useState('');
   const [city, setCity] = useState('');
-  const [zipCode, setZipCode] = useState('');
+  const [zip_code, setZipCode] = useState('');
   const [imagePreview, setImagePreview] = useState('');
 
   const [isEditing, setIsEditing] = useState(false);
@@ -55,9 +55,9 @@ export default function Profile() {
         setName(userData.name || '');
         setPhone(userData.phone || '');
         setBarangay(userData.address?.barangay || '');
-        setStreet(userData.address?.street || '');
+        setStreet(userData.address?.street_num || '');
         setCity(userData.address?.city || '');
-        setZipCode(userData.address?.zipCode || '');
+        setZipCode(userData.address?.zip_code || '');
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -93,9 +93,9 @@ export default function Profile() {
     if (!name) missingFields.push("Name");
     if (!email) missingFields.push("Email Address");
     if (!barangay) missingFields.push("Barangay");
-    if (!street) missingFields.push("Street");
+    if (!street_num) missingFields.push("Street");
     if (!city) missingFields.push("City");
-    if (!zipCode) missingFields.push("ZIP Code");
+    if (!zip_code) missingFields.push("ZIP Code");
     if (!showPhone && !isEditing) missingFields.push("Phone Number");
   
     if (missingFields.length > 0) {
