@@ -9,15 +9,9 @@ export default function Profile() {
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [selectedDay, setSelectedDay] = useState('');
-  const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedYear, setSelectedYear] = useState('');
-  const [selectedGender, setSelectedGender] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingGender, setIsEditingGender] = useState(false);
-  const [isEditingDOB, setIsEditingDOB] = useState(false);
   const [barangay, setBarangay] = useState('');
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
@@ -27,47 +21,11 @@ export default function Profile() {
   const [isEditingCity, setIsEditingCity] = useState(false);
   const [isEditingStreet, setIsEditingStreet] = useState(false);
   const [isEditingZipCode, setIsEditingZipCode] = useState(false);
-
-  const isLeapYear = (year) => {
-    return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
-  };
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i);
   
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const getDaysInMonth = (month, year) => {
-    if (month === 2) {
-      return isLeapYear(year) ? 29 : 28;
-    }
-    const monthsWith31Days = [1, 3, 5, 7, 8, 10, 12];
-    return monthsWith31Days.includes(month) ? 31 : 30;
-  };
-  
-  const [days, setDays] = useState([]);
-
   const handleEmailEditToggle = (index) => {
     const newEditingState = [...isEditingEmails];
     newEditingState[index] = !newEditingState[index];
     setIsEditingEmails(newEditingState);
-  };
-  
-  const handleMonthChange = (month) => {
-    setSelectedMonth(month);
-    if (selectedYear) {
-      setDays(Array.from({ length: getDaysInMonth(month, selectedYear) }, (_, i) => i + 1));
-    }
-  };
-  
-  const handleYearChange = (year) => {
-    setSelectedYear(year);
-    if (selectedMonth) {
-      setDays(Array.from({ length: getDaysInMonth(selectedMonth, year) }, (_, i) => i + 1));
-    }
   };
 
   const handleImageChange = (e) => {
@@ -99,8 +57,6 @@ export default function Profile() {
     if (!street) missingFields.push("Street");
     if (!city) missingFields.push("City");
     if (!zipCode) missingFields.push("ZIP Code");
-    if (!selectedMonth || !selectedDay || !selectedYear) missingFields.push("Date of Birth");
-    if (!selectedGender) missingFields.push("Gender");
     if (!showPhone && !isEditing) missingFields.push("Phone Number");
   
     if (missingFields.length > 0) {
@@ -421,7 +377,7 @@ export default function Profile() {
                 type="file"
                 id="image-upload"
                 className="hidden"
-                accept=".jpg,.jpeg,.png"
+                accept=".jpg,.jpeg,.png"  
                 onChange={handleImageChange}
               />
               <label 
