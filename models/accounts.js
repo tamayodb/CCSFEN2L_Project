@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const CustomerSchema = new mongoose.Schema({
-  username: { type: String, required: true },
+  username: { type: String, required: false },
   password: { type: String, required: true },
-  email: { type: String, required: false },
+  email: { type: String, required: true },
   contact_num: { type: String, required: false },
   street_num: { type: String, required: false },
   barangay: { type: String, required: false },

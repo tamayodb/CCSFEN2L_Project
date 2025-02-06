@@ -4,24 +4,39 @@ import { useState } from 'react';
 
 export default function Profile() {
   const [email, setEmail] = useState('');
-  const [showPhone, setShowPhone] = useState(false);
-  const [imagePreview, setImagePreview] = useState('');
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [isEditingUsername, setIsEditingUsername] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
   const [barangay, setBarangay] = useState('');
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [isEditingBarangay, setIsEditingBarangay] = useState(false);
   const [isEditingCity, setIsEditingCity] = useState(false);
   const [isEditingStreet, setIsEditingStreet] = useState(false);
   const [isEditingZipCode, setIsEditingZipCode] = useState(false);
+
+  const [showPhone, setShowPhone] = useState(false);
   
+  useEffect(() => {
+    // Retrieve user data from localStorage
+    const userData = JSON.parse(localStorage.getItem("user"));
+    if (userData) {
+      setEmail(userData.email);
+      setUsername(userData.username);
+      setPhone(userData.contact_num);
+      setBarangay(userData.address.barangay);
+      setStreet(userData.address.street_num);
+      setCity(userData.address.city);
+      setZipCode(userData.address.zip_code);
+    }
+  }, []);
   const handleEmailEditToggle = (index) => {
     const newEditingState = [...isEditingEmails];
     newEditingState[index] = !newEditingState[index];

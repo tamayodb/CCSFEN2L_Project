@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FcGoogle } from "react-icons/fc"; // Google icon
-import { FaFacebook } from "react-icons/fa"; // Facebook icon
 import axios from "axios";
 
 const LoginPage = () => {
@@ -21,6 +19,8 @@ const LoginPage = () => {
       const response = await axios.post("/api/login", { email, password });
 
       if (response.status === 201) {
+        // Store user data in localStorage or context
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         router.push("/"); // Redirect on successful login
       }
     } catch (err) {
