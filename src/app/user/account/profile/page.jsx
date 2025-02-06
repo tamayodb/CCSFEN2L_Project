@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Profile() {
   const [email, setEmail] = useState('');
@@ -23,26 +23,50 @@ export default function Profile() {
   const [isEditingZipCode, setIsEditingZipCode] = useState(false);
 
   const [showPhone, setShowPhone] = useState(false);
-  
-  useEffect(() => {
-    // Retrieve user data from localStorage
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (userData) {
-      setEmail(userData.email);
-      setUsername(userData.username);
-      setPhone(userData.contact_num);
-      setBarangay(userData.address.barangay);
-      setStreet(userData.address.street_num);
-      setCity(userData.address.city);
-      setZipCode(userData.address.zip_code);
-    }
-  }, []);
-  const handleEmailEditToggle = (index) => {
-    const newEditingState = [...isEditingEmails];
-    newEditingState[index] = !newEditingState[index];
-    setIsEditingEmails(newEditingState);
-  };
 
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem('token'); // Assuming the token is stored as 'token'
+        if (!token) {
+          console.error('No token found');
+          return;
+        }
+
+        // Fetch user data from the backend
+        const response = await fetch('/api/user', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+
+        const userData = await response.json();
+
+        // Populate the state with user data
+        setEmail(userData.email || '');
+        setUsername(userData.username || '');
+        setName(userData.name || '');
+        setPhone(userData.phone || '');
+        setBarangay(userData.address?.barangay || '');
+        setStreet(userData.address?.street || '');
+        setCity(userData.address?.city || '');
+        setZipCode(userData.address?.zipCode || '');
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  // Rest of the component code remains the same...
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
