@@ -6,9 +6,11 @@ import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
     await connectToDatabase(); // Establish database connection
-
+    console.log("lol1");
     const { email, password } = await request.json();
+    console.log("lol2");
     const userExistence = await account.findOne({ email });
+    console.log("lol");
     if (!userExistence) {
       return NextResponse.json({ error: "User not existed" }, { status: 400 });
     }
