@@ -1,4 +1,3 @@
-// filepath: /C:/Users/Ella/projects/datablitz/models/order.js
 import mongoose from 'mongoose';
 
 const OrderSchema = new mongoose.Schema({
@@ -7,7 +6,7 @@ const OrderSchema = new mongoose.Schema({
   orderDate: { type: Date, required: true },
   quantity: { type: [Number], required: true },
   status: { type: String, required: true },
-  product_ID: { type: [String], required: true },
+  product_id: { type: [String], required: true },
   address: { type: String, required: true },
   totalAmount: { type: Number, required: true },
   paymentMode: { type: String, required: true },

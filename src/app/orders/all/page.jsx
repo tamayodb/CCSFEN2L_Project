@@ -1,86 +1,8 @@
+// filepath: /C:/Users/Ella/projects/datablitz/src/app/orders/all/page.jsx
 "use client";
 
-import React, { useState } from 'react';
-
-const orders = [
-  {
-    id: '12345',
-    order_date: '2023-10-01',
-    status: 'To Ship',
-    totalAmount: '₱150.00',
-    address: '123 Main St, City, Country',
-    paymentMode: 'Credit Card',
-    items: [
-      { product: 'Product A', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand A' },
-      { product: 'Product B', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand B' },
-      { product: 'Product H', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand H' },
-    ],
-  },
-  {
-    id: '12346',
-    order_date: '2023-10-02',
-    status: 'To Ship',
-    totalAmount: '₱200.00',
-    address: '456 Another St, City, Country',
-    paymentMode: 'PayPal',
-    items: [
-      { product: 'Product C', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱100.00', brand: 'Brand C', amount: 2 },
-      { product: 'Product I', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱100.00', brand: 'Brand I', amount: 1 },
-    ],
-  },
-  {
-    id: '12347',
-    order_date: '2023-10-03',
-    status: 'Completed',
-    totalAmount: '₱100.00',
-    address: '789 Some St, City, Country',
-    paymentMode: 'Bank Transfer',
-    items: [
-      { product: 'Product D', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand D' },
-      { product: 'Product E', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand E' },
-      { product: 'Product J', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱50.00', brand: 'Brand J' },
-    ],
-  },
-  {
-    id: '12348',
-    order_date: '2023-10-04',
-    status: 'Cancelled',
-    totalAmount: '₱50.00',
-    address: '101 Another St, City, Country',
-    paymentMode: 'Cash on Delivery',
-    items: [
-      { product: 'Product F', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱25.00', brand: 'Brand F' },
-      { product: 'Product K', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱25.00', brand: 'Brand K' },
-    ],
-  },
-  {
-    id: '12349',
-    order_date: '2023-10-05',
-    status: 'Cancelled',
-    totalAmount: '₱75.00',
-    address: '202 Another St, City, Country',
-    paymentMode: 'Credit Card',
-    items: [
-      { product: 'Product G', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱37.50', brand: 'Brand G' },
-      { product: 'Product L', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱37.50', brand: 'Brand L' },
-    ],
-  },
-  {
-    id: '12350',
-    order_date: '2023-10-06',
-    status: 'To Receive',
-    totalAmount: '₱120.00',
-    address: '303 Another St, City, Country',
-    paymentMode: 'PayPal',
-    items: [
-      { product: 'Product M', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱60.00', brand: 'Brand M' },
-      { product: 'Product N', imageUrl: '/homepage/amiibo_samplepic.webp', price: '₱60.00', brand: 'Brand N' },
-    ],
-  },
-  // Add more orders as needed
-];
-
-const tabs = ['All', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState('All');
@@ -90,7 +12,29 @@ export default function Page() {
   const [isRating, setIsRating] = useState(false);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
-  const [orderList, setOrderList] = useState(orders);
+  const [orderList, setOrderList] = useState([]);
+  const [error, setError] = useState(null);
+
+  const tabs = ['All', 'To Ship', 'Completed', 'Cancelled'];
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get('/api/orders/orders');
+        setOrderList(response.data);
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          console.error('Orders not found:', error);
+          setError('Orders not found.');
+        } else {
+          console.error('Failed to fetch orders:', error);
+          setError('Failed to fetch orders.');
+        }
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   const toggleExpandOrder = (orderId) => {
     setExpandedOrders((prev) => ({
@@ -114,20 +58,22 @@ export default function Page() {
   const cancelOrder = (orderId) => {
     setOrderList((prevOrders) =>
       prevOrders.map((order) =>
-        order.id === orderId ? { ...order, status: 'Cancelled' } : order
+        order._id === orderId ? { ...order, status: 'Cancelled' } : order
       )
     );
   };
 
   const filteredOrders = orderList.filter(order => {
     const matchesStatus = activeTab === 'All' || order.status === activeTab;
-    const matchesSearch = order.items.some(item => item.product.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesSearch = order.product_id.some(product => product.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesStatus && matchesSearch;
   });
 
   return (
     <div className="container mx-auto p-4">
-      {selectedProduct ? (
+      {error ? (
+        <div className="text-red-500 text-center">{error}</div>
+      ) : selectedProduct ? (
         <div>
           <div className="flex justify-start mb-4">
             <button onClick={() => setSelectedProduct(null)} className="px-4 py-2 bg-blue-500 text-white rounded">&lt; Back</button>
@@ -145,7 +91,7 @@ export default function Page() {
                 <button className="px-4 py-2 bg-green-500 text-white rounded mr-2">Add to Cart</button>
                 <button className="px-4 py-2 bg-yellow-500 text-white rounded">Buy Now</button>
               </div>
-              {selectedProduct && filteredOrders.find(order => order.items.some(item => item.product === selectedProduct.product) && order.status === 'Completed') && (
+              {selectedProduct && filteredOrders.find(order => order.product_id.includes(selectedProduct.product) && order.status === 'Completed') && (
                 <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setIsRating(true)}>Rate Product</button>
               )}
               {isRating && (
@@ -202,10 +148,10 @@ export default function Page() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredOrders.map(order => (
-              <div key={order.id} className="border rounded-lg p-4 bg-white shadow">
-                <h2 className="text-lg font-bold mb-2">Order ID: {order.id}</h2>
+              <div key={order._id} className="border rounded-lg p-4 bg-white shadow">
+                <h2 className="text-lg font-bold mb-2">Order ID: {order.orderID}</h2>
                 <div className="text-sm text-gray-600 mb-2">
-                  <p>Order Date: {order.order_date}</p>
+                  <p>Order Date: {new Date(order.orderDate).toLocaleDateString()}</p>
                   <p>Status: {order.status}</p>
                   <p>Total: {order.totalAmount}</p>
                   <p>Address: {order.address}</p>
@@ -215,15 +161,15 @@ export default function Page() {
                   <img src={order.items[0].imageUrl} alt={order.items[0].product} className="w-12 h-12 object-cover rounded mr-4" />
                   <div>
                     <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(order.items[0])}>{order.items[0].product}</h3>
-                    <p className="text-sm text-gray-600">Amount: {order.items[0].amount || 1}</p>
+                    <p className="text-sm text-gray-600">Amount: {order.quantity[0]}</p>
                   </div>
                 </div>
-                {expandedOrders[order.id] && order.items.slice(1).map((item, index) => (
+                {expandedOrders[order._id] && order.items.slice(1).map((item, index) => (
                   <div key={index} className="flex items-center mb-4">
                     <img src={item.imageUrl} alt={item.product} className="w-12 h-12 object-cover rounded mr-4" />
                     <div>
                       <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(item)}>{item.product}</h3>
-                      <p className="text-sm text-gray-600">Amount: {item.amount || 1}</p>
+                      <p className="text-sm text-gray-600">Amount: {order.quantity[index + 1]}</p>
                     </div>
                   </div>
                 ))}
@@ -231,14 +177,14 @@ export default function Page() {
                   <div className="flex justify-center mt-2">
                     <button
                       className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
-                      onClick={() => toggleExpandOrder(order.id)}
+                      onClick={() => toggleExpandOrder(order._id)}
                     >
-                      {expandedOrders[order.id] ? 'View Less' : 'View More'}
+                      {expandedOrders[order._id] ? 'View Less' : 'View More'}
                     </button>
                     {order.status === 'To Ship' && (
                       <button
                         className="px-4 py-2 bg-red-500 text-white rounded"
-                        onClick={() => cancelOrder(order.id)}
+                        onClick={() => cancelOrder(order._id)}
                       >
                         Cancel Order
                       </button>
