@@ -14,7 +14,7 @@ const NewArrivals = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("/api/homepage/newArrivals"); // Fixed the URL
+        const response = await axios.get("/api/homepage/newArrivals"); // API endpoint
         console.log("Fetched Data:", response.data);
         setProducts(response.data);
       } catch (error) {
