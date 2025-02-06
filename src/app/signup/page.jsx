@@ -3,9 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FcGoogle } from "react-icons/fc"; // Google icon
-import { FaFacebook } from "react-icons/fa"; // Facebook icon
-import IconButton from "@/components/signup/IconButton";
 import axios from "axios";
 
 const SignupPage = () => {
