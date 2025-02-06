@@ -6,7 +6,7 @@ export default function Profile() {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [contact_num, setPhone] = useState('');
   const [barangay, setBarangay] = useState('');
   const [street_num, setStreet] = useState('');
   const [city, setCity] = useState('');
@@ -22,7 +22,7 @@ export default function Profile() {
   const [isEditingStreet, setIsEditingStreet] = useState(false);
   const [isEditingZipCode, setIsEditingZipCode] = useState(false);
 
-  const [showPhone, setShowPhone] = useState(false);
+  const [showContactNum, setShowPhone] = useState(false);
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function Profile() {
         setEmail(userData.email || '');
         setUsername(userData.username || '');
         setName(userData.name || '');
-        setPhone(userData.phone || '');
+        setPhone(userData.contact_num || '');
         setBarangay(userData.address?.barangay || '');
         setStreet(userData.address?.street_num || '');
         setCity(userData.address?.city || '');
@@ -96,7 +96,7 @@ export default function Profile() {
     if (!street_num) missingFields.push("Street");
     if (!city) missingFields.push("City");
     if (!zip_code) missingFields.push("ZIP Code");
-    if (!showPhone && !isEditing) missingFields.push("Phone Number");
+    if (!showContactNum && !isEditing) missingFields.push("Phone Number");
   
     if (missingFields.length > 0) {
       alert(`Please fill in the following fields: ${missingFields.join(", ")}`);
@@ -112,10 +112,10 @@ export default function Profile() {
       Email Address: ${email}
       Billing Address:
         Barangay: ${barangay}
-        Street: ${street}
+        Street: ${street_num}
         City: ${city}
-        ZIP Code: ${zipCode}
-      Phone: ${showPhone ? phone : "Hidden"}
+        ZIP Code: ${zip_code}
+      Phone: ${showContactNum ? contact_num : "Hidden"}
     `;
   
     const blob = new Blob([fileContent], { type: 'text/plain' });
@@ -291,8 +291,8 @@ export default function Profile() {
                     {isEditingStreet ? (
                       <input
                         type="text"
-                        id="street"
-                        value={street}
+                        id="street_num"
+                        value={street_num}
                         onChange={(e) => setStreet(e.target.value)}
                         className="w-full p-2 border rounded-md"
                         placeholder="Enter street"
@@ -317,8 +317,8 @@ export default function Profile() {
                     {isEditingZipCode ? (
                       <input
                         type="text"
-                        id="zipCode"
-                        value={zipCode}
+                        id="zip_code"
+                        value={zip_code}
                         onChange={(e) => setZipCode(e.target.value)}
                         className="w-full p-2 border rounded-md"
                         placeholder="Enter ZIP code"
@@ -345,14 +345,14 @@ export default function Profile() {
                 {isEditing ? (
                   <input
                     type="text"
-                    id="phone"
-                    value={phone}
+                    id="contact_num"
+                    value={contact_num}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full p-2 border rounded-md"
                   />
                 ) : (
                   <span className="w-full p-2">
-                    {phone ? (showPhone ? phone : `********${phone.slice(-2)}`) : " "}
+                    {contact_num ? (showContactNum ? contact_num : `********${contact_num.slice(-2)}`) : " "}
                   </span>
                 )}
 
@@ -361,7 +361,7 @@ export default function Profile() {
                   onClick={() => {
                     if (isEditing) {
                       setIsEditing(false);
-                      setPhone(phone);
+                      setPhone(contact_num);
                       setShowPhone(false);
                     } else {
                       setIsEditing(true);
@@ -375,10 +375,10 @@ export default function Profile() {
                 {!isEditing && (
                   <button
                     type="button"
-                    onClick={() => setShowPhone(!showPhone)}
+                    onClick={() => setShowPhone(!showContactNum)}
                     className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
                   >
-                    {showPhone ? 'Hide' : 'Show'}
+                    {showContactNum ? 'Hide' : 'Show'}
                   </button>
                 )}
               </div>

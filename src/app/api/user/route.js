@@ -40,12 +40,12 @@ export async function GET(req) {
         email: user.email,
         username: user.username,
         name: user.name,
-        phone: user.phone,
+        contact_num: user.contact_num,
         address: {
           barangay: user.address?.barangay,
-          street: user.address?.street,
+          street_num: user.address?.street_num,
           city: user.address?.city,
-          zipCode: user.address?.zipCode,
+          zip_code: user.address?.zip_code,
         },
       }),
       {
