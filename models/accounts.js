@@ -11,7 +11,7 @@ const CustomerSchema = new mongoose.Schema({
     city: { type: String, required: false },       // City is optional
     zip_code: { type: Number, required: false },   // ZIP code is optional
   },
-});
+}, { collection: "Customer" });
 
 const Customer =
   mongoose.models.Customer || mongoose.model("Customer", CustomerSchema);

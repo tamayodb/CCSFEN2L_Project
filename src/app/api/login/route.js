@@ -1,4 +1,4 @@
-import account from "../../../../models/accounts";
+import Customer from "../../../../models/accounts";
 import connectToDatabase from "../../../../lib/db";
 import bcrypt from "bcrypt";
 import { NextResponse } from "next/server";
@@ -6,11 +6,8 @@ import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
     await connectToDatabase(); // Establish database connection
-    console.log("lol1");
     const { email, password } = await request.json();
-    console.log("lol2");
-    const userExistence = await account.findOne({ email });
-    console.log("lol");
+    const userExistence = await Customer.findOne({email});
     if (!userExistence) {
       return NextResponse.json({ error: "User not existed" }, { status: 400 });
     }
@@ -25,7 +22,7 @@ export async function POST(request) {
         { status: 404 }
       );
     }
-
+    
     return NextResponse.json(
       { message: "Login successfully", user: userExistence },
       { status: 201 }
