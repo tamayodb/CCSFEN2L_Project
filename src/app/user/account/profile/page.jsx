@@ -285,7 +285,7 @@ export default function Profile() {
               <div className="flex gap-4">
                 <div className="w-1/2 space-y-2">
                   <label htmlFor="street" className="block text-sm font-medium text-gray-700">
-                    Street
+                    Street 
                   </label>
                   <div className="flex items-center gap-2">
                     {isEditingStreet ? (
@@ -298,7 +298,7 @@ export default function Profile() {
                         placeholder="Enter street"
                       />
                     ) : (
-                      <span className="w-full p-2">{street || " "}</span>
+                      <span className="w-full p-2">{street_num || " "}</span>
                     )}
                     <button
                       type="button"
@@ -324,7 +324,7 @@ export default function Profile() {
                         placeholder="Enter ZIP code"
                       />
                     ) : (
-                      <span className="w-full p-2">{zipCode || " "}</span>
+                      <span className="w-full p-2">{zip_code || " "}</span>
                     )}
                     <button
                       type="button"
