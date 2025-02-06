@@ -14,14 +14,11 @@ const NewArrivals = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("/api/homepage/newArrivals"); // Axios GET request
-
-        console.log("Fetched Data:", response.data); // Log the fetched data
-
-        // Set the response data to the state
+        const response = await axios.get("/api/homepage/newArrivals"); // Fixed the URL
+        console.log("Fetched Data:", response.data);
         setProducts(response.data);
       } catch (error) {
-        console.error("Error fetching products:", error.message); // Log error message
+        console.error("Error fetching products:", error.message);
       }
     };
 
