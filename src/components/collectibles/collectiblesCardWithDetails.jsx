@@ -8,13 +8,19 @@ const CollectiblesCard = ({ name, price, image, slug }) => {
       <a className="relative bg-white rounded-xl shadow-lg p-4 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300 ease-in-out group">
         {/* Product Image */}
         <div className="flex justify-center items-center aspect-w-1 aspect-h-1 overflow-hidden rounded-md">
-          <Image
-            src={image}
-            alt={name}
-            width={160}
-            height={160}
-            className="object-contain transition-transform duration-300 ease-in-out group-hover:scale-110"
-          />
+          {image ? (
+            <Image
+              src={image}
+              alt={name}
+              width={160}
+              height={160}
+              className="object-contain transition-transform duration-300 ease-in-out group-hover:scale-110"
+            />
+          ) : (
+            <div className="w-40 h-40 flex items-center justify-center bg-gray-200">
+              <span className="text-gray-600 text-sm">No Image</span>
+            </div>
+          )}
         </div>
         {/* Product Info */}
         <div className="mt-2 flex-grow">
