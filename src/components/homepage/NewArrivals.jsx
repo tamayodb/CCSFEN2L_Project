@@ -1,22 +1,34 @@
+// NewArrivals.js
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios"; // Import Axios
+import axios from "axios";
 import ProductCard from "./CardWithDetails";
 
 const NewArrivals = () => {
   const [activeCategory, setActiveCategory] = useState("Peripherals");
-  const [products, setProducts] = useState({
-    Peripherals: [],
-    Games: [],
-    Collectibles: [],
-  });
+  const [products, setProducts] = useState({});
   const carouselRef = useRef(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("/api/homepage/newArrivals"); // API endpoint
+        const response = await axios.get("/api/homepage/newArrivals");
         console.log("Fetched Data:", response.data);
-        setProducts(response.data);
+
+        // Ensure each product has a valid image (first photo in the array or fallback)
+        const formattedData = Object.fromEntries(
+          Object.entries(response.data).map(([category, items]) => [
+            category,
+            items.map((product) => ({
+              ...product,
+              photo:
+                Array.isArray(product.photo) && product.photo.length > 0
+                  ? product.photo[0]
+                  : "/fallback-image.jpg", // Use first image or fallback
+            })),
+          ])
+        );
+
+        setProducts(formattedData);
       } catch (error) {
         console.error("Error fetching products:", error.message);
       }
@@ -49,10 +61,7 @@ const NewArrivals = () => {
       </div>
 
       {/* Product List */}
-      <div
-        ref={carouselRef}
-        className="flex overflow-x-scroll scrollbar-hide mx-24"
-      >
+      <div ref={carouselRef} className="flex overflow-x-scroll scrollbar-hide mx-24">
         {products[activeCategory]?.map((product) => (
           <div key={product._id} className="flex-shrink-0 w-48 mb-10">
             <ProductCard

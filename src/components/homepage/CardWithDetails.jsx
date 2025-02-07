@@ -1,7 +1,7 @@
+// ProductCard.js
 import React from "react";
 import Image from "next/image";
 
-{/* Product Card with Consistent Height */}
 const ProductCard = ({ name, price, image }) => {
   return (
     <div className="h-60 w-40 bg-white rounded-lg shadow-md p-4 flex flex-col justify-between">
@@ -19,7 +19,7 @@ const ProductCard = ({ name, price, image }) => {
           className="text-xs font-light text-gray-700 text-left overflow-hidden"
           style={{
             display: "-webkit-box",
-            WebkitLineClamp: 2, // Limit to 2 lines
+            WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             whiteSpace: "normal",
           }}
@@ -32,6 +32,5 @@ const ProductCard = ({ name, price, image }) => {
     </div>
   );
 };
-
 
 export default ProductCard;
