@@ -1,9 +1,21 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation"; // Corrected import for Next.js App Router
 
-const ProductCard = ({ name, price, image }) => {
+const ProductCard = ({ name, price, image, category, id }) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/${category.toLowerCase()}/${id}`);
+  };
+
   return (
-    <div className="h-60 w-40 bg-white rounded-lg shadow-md p-4 flex flex-col justify-between">
+    <div
+      className="h-60 w-40 bg-white rounded-lg shadow-md p-4 flex flex-col justify-between cursor-pointer hover:shadow-lg transition duration-200"
+      onClick={handleClick}
+    >
       {/* Product Image */}
       <Image
         src={image}
@@ -27,7 +39,9 @@ const ProductCard = ({ name, price, image }) => {
         </h3>
       </div>
       {/* Price */}
-      <p className="font-bold text-[#0D3B66] mt-2 text-left">₱{price}</p>
+      <p className="font-bold text-[#0D3B66] mt-2 text-left">
+        ₱{price.toLocaleString()}
+      </p>
     </div>
   );
 };

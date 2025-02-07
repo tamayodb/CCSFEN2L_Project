@@ -19,7 +19,6 @@ const NewArrivals = () => {
             category,
             items.map((product) => ({
               ...product,
-              price: product.price.toLocaleString(), // Format price with commas
               photo:
                 Array.isArray(product.photo) && product.photo.length > 0
                   ? product.photo[0]
@@ -68,6 +67,8 @@ const NewArrivals = () => {
               name={product.productName}
               price={product.price}
               image={product.photo}
+              category={activeCategory} // Pass category for dynamic routing
+              id={product._id} // Pass MongoDB Object ID
             />
           </div>
         ))}
