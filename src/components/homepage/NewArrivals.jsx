@@ -1,4 +1,3 @@
-// NewArrivals.js
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import ProductCard from "./CardWithDetails";
@@ -20,6 +19,7 @@ const NewArrivals = () => {
             category,
             items.map((product) => ({
               ...product,
+              price: product.price.toLocaleString(), // Format price with commas
               photo:
                 Array.isArray(product.photo) && product.photo.length > 0
                   ? product.photo[0]
