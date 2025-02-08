@@ -1,22 +1,44 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useParams } from "next/navigation"; 
 import Image from "next/image";
 
-export default function SpecificPeripheral({ params }) {
-  const { id } = params; // Extract ObjectID from URL slug
+export default function SpecificProduct() {
+  const params = useParams(); 
+  const category = "peripherals";  // ✅ Hardcoded category
+  const [id, setId] = useState(null);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
+    if (params?.id) {
+      console.log("📌 Extracted id:", params.id);
+      setId(params.id);
+    } else {
+      console.warn("⚠️ id is missing in params:", params);
+    }
+  }, [params]);
+
+  useEffect(() => {
+    if (!id) {
+      console.warn("🚨 `fetchProduct()` skipped because id is missing.");
+      return;
+    }
+
     const fetchProduct = async () => {
+      console.log(`🔍 Fetching product: /api/product/${category}/${id}`);
+      
       try {
-        const res = await fetch(`/api/products/${id}`);
-        if (!res.ok) throw new Error("Product not found");
+        const res = await fetch(`/api/product/${category}/${id}`);
+        if (!res.ok) throw new Error("❌ Product not found");
+
         const data = await res.json();
+        console.log("✅ Product fetched:", data);
         setProduct(data);
       } catch (err) {
+        console.error("❌ Fetch error:", err.message);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -42,23 +64,14 @@ export default function SpecificPeripheral({ params }) {
     );
   }
 
-  const handleDecrease = () => {
-    if (quantity > 1) setQuantity(quantity - 1);
-  };
-
-  const handleIncrease = () => {
-    setQuantity(quantity + 1);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Product Image */}
           <div className="bg-white p-6 rounded-lg shadow-xl">
             {product.photo ? (
               <Image
-                src={product.photo}
+                src={product.photo[0]}
                 alt={product.productName}
                 width={600}
                 height={600}
@@ -71,27 +84,21 @@ export default function SpecificPeripheral({ params }) {
             )}
           </div>
 
-          {/* Product Details */}
           <div className="space-y-6">
             <h1 className="text-3xl font-semibold text-gray-900">{product.productName}</h1>
-            <p className="text-xl text-gray-600">Category: {product.tags?.join(", ") || "N/A"}</p>
-
+            <p className="text-xl text-gray-600">Category: {category}</p>
             <p>
               <span className="mt-4 text-2xl font-bold text-blue-600">₱{product.price}.00</span>
               <span className={`ml-4 ${product.quantity > 0 ? "text-green-600" : "text-red-600"}`}>
                 {product.quantity > 0 ? "In Stock" : "Out of Stock"}
               </span>
             </p>
-
             <p className="text-gray-600">{product.description?.join(" ")}</p>
 
-            <hr className="border-gray-300 my-4 w-full" />
-
-            {/* Quantity and Actions */}
             <div className="flex items-center mt-4 space-x-4">
               <div className="flex items-center border border-gray-300 rounded-lg">
                 <button
-                  onClick={handleDecrease}
+                  onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
                   className="bg-gray-200 px-4 py-2 rounded-l-lg text-gray-700 hover:bg-gray-300"
                 >
                   -
@@ -103,7 +110,7 @@ export default function SpecificPeripheral({ params }) {
                   className="bg-[#f9fafb] w-16 text-center focus:outline-none"
                 />
                 <button
-                  onClick={handleIncrease}
+                  onClick={() => setQuantity((prev) => prev + 1)}
                   className="bg-gray-200 px-4 py-2 rounded-r-lg text-gray-700 hover:bg-gray-300"
                 >
                   +
@@ -119,33 +126,9 @@ export default function SpecificPeripheral({ params }) {
                 </button>
               </div>
             </div>
-
-            {/* Delivery Info */}
-            <div className="bg-[#f9fafb] p-4 rounded-lg mt-6 space-y-4 border border-gray-200 w-full">
-              <div className="flex items-center space-x-4">
-                <Image src="/homepage/freedelivery.png" alt="Free Delivery" width={30} height={30} />
-                <div>
-                  <p className="font-semibold">Free Delivery</p>
-                  <span className="text-gray-500 text-sm hover:underline">
-                    Enter your postal code for Delivery Availability
-                  </span>
-                </div>
-              </div>
-
-              <hr className="border-gray-300 my-4 w-full" />
-
-              <div className="flex items-center space-x-4">
-                <Image src="/homepage/returndelivery.png" alt="Return Delivery" width={30} height={30} />
-                <div>
-                  <p className="font-semibold">Return Delivery</p>
-                  <p className="text-sm text-gray-600">Free 30 Days Delivery Returns.</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Product Description Section */}
         <div className="mt-12 bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-gray-800">Description</h2>
           <p className="text-gray-700 mt-3">{product.description?.join(" ")}</p>
