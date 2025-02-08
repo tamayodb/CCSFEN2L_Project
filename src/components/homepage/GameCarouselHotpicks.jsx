@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link"; // Import Link
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 const GameCarouselHotpicks = () => {
@@ -61,16 +62,18 @@ const GameCarouselHotpicks = () => {
           className="flex overflow-x-scroll scrollbar-hide mx-12 space-x-4"
         >
           {games.map((game) => (
-            <div key={game._id} className="flex-shrink-0 w-48">
-              <Image
-                src={game.photo}
-                alt="Game Cover"
-                width={400} // Increase width
-                height={600} // Increase height
-                quality={100} // Max quality
-                className="w-full h-[320px] object-cover rounded-lg"
-              />
-            </div>
+            <Link key={game._id} href={`/games/${game._id}`} className="flex-shrink-0 w-48">
+              <div className="cursor-pointer">
+                <Image
+                  src={game.photo}
+                  alt="Game Cover"
+                  width={400} // Increase width
+                  height={600} // Increase height
+                  quality={100} // Max quality
+                  className="w-full h-[320px] object-cover rounded-lg transition-transform transform hover:scale-105"
+                />
+              </div>
+            </Link>
           ))}
         </div>
         <button
