@@ -7,7 +7,7 @@ export async function POST(request) {
   try {
     await connectToDatabase(); // Establish database connection
     const { email, password } = await request.json();
-
+    console.log("check");
     // Check if email and password are provided
     if (!email || !password) {
       return NextResponse.json(
@@ -29,7 +29,7 @@ export async function POST(request) {
       password: hashPassword,
     });
     await newAccount.save();
-
+    console.log("check2");
     return NextResponse.json(
       { message: "Account created successfully" },
       { status: 201 }
