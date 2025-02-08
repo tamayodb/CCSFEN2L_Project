@@ -1,14 +1,15 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css";
-import ProductCarouselItem from "@/components/homepage/ProductCarouselItem";
+import FeaturedCarouselItem from "@/components/homepage/FeaturedCarouselItem"; // Updated import
 
 const FeaturedCarousel = ({ category }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const carouselRef = useRef(null); // Ref for carousel navigation
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -24,9 +25,12 @@ const FeaturedCarousel = ({ category }) => {
           categoryProducts.slice(0, 10).map((product) => ({
             ...product,
             photo:
-              Array.isArray(product.photo) && product.photo.length > 0
-                ? product.photo[0]
-                : "/fallback-image.jpg", // Fallback image
+              typeof product.photo === "string" && product.photo.startsWith("http")
+                ? product.photo
+                : "/fallback-image.jpg", // Ensure valid image URL
+            description: product.description
+              ? String(product.description).split("•").map((line) => line.trim())
+              : [],
           }))
         );
       } catch (err) {
@@ -49,31 +53,45 @@ const FeaturedCarousel = ({ category }) => {
         Featured {category}
       </h1>
       <AliceCarousel
+        ref={carouselRef}
         autoPlay
         autoPlayInterval={3000}
         infinite
-        disableButtonsControls={false}
+        disableButtonsControls
         disableDotsControls={false}
         responsive={{
-          0: { items: 1 }, // Shows only ONE item at a time
+          0: { items: 1 },
           768: { items: 1 },
           1024: { items: 1 },
         }}
-        renderPrevButton={() => (
-          <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-            ◀
-          </button>
-        )}
-        renderNextButton={() => (
-          <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-            ▶
-          </button>
-        )}
       >
         {products.map((product, index) => (
-          <ProductCarouselItem key={index} {...product} />
+          <FeaturedCarouselItem 
+            key={index} 
+            name={product.name} 
+            price={product.price} 
+            photo={product.photo} 
+            description={product.description} 
+            rating={product.rating} 
+            sold={product.sold}
+          />
         ))}
       </AliceCarousel>
+
+      {/* Custom Navigation Buttons */}
+      <button
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700"
+        onClick={() => carouselRef.current?.slidePrev()}
+      >
+        ◀
+      </button>
+
+      <button
+        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700"
+        onClick={() => carouselRef.current?.slideNext()}
+      >
+        ▶
+      </button>
     </div>
   );
 };
