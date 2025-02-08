@@ -12,13 +12,13 @@ export default async function handler(req, res) {
     const ordersWithProductDetails = await Promise.all(
       orders.map(async (order) => {
         const products = await Promise.all(
-          order.product_id.map(async (productId) => {
+          order.product_id.map(async (productId, index) => {
             const product = await Product.findById(productId);
             console.log('Fetched product:', product); // Add logging
             return {
               name: product.productName,
               picture: product.photo[0], // Get the first image from the array
-              quantity: order.quantity[order.product_id.indexOf(productId)],
+              quantity: order.quantity[index], // Get the quantity from the order
             };
           })
         );

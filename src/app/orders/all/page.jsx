@@ -46,7 +46,7 @@ const OrdersPage = () => {
                 <li key={index}>
                   <p>Product Name: {product.name}</p> {/* Ensure this matches the API response */}
                   <img src={product.picture} alt={product.name} className="w-full h-48 object-cover mb-4" />
-                  <p>Quantity: {product.quantity}</p>
+                  <p>Quantity: {product.quantity}</p> {/* Display the quantity */}
                 </li>
               ))}
             </ul>
