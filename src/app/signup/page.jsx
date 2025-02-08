@@ -23,7 +23,7 @@ const SignupPage = () => {
 
     try {
       const response = await axios.post('/api/register', { email, password });
-        if (loginResponse.status === 200) {
+        if (response.status === 201) {
           router.push("/login"); // Redirect to home page after successful signup and login
         }      
     } catch (err) {
@@ -31,10 +31,12 @@ const SignupPage = () => {
         if (err.response.status === 400) {
           setError(err.response.data.error);
         } else {
-          setError("An error occurred. Please try again later.");
+          setError(err.response.data.error || "An error occurred. Please try again later.");
         }
+      } else if (err.request) {
+        setError("No response received from server. Please try again.");
       } else {
-        setError("An error occurred. Please try again later.");
+        setError("Error setting up request. Please try again.");
       }
     }
   };
