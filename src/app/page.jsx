@@ -169,7 +169,7 @@ const Page = () => {
 
       {/* Peripherals Product Grid */}
       <div className="container mx-auto justify-center flex mb-32">
-        <ProductGrid products={products} />
+        <ProductGrid category="Peripherals" />
       </div>
 
       <div className="bg-[#FAF9F6]">
@@ -192,7 +192,7 @@ const Page = () => {
 
         {/* Games Product Grid */}
         <div className="container mx-auto justify-center flex mb-32">
-          <ProductGrid products={products} />
+          <ProductGrid category="Games" />
         </div>
       </div>
 
@@ -230,7 +230,7 @@ const Page = () => {
 
       {/* Collectibles Product Grid */}
       <div className="container mx-auto justify-center flex mb-20">
-        <ProductGrid products={products} />
+        <ProductGrid category="Collectibles" />
       </div>
 
       {/* Brand Feature */}
