@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             console.log('Fetched product:', product); // Add logging
             return {
               name: product.productName,
-              picture: product.photo[0], // Get the first image from the array
+              photo: product.photo, // Include the photo field
               price: product.price, // Get the price from the product
               quantity: order.quantity[index], // Get the quantity from the order
             };
