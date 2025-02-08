@@ -24,14 +24,12 @@ const FeaturedCarousel = ({ category }) => {
 
         setProducts(
           categoryProducts.slice(0, 10).map((product) => ({
-            name: product.productName || "No Name Available",  // ✅ Uses productName
+            name: product.productName || "No Name Available",
             price: product.price || "N/A",
             photo: Array.isArray(product.photo) && product.photo.length > 0
-              ? product.photo[0] // ✅ Uses first image in array
+              ? product.photo[0]
               : "/fallback-image.jpg",
-            description: Array.isArray(product.description) 
-              ? product.description
-              : [],
+            description: Array.isArray(product.description) ? product.description : [],
           }))
         );
       } catch (err) {
@@ -50,47 +48,51 @@ const FeaturedCarousel = ({ category }) => {
 
   return (
     <div className="relative mt-10 w-full md:w-[70%] mx-auto">
-      <h1 className="text-2xl font-bold text-center tracking-widest">
+      <h1 className="text-2xl font-bold text-center tracking-widest mb-4">
         Featured {category}
       </h1>
-      <AliceCarousel
-        ref={carouselRef}
-        autoPlay
-        autoPlayInterval={3000}
-        infinite
-        disableButtonsControls
-        disableDotsControls={false}
-        responsive={{
-          0: { items: 1 },
-          768: { items: 1 },
-          1024: { items: 1 },
-        }}
-      >
-        {products.map((product, index) => (
-          <FeaturedCarouselItem 
-            key={index} 
-            name={product.name} 
-            price={product.price} 
-            photo={product.photo} 
-            description={product.description}
-          />
-        ))}
-      </AliceCarousel>
 
-      {/* Custom Navigation Buttons */}
-      <button
-        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700"
-        onClick={() => carouselRef.current?.slidePrev()}
-      >
-        ◀
-      </button>
+      <div className="relative">
+        <AliceCarousel
+          ref={carouselRef}
+          autoPlay
+          autoPlayInterval={3000}
+          infinite
+          disableButtonsControls
+          disableDotsControls={false}
+          responsive={{
+            0: { items: 1 },
+            768: { items: 1 },
+            1024: { items: 1 },
+          }}
+          itemClass="flex justify-center items-center h-[450px] md:h-[400px]" // Ensure consistent height
+        >
+          {products.map((product, index) => (
+            <FeaturedCarouselItem 
+              key={index} 
+              name={product.name} 
+              price={product.price} 
+              photo={product.photo} 
+              description={product.description}
+            />
+          ))}
+        </AliceCarousel>
 
-      <button
-        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700"
-        onClick={() => carouselRef.current?.slideNext()}
-      >
-        ▶
-      </button>
+        {/* Custom Navigation Buttons */}
+        <button
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700"
+          onClick={() => carouselRef.current?.slidePrev()}
+        >
+          ◀
+        </button>
+
+        <button
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700"
+          onClick={() => carouselRef.current?.slideNext()}
+        >
+          ▶
+        </button>
+      </div>
     </div>
   );
 };
