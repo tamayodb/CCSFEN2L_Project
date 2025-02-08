@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const tabs = ['All', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
 
@@ -95,7 +96,19 @@ const OrdersPage = () => {
           </div>
           <div className="flex flex-col md:flex-row">
             <div className="md:w-1/2">
-              <img src={selectedProduct.picture} alt={selectedProduct.name} className="w-full h-auto mb-4" />
+              {selectedProduct.photo && selectedProduct.photo.length > 0 ? (
+                <Image
+                  src={selectedProduct.photo[0]}
+                  alt={selectedProduct.name}
+                  width={600}
+                  height={600}
+                  className="object-contain rounded-lg"
+                />
+              ) : (
+                <div className="w-full h-96 flex items-center justify-center bg-gray-200">
+                  <span className="text-gray-600 text-sm">No Image Available</span>
+                </div>
+              )}
             </div>
             <div className="md:w-1/2 md:pl-4">
               <h2 className="text-2xl font-bold mb-2">{selectedProduct.name}</h2>
@@ -172,7 +185,19 @@ const OrdersPage = () => {
                   <p>Payment Mode: {order.paymentMode}</p>
                 </div>
                 <div className="flex items-center mb-4">
-                  <img src={order.products[0].picture} alt={order.products[0].name} className="w-12 h-12 object-cover rounded mr-4" />
+                  {order.products[0].photo && order.products[0].photo.length > 0 ? (
+                    <Image
+                      src={order.products[0].photo[0]}
+                      alt={order.products[0].name}
+                      width={48}
+                      height={48}
+                      className="object-cover rounded mr-4"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 flex items-center justify-center bg-gray-200 rounded mr-4">
+                      <span className="text-gray-600 text-sm">No Image</span>
+                    </div>
+                  )}
                   <div>
                     <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(order.products[0])}>{order.products[0].name}</h3>
                     <p className="text-sm text-gray-600">Quantity: {order.products[0].quantity}</p>
@@ -181,7 +206,19 @@ const OrdersPage = () => {
                 </div>
                 {expandedOrders[order._id] && order.products.slice(1).map((product, index) => (
                   <div key={index} className="flex items-center mb-4">
-                    <img src={product.picture} alt={product.name} className="w-12 h-12 object-cover rounded mr-4" />
+                    {product.photo && product.photo.length > 0 ? (
+                      <Image
+                        src={product.photo[0]}
+                        alt={product.name}
+                        width={48}
+                        height={48}
+                        className="object-cover rounded mr-4"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 flex items-center justify-center bg-gray-200 rounded mr-4">
+                        <span className="text-gray-600 text-sm">No Image</span>
+                      </div>
+                    )}
                     <div>
                       <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(product)}>{product.name}</h3>
                       <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
