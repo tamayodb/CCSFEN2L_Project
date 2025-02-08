@@ -1,29 +1,39 @@
 import React from "react";
+import Image from "next/image";
 
-const FeaturedCarouselItem = ({ name, price, photo, description, rating, sold }) => {
+const FeaturedCarouselItem = ({ name, price, photo, description }) => {
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center p-6 text-left bg-white shadow-lg rounded-lg w-[380px] md:w-[600px] h-[250px]">
+    <div className="flex flex-col md:flex-row items-center bg-white rounded-2xl px-6 md:px-20 shadow-lg w-full md:w-[700px] h-auto md:h-[450px] py-6">
       {/* Product Image (Left Side) */}
-      <div className="w-1/3 flex justify-center">
-        <img
-          src={photo}
-          alt={name}
-          className="w-40 h-40 object-contain rounded-lg shadow-md"
-        />
+      <div className="flex-shrink-0 w-full md:w-1/2 h-[250px] md:h-[400px] flex justify-center items-center">
+        <div className="relative w-full h-full">
+          <Image
+            src={photo}
+            alt={name}
+            layout="fill"
+            objectFit="contain"
+            className="rounded-lg shadow-md"
+            priority // Ensures fast loading
+          />
+        </div>
       </div>
 
       {/* Product Details (Right Side) */}
-      <div className="w-2/3 ml-4 overflow-hidden">
-        <h2 className="text-lg font-bold text-gray-900 truncate">{name}</h2> {/* Product Name */}
-        <p className="text-xl font-semibold text-blue-900 mt-1">₱ {price}</p> {/* Price */}
-        <p className="text-sm text-gray-500">{rating} ⭐ | {sold} sold</p> {/* Rating & Sold Count */}
+      <div className="flex flex-col justify-center space-y-4 w-full md:w-1/2 px-6">
+        {/* Product Name */}
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900">{name}</h2>
 
-        {/* Description List (Limited to 3 Lines) */}
-        <ul className="list-disc list-inside mt-3 text-sm text-gray-700 space-y-1 max-h-[60px] overflow-hidden">
-          {description.length > 0 
-            ? description.slice(0, 3).map((line, i) => <li key={i} className="truncate">{line}</li>)
-            : <li>No description available.</li>}
-        </ul>
+        {/* Price */}
+        <p className="text-xl md:text-2xl font-semibold text-gray-900">₱ {price}</p>
+
+        {/* Description */}
+        <div className="text-gray-700 text-sm md:text-base leading-relaxed text-justify space-y-2">
+          {description.length > 0 ? (
+            description.slice(0, 4).map((line, i) => <p key={i}>{line}</p>)
+          ) : (
+            <p>No description available.</p>
+          )}
+        </div>
       </div>
     </div>
   );

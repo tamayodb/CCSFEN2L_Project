@@ -3,33 +3,34 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css";
-import FeaturedCarouselItem from "@/components/homepage/FeaturedCarouselItem"; // Updated import
+import FeaturedCarouselItem from "@/components/homepage/FeaturedCarouselItem";
 
 const FeaturedCarousel = ({ category }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const carouselRef = useRef(null); // Ref for carousel navigation
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       if (!category) return;
 
       try {
-        const response = await axios.get(
-          `/api/homepage/featuredProducts?category=${category}`
-        );
+        const response = await axios.get(`/api/homepage/featuredProducts?category=${category}`);
+        console.log("API Response:", response.data);
 
         const categoryProducts = response.data?.products || [];
+        console.log("Fetched Products:", categoryProducts);
+
         setProducts(
           categoryProducts.slice(0, 10).map((product) => ({
-            ...product,
-            photo:
-              typeof product.photo === "string" && product.photo.startsWith("http")
-                ? product.photo
-                : "/fallback-image.jpg", // Ensure valid image URL
-            description: product.description
-              ? String(product.description).split("•").map((line) => line.trim())
+            name: product.productName || "No Name Available",  // ✅ Uses productName
+            price: product.price || "N/A",
+            photo: Array.isArray(product.photo) && product.photo.length > 0
+              ? product.photo[0] // ✅ Uses first image in array
+              : "/fallback-image.jpg",
+            description: Array.isArray(product.description) 
+              ? product.description
               : [],
           }))
         );
@@ -71,9 +72,7 @@ const FeaturedCarousel = ({ category }) => {
             name={product.name} 
             price={product.price} 
             photo={product.photo} 
-            description={product.description} 
-            rating={product.rating} 
-            sold={product.sold}
+            description={product.description}
           />
         ))}
       </AliceCarousel>
