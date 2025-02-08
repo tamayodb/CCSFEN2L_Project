@@ -26,9 +26,11 @@ const FeaturedCarousel = ({ category }) => {
           categoryProducts.slice(0, 10).map((product) => ({
             name: product.productName || "No Name Available",
             price: product.price || "N/A",
-            photo: Array.isArray(product.photo) && product.photo.length > 0
+            image: Array.isArray(product.photo) && product.photo.length > 0
               ? product.photo[0]
               : "/fallback-image.jpg",
+            rating: product.rating || "No rating",
+            sold: product.sold || 0,
             description: Array.isArray(product.description) ? product.description : [],
           }))
         );
@@ -42,12 +44,12 @@ const FeaturedCarousel = ({ category }) => {
     fetchProducts();
   }, [category]);
 
-  if (loading) return <p>Loading {category} carousel...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
-  if (products.length === 0) return <p>No products found for {category}.</p>;
+  if (loading) return <p className="text-center text-gray-500">Loading {category} carousel...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (products.length === 0) return <p className="text-center text-gray-500">No products found for {category}.</p>;
 
   return (
-    <div className="relative mt-10 w-full md:w-[70%] mx-auto">
+    <div className="relative mt-10 w-[70%] mx-auto">
       <h1 className="text-2xl font-bold text-center tracking-widest mb-4">
         Featured {category}
       </h1>
@@ -62,18 +64,14 @@ const FeaturedCarousel = ({ category }) => {
           disableDotsControls={false}
           responsive={{
             0: { items: 1 },
-            768: { items: 1 },
-            1024: { items: 1 },
+            1024: { items: 1 }, // One item per slide
           }}
-          itemClass="flex justify-center items-center h-[450px] md:h-[400px]" // Ensure consistent height
+          itemClass="flex justify-center items-center h-[450px] md:h-[400px]"
         >
           {products.map((product, index) => (
             <FeaturedCarouselItem 
               key={index} 
-              name={product.name} 
-              price={product.price} 
-              photo={product.photo} 
-              description={product.description}
+              {...product} 
             />
           ))}
         </AliceCarousel>
