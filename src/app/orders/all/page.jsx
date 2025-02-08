@@ -100,14 +100,14 @@ const OrdersPage = () => {
             <div className="md:w-1/2 md:pl-4">
               <h2 className="text-2xl font-bold mb-2">{selectedProduct.name}</h2>
               <p className="text-xl text-gray-700 mb-4">₱{selectedProduct.price}</p>
-              <p className="mb-4"><strong>Description:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+              <p className="mb-4"><strong>Description:</strong> {selectedProduct.description && selectedProduct.description.length > 0 ? selectedProduct.description[0] : 'No description available'}</p>
               <div className="flex mb-4">
                 <button className="px-4 py-2 bg-green-500 text-white rounded mr-2">Add to Cart</button>
-                <button className="px-4 py-2 bg-yellow-500 text-white rounded">Buy Again</button>
+                <button className="px-4 py-2 bg-yellow-500 text-white rounded mr-2">Buy Again</button>
+                {selectedProduct && filteredOrders.find(order => order.products.some(product => product.name === selectedProduct.name) && order.status === 'Completed') && (
+                  <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setIsRating(true)}>Rate Product</button>
+                )}
               </div>
-              {selectedProduct && filteredOrders.find(order => order.products.some(product => product.name === selectedProduct.name) && order.status === 'Completed') && (
-                <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setIsRating(true)}>Rate Product</button>
-              )}
               {isRating && (
                 <div className="mt-4 p-4 border rounded bg-gray-100">
                   <h3 className="text-lg font-bold mb-2">Rate {selectedProduct.name}</h3>
