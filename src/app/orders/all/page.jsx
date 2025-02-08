@@ -103,7 +103,7 @@ const OrdersPage = () => {
               <p className="mb-4"><strong>Description:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
               <div className="flex mb-4">
                 <button className="px-4 py-2 bg-green-500 text-white rounded mr-2">Add to Cart</button>
-                <button className="px-4 py-2 bg-yellow-500 text-white rounded">Buy Now</button>
+                <button className="px-4 py-2 bg-yellow-500 text-white rounded">Buy Again</button>
               </div>
               {selectedProduct && filteredOrders.find(order => order.products.some(product => product.name === selectedProduct.name) && order.status === 'Completed') && (
                 <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setIsRating(true)}>Rate Product</button>
