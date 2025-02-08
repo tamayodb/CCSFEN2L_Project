@@ -9,14 +9,42 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState(null);
   const router = useRouter();
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    const response = await axios.post('/api/register', {email, password});
-    console.log(response)
+    setError(null);
 
-    router.push("/login"); // Redirect to the login page on form submission
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/register', { email, password });
+      
+      if (response.status === 201) {
+        // After successful registration, log the user in
+        const loginResponse = await axios.post('/api/login', { email, password });
+        
+        if (loginResponse.status === 200) {
+          const { token } = loginResponse.data;
+          localStorage.setItem("token", token);
+          router.push("/"); // Redirect to home page after successful signup and login
+        }
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.status === 400) {
+          setError(err.response.data.error);
+        } else {
+          setError("An error occurred. Please try again later.");
+        }
+      } else {
+        setError("An error occurred. Please try again later.");
+      }
+    }
   };
 
   return (
@@ -25,7 +53,7 @@ const SignupPage = () => {
       <div className="flex-3 w-3/4 relative">
         <video
           className="w-full h-full object-cover"
-          src="/signup/sign up video.webm" // Replace with your video path
+          src="/signup/sign up video.webm"
           autoPlay
           muted
           loop
@@ -57,7 +85,7 @@ const SignupPage = () => {
             </h2>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSignup} className="space-y-4">
             <div>
               <label
                 htmlFor="email"
@@ -112,15 +140,14 @@ const SignupPage = () => {
                 placeholder="********"
                 required
               />
-              {/* Fixed-height container for the validation message */}
-              <div className="h-12">
-                {confirmPassword && confirmPassword !== password && (
-                  <p className="text-red-500 text-sm">
-                    Passwords do not match.
-                  </p>
-                )}
-              </div>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="text-red-500 text-center font-light text-xs">
+                {error}
+              </div>
+            )}
 
             <button
               type="submit"
