@@ -16,6 +16,7 @@ import GameCarouselHotpicks from "@/components/homepage/GameCarouselHotpicks";
 import CategoryCatalog from "@/components/homepage/CategoryCatalog";
 import NewArrivals from "@/components/homepage/NewArrivals";
 import AssuranceSection from "@/components/homepage/AssuranceSection";
+import FeaturedCarousel from "@/components/homepage/FeaturedCarousel";
 
 const Page = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -232,6 +233,15 @@ const Page = () => {
       <div className="container mx-auto justify-center flex mb-20">
         <ProductGrid category="Collectibles" />
       </div>
+
+      {/* Featured Peripherals Carousel */}
+      <FeaturedCarousel category="Peripherals" />
+
+      {/* Featured Games Carousel */}
+      <FeaturedCarousel category="Games" />
+
+      {/* Featured Collectibles Carousel */}
+      <FeaturedCarousel category="Collectibles" />
 
       {/* Brand Feature */}
       <div className="bg-[#FAF9F6]">
