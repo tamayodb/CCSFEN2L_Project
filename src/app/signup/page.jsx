@@ -23,17 +23,9 @@ const SignupPage = () => {
 
     try {
       const response = await axios.post('/api/register', { email, password });
-      
-      if (response.status === 201) {
-        // After successful registration, log the user in
-        const loginResponse = await axios.post('/api/login', { email, password });
-        
         if (loginResponse.status === 200) {
-          const { token } = loginResponse.data;
-          localStorage.setItem("token", token);
-          router.push("/"); // Redirect to home page after successful signup and login
-        }
-      }
+          router.push("/login"); // Redirect to home page after successful signup and login
+        }      
     } catch (err) {
       if (err.response) {
         if (err.response.status === 400) {
