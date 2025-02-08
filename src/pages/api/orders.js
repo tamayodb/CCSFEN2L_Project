@@ -18,11 +18,16 @@ export default async function handler(req, res) {
             return {
               name: product.productName,
               picture: product.photo[0], // Get the first image from the array
+              price: product.price, // Get the price from the product
               quantity: order.quantity[index], // Get the quantity from the order
             };
           })
         );
-        return { ...order._doc, products };
+
+        // Calculate the total amount by summing the prices of each product
+        const totalAmount = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+
+        return { ...order._doc, products, totalAmount };
       })
     );
 
