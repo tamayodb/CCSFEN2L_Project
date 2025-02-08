@@ -178,9 +178,6 @@ const Page = () => {
           {/* Yellow Background Container */}
           <div className="absolute top-0 w-[60%] h-[250px] bg-[#F4D35E] left-1/2 -translate-x-1/2 z-0 rounded-2xl"></div>
           <div className="relative z-10 max-w-6xl mx-auto px-10 py-8">
-            <h2 className="text-3xl font-bold text-black tracking-widest text-center">
-              HOT PICKS
-            </h2>
             <GameCarouselHotpicks games={FGames} />
           </div>
         </div>

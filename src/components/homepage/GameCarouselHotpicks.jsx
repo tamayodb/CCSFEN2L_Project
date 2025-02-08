@@ -46,8 +46,9 @@ const GameCarouselHotpicks = () => {
 
   return (
     <div className="relative w-full max-w-7xl mx-auto p-4 mb-16">
-      
-
+      <h2 className="text-3xl font-bold text-black tracking-widest text-center pb-4 pt-2">
+        HOT PICKS
+      </h2>
       <div className="relative flex items-center">
         <button
           className="absolute left-0 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-200"
@@ -55,14 +56,18 @@ const GameCarouselHotpicks = () => {
         >
           <ChevronLeftIcon size={24} />
         </button>
-        <div ref={carouselRef} className="flex overflow-x-scroll scrollbar-hide mx-12 space-x-4">
+        <div
+          ref={carouselRef}
+          className="flex overflow-x-scroll scrollbar-hide mx-12 space-x-4"
+        >
           {games.map((game) => (
             <div key={game._id} className="flex-shrink-0 w-48">
               <Image
                 src={game.photo}
                 alt="Game Cover"
-                width={200}
-                height={320}
+                width={400} // Increase width
+                height={600} // Increase height
+                quality={100} // Max quality
                 className="w-full h-[320px] object-cover rounded-lg"
               />
             </div>

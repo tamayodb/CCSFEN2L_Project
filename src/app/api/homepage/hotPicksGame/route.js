@@ -6,14 +6,17 @@ export async function GET() {
   try {
     await connectToDatabase();
 
-    // Fetch 10 random products
-    const randomProducts = await Products.aggregate([{ $sample: { size: 10 } }]);
+    // Fetch 10 random products where tag.type is "Games"
+    const randomGames = await Products.aggregate([
+      { $match: { "tag.type": "Games" } }, // Correct filter for category
+      { $sample: { size: 10 } }, // Get 10 random games
+    ]);
 
-    console.log("🎲 10 Random Products:", randomProducts); // Log in server console
+    console.log("🎲 10 Random Games:", randomGames); // Debugging
 
-    return NextResponse.json(randomProducts, { status: 200 });
+    return NextResponse.json(randomGames, { status: 200 });
   } catch (error) {
-    console.error("❌ Error fetching products:", error);
+    console.error("❌ Error fetching games:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
