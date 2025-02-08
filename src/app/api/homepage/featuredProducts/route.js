@@ -26,8 +26,6 @@ export async function GET(req) {
         { "tag.category": { $in: [category] } },
       ],
     })
-      .sort({ date: -1 }) // Sort by newest
-      .limit(10) // Limit to 10 items
       .lean(); // Optimize query
 
     console.log(`Found ${categoryProducts.length} products for ${category}`);

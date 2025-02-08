@@ -24,14 +24,14 @@ const FeaturedCarousel = ({ category }) => {
 
         setProducts(
           categoryProducts.slice(0, 10).map((product) => ({
+            id: product._id, // Ensure the _id is included
             name: product.productName || "No Name Available",
-            price: product.price || "N/A",
-            image: Array.isArray(product.photo) && product.photo.length > 0
+            price: product.price?.toLocaleString() || "N/A", // Add comma formatting
+            photo: Array.isArray(product.photo) && product.photo.length > 0
               ? product.photo[0]
               : "/fallback-image.jpg",
-            rating: product.rating || "No rating",
-            sold: product.sold || 0,
             description: Array.isArray(product.description) ? product.description : [],
+            category, // Pass the category for dynamic linking
           }))
         );
       } catch (err) {
@@ -44,12 +44,12 @@ const FeaturedCarousel = ({ category }) => {
     fetchProducts();
   }, [category]);
 
-  if (loading) return <p className="text-center text-gray-500">Loading {category} carousel...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
-  if (products.length === 0) return <p className="text-center text-gray-500">No products found for {category}.</p>;
+  if (loading) return <p>Loading {category} carousel...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (products.length === 0) return <p>No products found for {category}.</p>;
 
   return (
-    <div className="relative mt-10 w-[70%] mx-auto">
+    <div className="relative mt-10 w-full md:w-[70%] mx-auto">
       <h1 className="text-2xl font-bold text-center tracking-widest mb-4">
         Featured {category}
       </h1>
@@ -64,15 +64,13 @@ const FeaturedCarousel = ({ category }) => {
           disableDotsControls={false}
           responsive={{
             0: { items: 1 },
-            1024: { items: 1 }, // One item per slide
+            768: { items: 1 },
+            1024: { items: 1 },
           }}
-          itemClass="flex justify-center items-center h-[450px] md:h-[400px]"
+          itemClass="flex justify-center items-center h-[450px] md:h-[400px]" // Ensure consistent height
         >
           {products.map((product, index) => (
-            <FeaturedCarouselItem 
-              key={index} 
-              {...product} 
-            />
+            <FeaturedCarouselItem key={index} {...product} />
           ))}
         </AliceCarousel>
 

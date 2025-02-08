@@ -136,37 +136,8 @@ const Page = () => {
         <CategoryCatalog></CategoryCatalog>
       </div>
 
-      {/* Peripherals Featured */}
-      <div className="relative mt-10 w-[70%] mx-auto">
-        <h1 className="text-2xl font-bold text-center tracking-widest">
-          Featured Peripherals
-        </h1>
-        <AliceCarousel
-          autoPlay
-          autoPlayInterval={3000}
-          infinite
-          disableButtonsControls={false}
-          disableDotsControls={false}
-          responsive={{
-            0: { items: 1 },
-            1024: { items: 1 }, // One item per slide
-          }}
-          renderPrevButton={() => (
-            <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-              ◀
-            </button>
-          )}
-          renderNextButton={() => (
-            <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-              ▶
-            </button>
-          )}
-        >
-          {productsPeri.map((product, index) => (
-            <ProductCarouselItem key={index} {...product} />
-          ))}
-        </AliceCarousel>
-      </div>
+      {/* Featured Peripherals Carousel */}
+      <FeaturedCarousel category="Peripherals"></FeaturedCarousel>
 
       {/* Peripherals Product Grid */}
       <div className="container mx-auto justify-center flex mb-32">
@@ -183,13 +154,8 @@ const Page = () => {
           </div>
         </div>
 
-        {/* Featured Game Carousel */}
-        <div>
-          <h1 className="text-2xl font-bold text-center tracking-widest">
-            Featured Games
-          </h1>
-          <GameCarousel games={FGames} />
-        </div>
+        {/* Featured Games Carousel */}
+        <FeaturedCarousel category="Games" />
 
         {/* Games Product Grid */}
         <div className="container mx-auto justify-center flex mb-32">
@@ -197,51 +163,13 @@ const Page = () => {
         </div>
       </div>
 
-      {/* Collectibles Featured */}
-      <div className="relative mt-10 w-[70%] mx-auto">
-        <h1 className="text-2xl font-bold text-center tracking-widest">
-          Featured Collectibles
-        </h1>
-        <AliceCarousel
-          autoPlay
-          autoPlayInterval={3000}
-          infinite
-          disableButtonsControls={false}
-          disableDotsControls={false}
-          responsive={{
-            0: { items: 1 },
-            1024: { items: 1 }, // One item per slide
-          }}
-          renderPrevButton={() => (
-            <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-              ◀
-            </button>
-          )}
-          renderNextButton={() => (
-            <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-              ▶
-            </button>
-          )}
-        >
-          {productsPeri.map((product, index) => (
-            <ProductCarouselItem key={index} {...product} />
-          ))}
-        </AliceCarousel>
-      </div>
+      {/* Featured Collectibles Carousel */}
+      <FeaturedCarousel category="Collectibles" />
 
       {/* Collectibles Product Grid */}
       <div className="container mx-auto justify-center flex mb-20">
         <ProductGrid category="Collectibles" />
       </div>
-
-      {/* Featured Peripherals Carousel */}
-      <FeaturedCarousel category="Peripherals" />
-
-      {/* Featured Games Carousel */}
-      <FeaturedCarousel category="Games" />
-
-      {/* Featured Collectibles Carousel */}
-      <FeaturedCarousel category="Collectibles" />
 
       {/* Brand Feature */}
       <div className="bg-[#FAF9F6]">

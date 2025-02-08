@@ -27,8 +27,7 @@ export async function GET(req) {
         { "tag.category": { $in: [category] } },
       ],
     })
-      .sort({ date: -1 })
-      .limit(10);
+
 
     console.log(`Found ${categoryProducts.length} products for ${category}`);
 
