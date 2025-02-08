@@ -34,15 +34,15 @@ const CategoryCatalog = () => {
               style={{ height: category.name === "Plush" || category.name === "Amiibo" ? "130px" : "auto" }}
               onClick={() => handleClick(category.path)}
             >
-              {/* Image */}
+              {/* Image with sizes optimization */}
               <Image
                 src={category.image}
                 alt={category.name}
-                layout="fill"
-                objectFit="cover"
-                className="group-hover:scale-105 transition-transform duration-300"
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
               />
-              
+
               {/* Static Title */}
               <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center group-hover:opacity-0 transition-opacity duration-300">
                 <span className="text-white text-sm font-medium">{category.name}</span>
