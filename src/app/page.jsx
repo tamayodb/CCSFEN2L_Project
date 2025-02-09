@@ -16,6 +16,7 @@ import GameCarouselHotpicks from "@/components/homepage/GameCarouselHotpicks";
 import CategoryCatalog from "@/components/homepage/CategoryCatalog";
 import NewArrivals from "@/components/homepage/NewArrivals";
 import AssuranceSection from "@/components/homepage/AssuranceSection";
+import FeaturedCarousel from "@/components/homepage/FeaturedCarousel";
 
 const Page = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -135,41 +136,12 @@ const Page = () => {
         <CategoryCatalog></CategoryCatalog>
       </div>
 
-      {/* Peripherals Featured */}
-      <div className="relative mt-10 w-[70%] mx-auto">
-        <h1 className="text-2xl font-bold text-center tracking-widest">
-          Featured Peripherals
-        </h1>
-        <AliceCarousel
-          autoPlay
-          autoPlayInterval={3000}
-          infinite
-          disableButtonsControls={false}
-          disableDotsControls={false}
-          responsive={{
-            0: { items: 1 },
-            1024: { items: 1 }, // One item per slide
-          }}
-          renderPrevButton={() => (
-            <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-              ◀
-            </button>
-          )}
-          renderNextButton={() => (
-            <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-              ▶
-            </button>
-          )}
-        >
-          {productsPeri.map((product, index) => (
-            <ProductCarouselItem key={index} {...product} />
-          ))}
-        </AliceCarousel>
-      </div>
+      {/* Featured Peripherals Carousel */}
+      <FeaturedCarousel category="Peripherals"></FeaturedCarousel>
 
       {/* Peripherals Product Grid */}
       <div className="container mx-auto justify-center flex mb-32">
-        <ProductGrid products={products} />
+        <ProductGrid category="Peripherals" />
       </div>
 
       <div className="bg-[#FAF9F6]">
@@ -178,62 +150,25 @@ const Page = () => {
           {/* Yellow Background Container */}
           <div className="absolute top-0 w-[60%] h-[250px] bg-[#F4D35E] left-1/2 -translate-x-1/2 z-0 rounded-2xl"></div>
           <div className="relative z-10 max-w-6xl mx-auto px-10 py-8">
-            <h2 className="text-3xl font-bold text-black tracking-widest text-center">
-              HOT PICKS
-            </h2>
             <GameCarouselHotpicks games={FGames} />
           </div>
         </div>
 
-        {/* Featured Game Carousel */}
-        <div>
-          <h1 className="text-2xl font-bold text-center tracking-widest">
-            Featured Games
-          </h1>
-          <GameCarousel games={FGames} />
-        </div>
+        {/* Featured Games Carousel */}
+        <FeaturedCarousel category="Games" />
 
         {/* Games Product Grid */}
         <div className="container mx-auto justify-center flex mb-32">
-          <ProductGrid products={products} />
+          <ProductGrid category="Games" />
         </div>
       </div>
 
-      {/* Collectibles Featured */}
-      <div className="relative mt-10 w-[70%] mx-auto">
-        <h1 className="text-2xl font-bold text-center tracking-widest">
-          Featured Collectibles
-        </h1>
-        <AliceCarousel
-          autoPlay
-          autoPlayInterval={3000}
-          infinite
-          disableButtonsControls={false}
-          disableDotsControls={false}
-          responsive={{
-            0: { items: 1 },
-            1024: { items: 1 }, // One item per slide
-          }}
-          renderPrevButton={() => (
-            <button className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-              ◀
-            </button>
-          )}
-          renderNextButton={() => (
-            <button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700">
-              ▶
-            </button>
-          )}
-        >
-          {productsPeri.map((product, index) => (
-            <ProductCarouselItem key={index} {...product} />
-          ))}
-        </AliceCarousel>
-      </div>
+      {/* Featured Collectibles Carousel */}
+      <FeaturedCarousel category="Collectibles" />
 
       {/* Collectibles Product Grid */}
       <div className="container mx-auto justify-center flex mb-20">
-        <ProductGrid products={products} />
+        <ProductGrid category="Collectibles" />
       </div>
 
       {/* Brand Feature */}

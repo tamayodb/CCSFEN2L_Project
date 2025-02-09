@@ -1,157 +1,101 @@
-import React, { useState, useRef, useEffect } from "react";
-import ProductCard from "./CardWithDetails"; // Adjust the path as necessary
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import ProductCard from "./CardWithDetails";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 const NewArrivals = () => {
   const [activeCategory, setActiveCategory] = useState("Peripherals");
+  const [products, setProducts] = useState({});
   const carouselRef = useRef(null);
 
-  const categories = ["Peripherals", "Games", "Collectibles"];
-  const products = {
-    Peripherals: [
-      {
-        name: "Gaming Mouse",
-        price: 1999,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Mechanical Keyboard",
-        price: 3499,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "RGB Headset",
-        price: 2799,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Gaming Chair",
-        price: 5999,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Gaming Mouse1",
-        price: 1999,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Mechanical Keyboard1",
-        price: 3499,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "RGB Headset1",
-        price: 2799,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Gaming Chair1",
-        price: 5999,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-    ],
-    Games: [
-      { name: "Game 1", price: 1599, image: "/homepage/plush_samplepic2.jpeg" },
-      { name: "Game 2", price: 1999, image: "/homepage/plush_samplepic2.jpeg" },
-      { name: "Game 3", price: 2499, image: "/homepage/plush_samplepic2.jpeg" },
-    ],
-    Collectibles: [
-      {
-        name: "Figure 1",
-        price: 999,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Figure 2",
-        price: 1299,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-      {
-        name: "Figure 3",
-        price: 1899,
-        image: "/homepage/plush_samplepic2.jpeg",
-      },
-    ],
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("/api/homepage/newArrivals");
+        console.log("Fetched Data:", response.data);
+
+        const formattedData = Object.fromEntries(
+          Object.entries(response.data).map(([category, items]) => [
+            category,
+            items.map((product) => ({
+              ...product,
+              photo:
+                Array.isArray(product.photo) && product.photo.length > 0
+                  ? product.photo[0]
+                  : "/fallback-image.jpg",
+            })),
+          ])
+        );
+
+        setProducts(formattedData);
+      } catch (error) {
+        console.error("Error fetching products:", error.message);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const scrollLeft = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -300, behavior: "smooth" });
+    }
   };
 
-  useEffect(() => {
-    // Reset scroll position to the start of the carousel
+  const scrollRight = () => {
     if (carouselRef.current) {
-      carouselRef.current.scrollLeft = 0;
-    }
-  }, [activeCategory]);
-
-  const scrollCarousel = (direction) => {
-    if (carouselRef.current) {
-      const scrollAmount = carouselRef.current.clientWidth;
-      carouselRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
-      });
+      carouselRef.current.scrollBy({ left: 300, behavior: "smooth" });
     }
   };
 
   return (
     <div className="relative w-full max-w-7xl mx-auto p-4 mb-16">
-      {/* Background Container */}
-      <div className="absolute top-0 w-[60%] h-[200px] bg-[#FAF0CA] left-1/2 -translate-x-1/2 z-0 rounded-2xl"></div>
+      <h2 className="text-3xl font-bold text-black tracking-widest text-center pb-4 pt-2">
+        NEW ARRIVALS
+      </h2>
 
-      <div className="relative z-10">
-        {/* Title */}
-        <h2 className="text-3xl font-bold text-black tracking-widest text-center pb-4 pt-2">
-          NEW ARRIVALS
-        </h2>
+      <div className="flex justify-center space-x-4 mb-6">
+        {Object.keys(products).map((category) => (
+          <button
+            key={category}
+            className={`py-2 px-6 rounded-md font-medium ${
+              activeCategory === category
+                ? "bg-[#0D3B66] text-white"
+                : "bg-white text-[#0D3B66] border-2 border-[#0D3B66] hover:bg-[#0D3B66] hover:text-white"
+            }`}
+            onClick={() => setActiveCategory(category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
 
-        {/* Category Tabs */}
-        <div className="flex justify-center space-x-4 mb-6">
-          {categories.map((category) => (
-            <button
-              key={category}
-              className={`py-2 px-6 rounded-md font-medium transition-colors duration-300 ${
-                activeCategory === category
-                  ? "bg-[#0D3B66] text-white shadow-lg"
-                  : "bg-white text-[#0D3B66] border-2 border-[#0D3B66] hover:bg-[#0D3B66] hover:text-white"
-              }`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </button>
+      <div className="relative flex items-center">
+        <button
+          className="absolute left-0 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-200"
+          onClick={scrollLeft}
+        >
+          <ChevronLeftIcon size={24} />
+        </button>
+        <div ref={carouselRef} className="flex overflow-x-scroll scrollbar-hide mx-12">
+          {products[activeCategory]?.map((product) => (
+            <div key={product._id} className="flex-shrink-0 w-48 mb-10">
+              <ProductCard
+                name={product.productName}
+                price={product.price}
+                image={product.photo}
+                category={activeCategory}
+                id={product._id}
+              />
+            </div>
           ))}
         </div>
-
-        {/* Product Carousel */}
-        <div className="relative mx-20">
-          {/* Left Navigation Button */}
-          <button
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700 z-10"
-            onClick={() => scrollCarousel("left")}
-          >
-            ◀
-          </button>
-
-          {/* Carousel Container */}
-          <div
-            ref={carouselRef}
-            className="flex overflow-x-scroll scrollbar-hide mx-24"
-          >
-            {products[activeCategory]?.map((product) => (
-              <div key={product.name} className="flex-shrink-0 w-48 mb-10">
-                <ProductCard
-                  name={product.name}
-                  price={product.price}
-                  image={product.image}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Right Navigation Button */}
-          <button
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-blue-900 text-white rounded-md p-3 hover:bg-blue-700 z-10"
-            onClick={() => scrollCarousel("right")}
-          >
-            ▶
-          </button>
-        </div>
+        <button
+          className="absolute right-0 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-200"
+          onClick={scrollRight}
+        >
+          <ChevronRightIcon size={24} />
+        </button>
       </div>
     </div>
   );
