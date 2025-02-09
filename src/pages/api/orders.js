@@ -19,6 +19,7 @@ export default async function handler(req, res) {
               name: product.productName,
               photo: product.photo, // Include the photo field
               price: product.price, // Get the price from the product
+              description: product.description, // Get the desc from the product
               quantity: order.quantity[index], // Get the quantity from the order
             };
           })
