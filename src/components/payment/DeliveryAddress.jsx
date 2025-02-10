@@ -1,34 +1,54 @@
-import React from "react";
+import { useState, useEffect } from "react";
 
-export default function DeliveryAddress({ name, contactNumber, address }) {
+const DeliveryAddress = () => {
+  const [address, setAddress] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setError("Unauthorized: No token found");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/payment/deliveryaddress", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json(); // Parse response JSON
+        console.log("Fetched Data:", data);
+
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to fetch address");
+        }
+
+        setAddress(data.address); // Ensure `address` is not an object
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchAddress();
+  }, []);
+
   return (
-    <div className="border border-gray-300 rounded-lg shadow-md p-4 flex items-center justify-between bg-white px-8">
-      <div>
-        {/* Header */}
-        <div className="text-sm text-gray-500 font-medium mb-2 tracking-widest">
-          Delivery Address
-        </div>
-
-        {/* Name and Contact */}
-        <div className="font-semibold text-gray-800">{name}</div>
-        <div className="text-gray-600 text-xs">{contactNumber}</div>
-
-        {/* Address */}
-        <div className="text-gray-600 text-xs mt-1">{address}</div>
-      </div>
-
-      {/* Right side */}
-      <div className="flex items-center space-x-3">
-        {/* Default */}
-        <div className="text-xs text-gray-500 font-medium border border-gray-400 rounded-md px-2 py-1">
-          Default
-        </div>
-
-        {/* Change Button */}
-        <button className="text-yellow-500 text-xs font-medium hover:underline focus:outline-none">
-          Change
-        </button>
-      </div>
+    <div>
+      <h2>Delivery Address</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {address ? (
+        <p>{typeof address === "object" ? JSON.stringify(address) : address}</p>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
-}
+};
+
+export default DeliveryAddress;
