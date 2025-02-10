@@ -24,19 +24,16 @@ export default function Profile() {
 
   const [showContactNum, setShowPhone] = useState(false);
 
-  // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Retrieve the token from localStorage
-        const token = localStorage.getItem('token'); // Assuming the token is stored as 'token'
+        const token = localStorage.getItem('token'); 
         if (!token) {
           console.error('No token found');
           return;
         }
 
-        // Fetch user data from the backend
-        const response = await fetch('/api/user', {
+        const response = await fetch('/api/user/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -49,7 +46,6 @@ export default function Profile() {
 
         const userData = await response.json();
 
-        // Populate the state with user data
         setEmail(userData.email || '');
         setUsername(userData.username || '');
         setName(userData.name || '');
@@ -66,7 +62,6 @@ export default function Profile() {
     fetchUserData();
   }, []);
 
-  // Rest of the component code remains the same...
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -86,43 +81,63 @@ export default function Profile() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const missingFields = [];
   
     if (!username) missingFields.push("Username");
-    if (!name) missingFields.push("Name");
     if (!email) missingFields.push("Email Address");
     if (!barangay) missingFields.push("Barangay");
     if (!street_num) missingFields.push("Street");
     if (!city) missingFields.push("City");
     if (!zip_code) missingFields.push("ZIP Code");
-    if (!showContactNum && !isEditing) missingFields.push("Phone Number");
+    if (!contact_num) missingFields.push("Phone Number");
   
     if (missingFields.length > 0) {
       alert(`Please fill in the following fields: ${missingFields.join(", ")}`);
-    } else {
-      handleSaveToFile();
-    }
-  };
+      return;
+    };
 
-  const handleSaveToFile = () => {
-    const fileContent = `
-      Username: ${username}
-      Name: ${name}
-      Email Address: ${email}
-      Billing Address:
-        Barangay: ${barangay}
-        Street: ${street_num}
-        City: ${city}
-        ZIP Code: ${zip_code}
-      Phone: ${showContactNum ? contact_num : "Hidden"}
-    `;
-  
-    const blob = new Blob([fileContent], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'profile_data.txt';
-    link.click();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('No authentication token found');
+        return;
+      }
+
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          contact_num,
+          address: {
+            street_num,
+            barangay,
+            city,
+            zip_code,
+          },
+        }),
+      });
+
+      alert('Profile updated successfully!');
+      window.location.reload(); 
+
+      setIsEditing(false);
+      setIsEditingUsername(false);
+      setIsEditingEmail(false);
+      setIsEditingBarangay(false);
+      setIsEditingCity(false);
+      setIsEditingStreet(false);
+      setIsEditingZipCode(false);
+      
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
+    }
   };
 
   return (
@@ -150,16 +165,10 @@ export default function Profile() {
                 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (isEditing) {
-                      setIsEditingUsername(false);
-                    } else {
-                      setIsEditingUsername(true);
-                    }
-                  }}
+                  onClick={() => setIsEditingUsername(!isEditingUsername)}
                   className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
                 >
-                  {isEditing ? 'Save' : 'Edit'}
+                  {isEditingUsername ? 'Save' : 'Edit'}
                 </button>
               </div>
             </div>
@@ -184,13 +193,7 @@ export default function Profile() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (isEditingName) {
-                      setIsEditingName(false);
-                    } else {
-                      setIsEditingName(true);
-                    }
-                  }}
+                  onClick={() => setIsEditingName(!isEditingName)} 
                   className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
                 >
                   {isEditingName ? 'Save' : 'Edit'}

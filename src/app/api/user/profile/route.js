@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import Customer from '../../../../models/accounts'; // Your user model
-import connectToDatabase from '../../../../lib/db'; // Your DB connection
+import Customer from '../../../../../models/accounts'; // Your user model
+import connectToDatabase from '../../../../../lib/db'; // Your DB connection
 
 // Named export for the GET method
 export async function GET(req) {
