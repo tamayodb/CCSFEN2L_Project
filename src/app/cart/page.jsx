@@ -58,40 +58,42 @@ export default function page() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Cart Items */}
           <div className="col-span-2 bg-white p-4 rounded-lg shadow-md">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b">
-                  <th className="py-2"></th>
-                  <th className="py-2">Product</th>
-                  <th className="py-2">Price</th>
-                  <th className="py-2">Quantity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cartItems.map((item) => (
-                  <tr key={item.id} className="border-b">
-                    <td className="py-4">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox h-5 w-5 text-blue-600"
-                        checked={selectedItems[item.id] || false}
-                        onChange={() => handleCheckboxChange(item.id)}
-                      />
-                    </td>
-                    <td className="py-4 flex items-center space-x-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-16 h-16 object-contain"
-                      />
-                      <p>{item.name}</p>
-                    </td>
-                    <td className="py-4">₱{item.price.toLocaleString()}</td>
-                    <td className="py-4">{item.quantity}</td>
+            <div className="overflow-auto max-h-96">
+              <table className="w-full text-left">
+                <thead className="sticky top-0 bg-white">
+                  <tr className="border-b">
+                    <th className="py-2"></th>
+                    <th className="py-2">Product</th>
+                    <th className="py-2">Price</th>
+                    <th className="py-2">Quantity</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {cartItems.map((item) => (
+                    <tr key={item.id} className="border-b">
+                      <td className="py-4">
+                        <input
+                          type="checkbox"
+                          className="form-checkbox h-5 w-5 text-blue-600"
+                          checked={selectedItems[item.id] || false}
+                          onChange={() => handleCheckboxChange(item.id)}
+                        />
+                      </td>
+                      <td className="py-4 flex items-center space-x-4">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-16 h-16 object-contain"
+                        />
+                        <p>{item.name}</p>
+                      </td>
+                      <td className="py-4">₱{item.price.toLocaleString()}</td>
+                      <td className="py-4">{item.quantity}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
   
           {/* Order Summary */}
