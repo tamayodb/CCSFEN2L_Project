@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FcGoogle } from "react-icons/fc"; // Google icon
-import { FaFacebook } from "react-icons/fa"; // Facebook icon
 import axios from "axios";
 
 const LoginPage = () => {
@@ -14,21 +12,23 @@ const LoginPage = () => {
   const router = useRouter();
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent form refresh
-    setError(null); // Clear previous errors
-
+    e.preventDefault();
+    setError(null);
+  
     try {
       const response = await axios.post("/api/login", { email, password });
-
-      if (response.status === 201) {
+  
+      if (response.status === 200) {
+        const { token } = response.data; // Extract the token from the response
+        localStorage.setItem("token", token); // Store the token in localStorage
         router.push("/"); // Redirect on successful login
       }
     } catch (err) {
       if (err.response) {
         if (err.response.status === 400) {
           setError("Invalid email or password."); // Wrong credentials
-        } else if (err.response.status === 404) {
-          setError(" The password you’ve entered is incorrect."); // Account not found
+        } else if (err.response.status === 401) {
+          setError("The password you’ve entered is incorrect."); // Wrong password
         } else {
           setError("An error occurred. Please try again later."); // General error
         }
