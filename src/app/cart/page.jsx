@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import AssuranceSection from "@/components/homepage/AssuranceSection";
 import { peripheralProducts } from "@/utils/peripherals/constantsPeripherals";
+import Image from "next/image";
 
 export default function page() {
   const [cartItems, setCartItems] = useState([]);
@@ -80,11 +81,13 @@ export default function page() {
                         />
                       </td>
                       <td className="py-4 flex items-center space-x-4">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-16 h-16 object-contain"
-                        />
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={64}
+                        height={64}
+                        className="object-contain"
+                      />
                         <p>{item.name}</p>
                       </td>
                       <td className="py-4">₱{item.price.toLocaleString()}</td>
@@ -110,7 +113,7 @@ export default function page() {
           </div>
         </div>
 
-      {/* Recently Viewed */}
+      {/* Recently Ordered */}
     <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
     <h2 className="text-lg font-bold mb-6">Recently Ordered</h2>
         <div className="flex justify-between gap-6">
