@@ -12,7 +12,7 @@ export default function CartPage() {
 
   const handleProceedToPayment = () => {
     const encodedData = encodeURIComponent(JSON.stringify(cartItems));
-    router.push(`/sample2?cart=${encodedData}`);
+    router.push(`/payment?cart=${encodedData}`);
   };
 
   return (
