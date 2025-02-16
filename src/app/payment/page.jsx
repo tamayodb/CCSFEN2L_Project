@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import DeliveryAddress from "@/components/payment/DeliveryAddress";
 import AssuranceSection from "@/components/homepage/AssuranceSection";
@@ -7,26 +8,58 @@ import PaymentComponent from "@/components/payment/PaymentMethod";
 import ProductOrderComponent from "@/components/payment/ProdOrderComponent";
 
 export default function Payment() {
-  const [products] = useState([
-    { id: 1, itemName: "Logitech G915 X", qty: 1, price: 53795, image: "/homepage/product_sample.webp" },
-    { id: 2, itemName: "Razer DeathAdder", qty: 1, price: 27495, image: "/homepage/product_sample.webp" },
-    { id: 3, itemName: "SteelSeries Headset", qty: 1, price: 14995, image: "/homepage/product_sample.webp" },
-  ]);
+  const searchParams = useSearchParams();
+  const cartData = searchParams.get("cart");
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [shippingFee] = useState(200);
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
-    const totalProductPrice = products.reduce(
-      (total, product) => total + product.price * product.qty,
-      0
-    );
-    const updatedTotalPrice = totalProductPrice + shippingFee;
-    setTotalPrice(updatedTotalPrice);
-  }, [products, shippingFee]); // Ensure price updates when products or shippingFee change
+    const fetchProducts = async () => {
+      if (!cartData) return;
+
+      try {
+        const decodedCart = JSON.parse(decodeURIComponent(cartData));
+        console.log("Decoded Cart Data:", decodedCart);
+
+        const productDetails = await Promise.all(
+          decodedCart.map(async (item) => {
+            const res = await fetch(`/api/payment/${item.id}`);
+            const data = await res.json();
+            return { ...data, qty: item.qty };
+          })
+        );
+
+        setProducts(productDetails);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [cartData]);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const totalProductPrice = products.reduce(
+        (total, product) => total + product.price * product.qty,
+        0
+      );
+      setTotalPrice(totalProductPrice + shippingFee);
+    }
+  }, [products, shippingFee]);
+
+  if (loading) {
+    return <div className="text-center py-10">Loading payment details...</div>;
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      {/* Breadcrumb Navigation */}
       <div className="flex justify-between items-center">
         <div className="text-xs font-medium text-gray-500 flex items-center space-x-2 tracking-widest">
           <Link href="/" className="hover:text-gray-700">Home</Link>
@@ -37,6 +70,7 @@ export default function Payment() {
         </div>
       </div>
 
+      {/* Delivery Address Section */}
       <div className="my-5">
         <DeliveryAddress
           name="John Doe"
@@ -45,14 +79,17 @@ export default function Payment() {
         />
       </div>
 
+      {/* Product Order Summary */}
       <div>
         <ProductOrderComponent products={products} shippingFee={shippingFee} />
       </div>
 
+      {/* Payment Component */}
       <div>
         <PaymentComponent products={products} shippingFee={shippingFee} totalPrice={totalPrice} />
       </div>
 
+      {/* Assurance Section */}
       <div className="mt-16">
         <AssuranceSection />
       </div>
