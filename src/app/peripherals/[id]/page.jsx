@@ -13,21 +13,24 @@ export default function SpecificProduct() {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [recentlyViewedIds, setRecentlyViewedIds] = useState([]);
+  const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
   const descriptionRef = useRef(null);
 
-  // Fetch recently viewed items from localStorage on component mount
+  // Get recently viewed product IDs from sessionStorage on mount
   useEffect(() => {
-    const storedRecentlyViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
-    setRecentlyViewed(storedRecentlyViewed);
+    const storedIds = JSON.parse(sessionStorage.getItem("recentlyViewed") || "[]");
+    setRecentlyViewedIds(storedIds);
   }, []);
 
+  // Set product ID from params
   useEffect(() => {
     if (params?.id) {
       setId(params.id);
     }
   }, [params]);
 
+  // Fetch product details
   useEffect(() => {
     if (!id) return;
 
@@ -49,39 +52,51 @@ export default function SpecificProduct() {
     fetchProduct();
   }, [id]);
 
-  // Update recently viewed items when product changes
+  // Update recently viewed product IDs
   useEffect(() => {
-    if (product) {
-      const updatedRecentlyViewed = updateRecentlyViewed(product);
-      setRecentlyViewed(updatedRecentlyViewed);
-    }
-  }, [product]);
+    if (!id) return;
 
-  const updateRecentlyViewed = (product) => {
-    let recentlyViewedItems = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
+    let updatedIds = JSON.parse(sessionStorage.getItem("recentlyViewed") || "[]");
 
-    // Check if the product is already in the list
-    const existingIndex = recentlyViewedItems.findIndex((item) => item.id === product.id);
+    // Remove duplicate
+    updatedIds = updatedIds.filter((itemId) => itemId !== id);
 
-    if (existingIndex !== -1) {
-      // Remove the existing item to avoid duplicates
-      recentlyViewedItems.splice(existingIndex, 1);
-    }
-
-    // Add the new product to the beginning of the list
-    recentlyViewedItems.unshift(product);
+    // Add the new product ID at the beginning
+    updatedIds.unshift(id);
 
     // Keep only the last 5 items
-    if (recentlyViewedItems.length > 5) {
-      recentlyViewedItems = recentlyViewedItems.slice(0, 5);
+    if (updatedIds.length > 5) {
+      updatedIds = updatedIds.slice(0, 5);
     }
 
-    // Update localStorage
-    localStorage.setItem("recentlyViewed", JSON.stringify(recentlyViewedItems));
+    // Store in sessionStorage
+    sessionStorage.setItem("recentlyViewed", JSON.stringify(updatedIds));
+    setRecentlyViewedIds(updatedIds);
+  }, [id]);
 
-    // Return the updated list
-    return recentlyViewedItems;
-  };
+  // Fetch recently viewed product details
+  useEffect(() => {
+    const fetchRecentlyViewedProducts = async () => {
+      if (recentlyViewedIds.length === 0) return;
+
+      try {
+        const productsData = await Promise.all(
+          recentlyViewedIds.map(async (productId) => {
+            const res = await fetch(`/api/product/${category}/${productId}`);
+            if (!res.ok) return null;
+            return res.json();
+          })
+        );
+
+        // Filter out null responses
+        setRecentlyViewedProducts(productsData.filter(Boolean));
+      } catch (error) {
+        console.error("Error fetching recently viewed products:", error);
+      }
+    };
+
+    fetchRecentlyViewedProducts();
+  }, [recentlyViewedIds]);
 
   const handleShowMore = () => {
     descriptionRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -107,9 +122,8 @@ export default function SpecificProduct() {
     <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* 🔹 Image Gallery */}
+          {/* Image Gallery */}
           <div className="bg-white p-6 rounded-lg shadow-xl flex">
-            {/* Thumbnail Images */}
             <div className="flex flex-col space-y-2 mr-4">
               {product.photo?.map((img, index) => (
                 <Image
@@ -123,7 +137,6 @@ export default function SpecificProduct() {
                 />
               ))}
             </div>
-            {/* Main Image */}
             <div>
               {selectedImage ? (
                 <Image
@@ -141,7 +154,7 @@ export default function SpecificProduct() {
             </div>
           </div>
 
-          {/* 🔹 Product Info */}
+          {/* Product Info */}
           <div className="space-y-6">
             <h1 className="text-3xl font-semibold text-gray-900">{product.productName}</h1>
             <p className="text-xl text-gray-600">Category: {category}</p>
@@ -200,7 +213,7 @@ export default function SpecificProduct() {
         </div>
 
         {/* 🔹 Long Description */}
-        <div ref={descriptionRef} className="mt-12 bg-white p-8 rounded-lg shadow-lg">
+         <div ref={descriptionRef} className="mt-12 bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-gray-800">Description</h2>
           <ul className="list-disc list-inside text-gray-700 mt-3 space-y-2">
             {product.description?.map((desc, index) => (
@@ -209,15 +222,16 @@ export default function SpecificProduct() {
           </ul>
         </div>
 
-        {/* 🔹 Recently Viewed Items */}
+
+        {/* Recently Viewed Products */}
         <div className="mt-12 bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-gray-800">Recently Viewed</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-6">
-            {recentlyViewed.map((item) => (
-              <Link key={item.id} href={`/product/${item.id}`}>
+            {recentlyViewedProducts.map((item) => (
+              <Link key={item.id} href={`/peripherals/${item.id}`}>
                 <div className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                   <Image
-                    src={item.photo?.[0]}
+                    src={item.photo?.[0] || "/placeholder.jpg"}
                     alt={item.productName}
                     width={200}
                     height={200}
