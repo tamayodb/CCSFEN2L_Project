@@ -8,7 +8,7 @@ const PeripheralGrid = ({ products }) => {
       <div className="mb-6">
         <h2 className="text-4xl font-bold text-gray-800">Peripherals</h2>
         <p className="text-sm text-gray-600">
-          Browse our selection of high-quality gaming peripheral products.
+          Browse our selection of high-quality gaming products.
         </p>
       </div>
       {/* Grid Layout */}

@@ -1,31 +1,35 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
-import { useParams } from "next/navigation"; // This is correct for dynamic routing in Next.js
 
-export default function SpecificPeripheral() {
-  const { id } = useParams(); // Extract the id from the URL
+export default function SpecificProduct() {
+  const params = useParams();
+  const category = "peripherals"; // ✅ Hardcoded category
+  const [id, setId] = useState(null);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const descriptionRef = useRef(null); // 🔹 Ref for long description scroll
 
   useEffect(() => {
-    if (!id) {
-      console.log("No ID found in the URL!");
-      return;
+    if (params?.id) {
+      setId(params.id);
     }
+  }, [params]);
+
+  useEffect(() => {
+    if (!id) return;
 
     const fetchProduct = async () => {
       try {
-        console.log(`Fetching product with ID: ${id}`);
-        const res = await fetch(`/api/product/${id}`); // Fetch using only the ID
-        if (!res.ok) throw new Error("Product not found");
+        const res = await fetch(`/api/product/${category}/${id}`);
+        if (!res.ok) throw new Error("❌ Product not found");
 
         const data = await res.json();
         setProduct(data);
       } catch (err) {
-        console.error("Error fetching product:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -34,6 +38,10 @@ export default function SpecificPeripheral() {
 
     fetchProduct();
   }, [id]);
+
+  const handleShowMore = () => {
+    descriptionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   if (loading) {
     return (
@@ -51,21 +59,12 @@ export default function SpecificPeripheral() {
     );
   }
 
-  const handleDecrease = () => {
-    if (quantity > 1) setQuantity(quantity - 1);
-  };
-
-  const handleIncrease = () => {
-    setQuantity(quantity + 1);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Product Image */}
           <div className="bg-white p-6 rounded-lg shadow-xl">
-            {product.photo && product.photo.length > 0 ? (
+            {product.photo ? (
               <Image
                 src={product.photo[0]}
                 alt={product.productName}
@@ -80,11 +79,9 @@ export default function SpecificPeripheral() {
             )}
           </div>
 
-          {/* Product Details */}
           <div className="space-y-6">
             <h1 className="text-3xl font-semibold text-gray-900">{product.productName}</h1>
-            <p className="text-xl text-gray-600">Brand: {product.brand}</p>
-
+            <p className="text-xl text-gray-600">Category: {category}</p>
             <p>
               <span className="mt-4 text-2xl font-bold text-blue-600">₱{product.price}.00</span>
               <span className={`ml-4 ${product.quantity > 0 ? "text-green-600" : "text-red-600"}`}>
@@ -92,15 +89,23 @@ export default function SpecificPeripheral() {
               </span>
             </p>
 
-            <p className="text-gray-600">{product.description?.join(" ")}</p>
+            {/* Short Description */}
+            <p className="text-gray-600">
+              {product.description?.slice(0, 2).join(" ")}{" "}
+              {product.description?.length > 2 && (
+                <button
+                  onClick={handleShowMore}
+                  className="text-blue-500 underline ml-2"
+                >
+                  Show more
+                </button>
+              )}
+            </p>
 
-            <hr className="border-gray-300 my-4 w-full" />
-
-            {/* Quantity and Actions */}
             <div className="flex items-center mt-4 space-x-4">
               <div className="flex items-center border border-gray-300 rounded-lg">
                 <button
-                  onClick={handleDecrease}
+                  onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
                   className="bg-gray-200 px-4 py-2 rounded-l-lg text-gray-700 hover:bg-gray-300"
                 >
                   -
@@ -112,7 +117,7 @@ export default function SpecificPeripheral() {
                   className="bg-[#f9fafb] w-16 text-center focus:outline-none"
                 />
                 <button
-                  onClick={handleIncrease}
+                  onClick={() => setQuantity((prev) => prev + 1)}
                   className="bg-gray-200 px-4 py-2 rounded-r-lg text-gray-700 hover:bg-gray-300"
                 >
                   +
@@ -131,8 +136,8 @@ export default function SpecificPeripheral() {
           </div>
         </div>
 
-        {/* Product Description Section */}
-        <div className="mt-12 bg-white p-8 rounded-lg shadow-lg">
+        {/* Long Description */}
+        <div ref={descriptionRef} className="mt-12 bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-gray-800">Description</h2>
           <p className="text-gray-700 mt-3">{product.description?.join(" ")}</p>
         </div>
