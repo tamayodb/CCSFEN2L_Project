@@ -1,44 +1,35 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation"; 
+import React, { useState, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 
 export default function SpecificGame() {
-  const params = useParams(); 
-  const category = "games";  // ✅ Hardcoded category
+  const params = useParams();
+  const category = "games"; // ✅ Hardcoded category
   const [id, setId] = useState(null);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const descriptionRef = useRef(null); // 🔹 Ref for long description scroll
 
   useEffect(() => {
     if (params?.id) {
-      console.log("📌 Extracted id:", params.id);
       setId(params.id);
-    } else {
-      console.warn("⚠️ id is missing in params:", params);
     }
   }, [params]);
 
   useEffect(() => {
-    if (!id) {
-      console.warn("🚨 `fetchProduct()` skipped because id is missing.");
-      return;
-    }
+    if (!id) return;
 
     const fetchProduct = async () => {
-      console.log(`🔍 Fetching product: /api/product/${category}/${id}`);
-      
       try {
         const res = await fetch(`/api/product/${category}/${id}`);
         if (!res.ok) throw new Error("❌ Product not found");
 
         const data = await res.json();
-        console.log("✅ Product fetched:", data);
         setProduct(data);
       } catch (err) {
-        console.error("❌ Fetch error:", err.message);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -48,10 +39,14 @@ export default function SpecificGame() {
     fetchProduct();
   }, [id]);
 
+  const handleShowMore = () => {
+    descriptionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <p className="text-gray-600 text-lg">Loading product details...</p>
+        <p className="text-gray-600 text-lg">Loading game details...</p>
       </div>
     );
   }
@@ -59,7 +54,7 @@ export default function SpecificGame() {
   if (error || !product) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <p className="text-red-500 text-lg">Product not found.</p>
+        <p className="text-red-500 text-lg">Game not found.</p>
       </div>
     );
   }
@@ -93,7 +88,19 @@ export default function SpecificGame() {
                 {product.quantity > 0 ? "In Stock" : "Out of Stock"}
               </span>
             </p>
-            <p className="text-gray-600">{product.description?.join(" ")}</p>
+
+            {/* Short Description */}
+            <p className="text-gray-600">
+              {product.description?.slice(0, 1).join(" ")}{" "}
+              {product.description?.length > 2 && (
+                <button
+                  onClick={handleShowMore}
+                  className="text-blue-500 underline ml-2"
+                >
+                  Show more
+                </button>
+              )}
+            </p>
 
             <div className="flex items-center mt-4 space-x-4">
               <div className="flex items-center border border-gray-300 rounded-lg">
@@ -129,7 +136,8 @@ export default function SpecificGame() {
           </div>
         </div>
 
-        <div className="mt-12 bg-white p-8 rounded-lg shadow-lg">
+        {/* Long Description */}
+        <div ref={descriptionRef} className="mt-12 bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-gray-800">Description</h2>
           <p className="text-gray-700 mt-3">{product.description?.join(" ")}</p>
         </div>
