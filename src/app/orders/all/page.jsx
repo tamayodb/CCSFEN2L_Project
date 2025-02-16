@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-const tabs = ['All', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
+const tabs = ['All', 'To Approve', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
 
-const OrdersPage = () => {
+const OrdersPage = ({ userId }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +20,7 @@ const OrdersPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch('/api/orders');
+        const response = await fetch(`/api/orders?userId=${userId}`);
         const data = await response.json();
         console.log('Fetched orders:', data);
         setOrders(data);
@@ -32,7 +32,7 @@ const OrdersPage = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [userId]);
 
   const toggleExpandOrder = (orderId) => {
     setExpandedOrders((prev) => ({

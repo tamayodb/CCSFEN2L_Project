@@ -5,8 +5,14 @@ import Product from '../../../models/product';
 export default async function handler(req, res) {
   await connectToDatabase();
 
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required' });
+  }
+
   try {
-    const orders = await Order.find({});
+    const orders = await Order.find({ user_id: userId });
 
     // Fetch product details for each order
     const ordersWithProductDetails = await Promise.all(
