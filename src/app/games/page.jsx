@@ -5,8 +5,10 @@ import GamesGrid from "@/components/games/gamesGrid";
 export default function Games() {
   const [products, setProducts] = useState([]); // All products
   const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products
+  const [brands, setBrands] = useState([]); // Unique brands list
   const [filters, setFilters] = useState({
     platform: [],
+    brand: "",
     category: [],
     price: 8999,
     ratings: [],
@@ -19,6 +21,10 @@ export default function Games() {
         const data = await response.json();
         setProducts(data);
         setFilteredProducts(data); // Set initial filtered products
+      
+        // Extract unique brands from `tag.brand`
+        const uniqueBrands = [...new Set(data.map((p) => p.tag?.brand).filter(Boolean))];
+        setBrands(uniqueBrands);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -43,6 +49,11 @@ export default function Games() {
       filtered = filtered.filter((product) =>
         product.tag.category.some((cat) => filters.category.includes(cat))
       );
+    }
+
+    // ✅ Filter by Brand
+    if (filters.brand) {
+      filtered = filtered.filter((product) => product.tag?.brand === filters.brand);
     }
 
     // ✅ Filter by Price
@@ -76,6 +87,11 @@ export default function Games() {
         ? prev.category.filter((c) => c !== category)
         : [...prev.category, category],
     }));
+  };
+
+  // 🔹 Handle Brand Change
+  const handleBrandChange = (event) => {
+    setFilters((prev) => ({ ...prev, brand: event.target.value }));
   };
 
   // 🔹 Handle Price Change
@@ -148,6 +164,23 @@ export default function Games() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            {/* Brand Filter */}
+            <div className="mb-4">
+              <h3 className="font-medium">Brand</h3>
+              <select
+                value={filters.brand}
+                onChange={handleBrandChange}
+                className="w-full border rounded p-2 bg-white"
+              >
+                <option value="">All Brands</option>
+                {brands.map((brand) => (
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Price Filter */}
