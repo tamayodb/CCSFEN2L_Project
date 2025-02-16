@@ -11,7 +11,7 @@ const CartSchema = new mongoose.Schema({
   },
   quantity: { type: Number, required: true, default: 1 }, // Default to 1 if not specified
   totalPrice: { type: Number, required: true },
-});
+}, { collection: 'Cart' });
 
 const Cart = mongoose.models.Cart || mongoose.model("Cart", CartSchema);
 
