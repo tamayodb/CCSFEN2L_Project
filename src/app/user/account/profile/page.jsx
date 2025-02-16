@@ -1,74 +1,72 @@
 "use client";
 
-import { useState } from 'react';
-import { UserCircle, Plus, Edit2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function Profile() {
-  const [emails, setEmails] = useState(['john.doe@example.com']);
-  const [showPhone, setShowPhone] = useState(false);
-  const [imagePreview, setImagePreview] = useState('');
+  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [selectedDay, setSelectedDay] = useState('');
-  const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedYear, setSelectedYear] = useState('');
-  const [selectedGender, setSelectedGender] = useState('');
-  const [isEditing, setIsEditing] = useState(false); // Added isEditing state
+  const [contact_num, setPhone] = useState('');
+  const [barangay, setBarangay] = useState('');
+  const [street_num, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [zip_code, setZipCode] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
+
+  const [isEditing, setIsEditing] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false); 
-  const [isEditingGender, setIsEditingGender] = useState(false); 
-  const [isEditingDOB, setIsEditingDOB] = useState(false)
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [isEditingBarangay, setIsEditingBarangay] = useState(false);
+  const [isEditingCity, setIsEditingCity] = useState(false);
+  const [isEditingStreet, setIsEditingStreet] = useState(false);
+  const [isEditingZipCode, setIsEditingZipCode] = useState(false);
 
-  const [isEditingEmails, setIsEditingEmails] = useState(
-    Array(emails.length).fill(false)
-  );
+  const [showContactNum, setShowPhone] = useState(false);
 
-  const isLeapYear = (year) => {
-    return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
-  };
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Retrieve the token from localStorage
+        const token = localStorage.getItem('token'); // Assuming the token is stored as 'token'
+        if (!token) {
+          console.error('No token found');
+          return;
+        }
 
-  // Generate year options from 1900 to current year
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i);
-  
-  // Generate months
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+        // Fetch user data from the backend
+        const response = await fetch('/api/user', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-  const getDaysInMonth = (month, year) => {
-    if (month === 2) {
-      return isLeapYear(year) ? 29 : 28; // February logic
-    }
-    const monthsWith31Days = [1, 3, 5, 7, 8, 10, 12]; // January, March, May, July, August, October, December
-    return monthsWith31Days.includes(month) ? 31 : 30;
-  };
-  
-  const [days, setDays] = useState([]);
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
 
-  // Function to handle email edit/save
-  const handleEmailEditToggle = (index) => {
-    const newEditingState = [...isEditingEmails];
-    newEditingState[index] = !newEditingState[index];
-    setIsEditingEmails(newEditingState);
-  };
-  
-  const handleMonthChange = (month) => {
-    setSelectedMonth(month);
-    if (selectedYear) {
-      setDays(Array.from({ length: getDaysInMonth(month, selectedYear) }, (_, i) => i + 1));
-    }
-  };
-  
-  const handleYearChange = (year) => {
-    setSelectedYear(year);
-    if (selectedMonth) {
-      setDays(Array.from({ length: getDaysInMonth(selectedMonth, year) }, (_, i) => i + 1));
-    }
-  };
+        const userData = await response.json();
 
+        // Populate the state with user data
+        setEmail(userData.email || '');
+        setUsername(userData.username || '');
+        setName(userData.name || '');
+        setPhone(userData.contact_num || '');
+        setBarangay(userData.address?.barangay || '');
+        setStreet(userData.address?.street_num || '');
+        setCity(userData.address?.city || '');
+        setZipCode(userData.address?.zip_code || '');
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  // Rest of the component code remains the same...
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -91,49 +89,44 @@ export default function Profile() {
   const handleSubmit = () => {
     const missingFields = [];
   
-    // Check for required fields
     if (!username) missingFields.push("Username");
     if (!name) missingFields.push("Name");
-    if (emails.length === 0 || !emails.some(email => email)) missingFields.push("Email Addresses");
-    if (!selectedMonth || !selectedDay || !selectedYear) missingFields.push("Date of Birth");
-    
-    // You can also add checks for gender and phone, based on your requirements
-    if (!selectedGender) missingFields.push("Gender");
-    if (!showPhone && !isEditing) missingFields.push("Phone Number");
+    if (!email) missingFields.push("Email Address");
+    if (!barangay) missingFields.push("Barangay");
+    if (!street_num) missingFields.push("Street");
+    if (!city) missingFields.push("City");
+    if (!zip_code) missingFields.push("ZIP Code");
+    if (!showContactNum && !isEditing) missingFields.push("Phone Number");
   
-    // If there are missing fields, show an alert
     if (missingFields.length > 0) {
       alert(`Please fill in the following fields: ${missingFields.join(", ")}`);
     } else {
-      handleSaveToFile(); // Proceed with file saving if no fields are missing
+      handleSaveToFile();
     }
   };
 
-   // Function to save form data to a .txt file
-   const handleSaveToFile = () => {
-    // Prepare the text content from form data
+  const handleSaveToFile = () => {
     const fileContent = `
       Username: ${username}
       Name: ${name}
-      Email Addresses: ${emails.join(', ')}
-      Phone: ${showPhone ? phone : "Hidden"}
+      Email Address: ${email}
+      Billing Address:
+        Barangay: ${barangay}
+        Street: ${street_num}
+        City: ${city}
+        ZIP Code: ${zip_code}
+      Phone: ${showContactNum ? contact_num : "Hidden"}
     `;
-
-    // Create a Blob with the content
+  
     const blob = new Blob([fileContent], { type: 'text/plain' });
-
-    // Create an anchor tag to trigger download
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'profile_data.txt'; // Filename for download
-
-    // Trigger the download by simulating a click
+    link.download = 'profile_data.txt';
     link.click();
   };
 
   return (
     <div className="flex gap-6">
-      {/* Left section - Forms (2/3) */}
       <div className="w-2/3">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="space-y-4">
@@ -141,7 +134,6 @@ export default function Profile() {
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                 Username
               </label>
-              {/* Conditional rendering: label or input field */}
               <div className="flex items-center gap-2">
                 {isEditingUsername ? (
                   <input
@@ -156,15 +148,12 @@ export default function Profile() {
                   <span className="w-full p-2">{username}</span>
                 )}
                 
-                {/* Edit/Save Button */}
                 <button
                   type="button"
                   onClick={() => {
                     if (isEditing) {
-                      // Save the new username and revert to label
                       setIsEditingUsername(false);
                     } else {
-                      // Switch to edit mode
                       setIsEditingUsername(true);
                     }
                   }}
@@ -179,9 +168,7 @@ export default function Profile() {
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Name
               </label>
-              {/* Flex container to align the name input/label and button */}
               <div className="flex items-center gap-2">
-                {/* Conditional rendering: label or input field */}
                 {isEditingName ? (
                   <input
                     type="text"
@@ -195,15 +182,12 @@ export default function Profile() {
                   <span className="w-full p-2">{name}</span>
                 )}
 
-                {/* Edit/Save Button for Name */}
                 <button
                   type="button"
                   onClick={() => {
                     if (isEditingName) {
-                      // Save the new name and revert to label
                       setIsEditingName(false);
                     } else {
-                      // Switch to edit mode
                       setIsEditingName(true);
                     }
                   }}
@@ -214,98 +198,172 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Email section with Add button */}
             <div className="space-y-2">
-              <label htmlFor="emails" className="block text-sm font-medium text-gray-700">
-                Email Addresses
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email Address
               </label>
-              {emails.map((email, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  {/* Conditional rendering for each email: input or label */}
-                  {isEditingEmails[index] ? (
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => {
-                        const newEmails = [...emails];
-                        newEmails[index] = e.target.value;
-                        setEmails(newEmails);
-                      }}
-                      className="w-full p-2  border rounded-md"
-                      placeholder="Enter email address"
-                    />
-                  ) : (
-                    <span className="w-full p-2 ">{email}</span>
-                  )}
+              <div className="flex items-center gap-2">
+                {isEditingEmail ? (
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                    placeholder="Enter email address"
+                  />
+                ) : (
+                  <span className="w-full p-2">{email}</span>
+                )}
 
-                  {/* Edit/Save Button for each email */}
-                  <button
-                    type="button"
-                    onClick={() => handleEmailEditToggle(index)}
-                    className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
-                  >
-                    {isEditingEmails[index] ? 'Save' : 'Edit'}
-                  </button>
-                  {/* Delete Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newEmails = emails.filter((_, i) => i !== index); // Remove email at the specified index
-                      setEmails(newEmails); // Update the state with the new list
-                    }}
-                    className="px-3 py-1 text-sm border rounded-md text-red-600 hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-
-              {/* Add Email Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setEmails([...emails, '']); // Add an empty email to the emails list
-                  setIsEditingEmails([...isEditingEmails, true]); // Set the new email to be in editable state
-                }}
-                className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
-              >
-                <Plus className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap" /> Add Email
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingEmail(!isEditingEmail)}
+                  className="px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                >
+                  {isEditingEmail ? 'Save' : 'Edit'}
+                </button>
+              </div>
             </div>  
-
-            {/* Phone number with masked digits */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Billing Address
+              </label>
+              <div className="flex gap-4">
+                <div className="w-1/2 space-y-2">
+                  <label htmlFor="barangay" className="block text-sm font-medium text-gray-700">
+                    Barangay
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {isEditingBarangay ? (
+                      <input
+                        type="text"
+                        id="barangay"
+                        value={barangay}
+                        onChange={(e) => setBarangay(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Enter barangay"
+                      />
+                    ) : (
+                      <span className="w-full p-2">{barangay || " "}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingBarangay(!isEditingBarangay)}
+                      className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                    >
+                      {isEditingBarangay ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                </div>
+                <div className="w-1/2 space-y-2">
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                    City
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {isEditingCity ? (
+                      <input
+                        type="text"
+                        id="city"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Enter city"
+                      />
+                    ) : (
+                      <span className="w-full p-2">{city || " "}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingCity(!isEditingCity)}
+                      className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                    >
+                      {isEditingCity ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-1/2 space-y-2">
+                  <label htmlFor="street" className="block text-sm font-medium text-gray-700">
+                    Street 
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {isEditingStreet ? (
+                      <input
+                        type="text"
+                        id="street_num"
+                        value={street_num}
+                        onChange={(e) => setStreet(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Enter street"
+                      />
+                    ) : (
+                      <span className="w-full p-2">{street_num || " "}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingStreet(!isEditingStreet)}
+                      className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                    >
+                      {isEditingStreet ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                </div>
+                <div className="w-1/2 space-y-2">
+                  <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+                    ZIP Code
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {isEditingZipCode ? (
+                      <input
+                        type="text"
+                        id="zip_code"
+                        value={zip_code}
+                        onChange={(e) => setZipCode(e.target.value)}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Enter ZIP code"
+                      />
+                    ) : (
+                      <span className="w-full p-2">{zip_code || " "}</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingZipCode(!isEditingZipCode)}
+                      className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
+                    >
+                      {isEditingZipCode ? 'Save' : 'Edit'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>  
             <div className="space-y-2">
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
                 Phone Number
               </label>
               <div className="flex gap-2 items-center">
-                {/* If isEditing is true, show the input field */}
                 {isEditing ? (
                   <input
                     type="text"
-                    id="phone"
-                    value={phone}
+                    id="contact_num"
+                    value={contact_num}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full p-2 border rounded-md"
                   />
                 ) : (
-                  // Else, show the label with censored or None
-                  <span className="w-full p-2 ">
-                    {showPhone ? "None" : `********${phone.slice(-2)}`}
+                  <span className="w-full p-2">
+                    {contact_num ? (showContactNum ? contact_num : `********${contact_num.slice(-2)}`) : " "}
                   </span>
                 )}
 
-                {/* Edit/Save Button */}
                 <button
                   type="button"
                   onClick={() => {
                     if (isEditing) {
-                      // Save phone number, revert to label and censor
                       setIsEditing(false);
-                      setPhone(phone); // Update phone to be saved
-                      setShowPhone(false); // Ensure phone is hidden after saving
+                      setPhone(contact_num);
+                      setShowPhone(false);
                     } else {
-                      // Switch to edit mode
                       setIsEditing(true);
                     }
                   }}
@@ -314,133 +372,21 @@ export default function Profile() {
                   {isEditing ? 'Save' : 'Edit'}
                 </button>
 
-                {/* Show/Hide Button */}
                 {!isEditing && (
                   <button
                     type="button"
-                    onClick={() => setShowPhone(!showPhone)}
+                    onClick={() => setShowPhone(!showContactNum)}
                     className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
                   >
-                    {showPhone ? 'Hide' : 'Show'}
+                    {showContactNum ? 'Hide' : 'Show'}
                   </button>
                 )}
               </div>
             </div>
-
-            {/* Gender selection */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Gender
-              </label>
-              {/* Conditional rendering for Gender: dropdown or label */}
-              <div className="flex items-center gap-2">
-                {isEditingGender ? (
-                  <select
-                    className="w-full p-2 border rounded-md"
-                    value={selectedGender}
-                    onChange={(e) => setSelectedGender(e.target.value)}
-                  >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                ) : (
-                  <span className="w-full p-2">{selectedGender || "Not selected"}</span>
-                )}
-
-                {/* Edit/Save Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isEditingGender) {
-                      setIsEditingGender(false); // Save the selected gender and revert to label
-                    } else {
-                      setIsEditingGender(true); // Switch to edit mode
-                    }
-                  }}
-                  className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
-                >
-                  {isEditingGender ? 'Save' : 'Edit'}
-                </button>
-              </div>
-            </div>
-
-            {/* Date of Birth dropdowns */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Date of Birth
-              </label>
-              <div className="flex gap-2">
-                {isEditingDOB ? (
-                  <>
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value={selectedMonth}
-                      onChange={(e) => handleMonthChange(Number(e.target.value))}
-                    >
-                      <option value="">Month</option>
-                      {months.map((month, index) => (
-                        <option key={month} value={index + 1}>
-                          {month}
-                        </option>
-                      ))}
-                    </select>
-
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value={selectedYear}
-                      onChange={(e) => handleYearChange(Number(e.target.value))}
-                    >
-                      <option value="">Year</option>
-                      {years.map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </select>
-
-                    <select 
-                      className="w-full p-2 border rounded-md" 
-                      value={selectedDay}
-                      onChange={(e) => setSelectedDay(Number(e.target.value))}
-                    >
-                      <option value="">Day</option>
-                      {days.map((day) => (
-                        <option key={day} value={day}>
-                          {day}
-                        </option>
-                      ))}
-                    </select>
-                  </>
-                ) : (
-                  <span className="w-full p-2">
-                    {selectedMonth && selectedDay && selectedYear
-                      ? `${months[selectedMonth - 1]} ${selectedDay}, ${selectedYear}`
-                      : "None"}
-                  </span>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isEditingDOB) {
-                      setIsEditingDOB(false); // Save the selected date and revert to label
-                    } else {
-                      setIsEditingDOB(true); // Switch to edit mode
-                    }
-                  }}
-                  className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
-                >
-                  {isEditingDOB ? 'Save' : 'Edit'}
-                </button>
-              </div>
-            </div>
-
-            {/* Submit Button */}
             <div>
               <button
                 type="button"
-                onClick={handleSubmit} // Use handleSubmit to validate before saving
+                onClick={handleSubmit}
                 className="flex items-center gap-2 px-3 py-2 border rounded-md hover:bg-gray-50 whitespace-nowrap"
               >
                 Submit Profile
@@ -458,7 +404,10 @@ export default function Profile() {
               {imagePreview ? (
                 <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <UserCircle className="w-32 h-32 text-gray-400" />
+                /* User Circle Icon using Tailwind SVG */
+                <svg className="w-32 h-32 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
               )}
             </div>
             
@@ -467,7 +416,7 @@ export default function Profile() {
                 type="file"
                 id="image-upload"
                 className="hidden"
-                accept=".jpg,.jpeg,.png"
+                accept=".jpg,.jpeg,.png"  
                 onChange={handleImageChange}
               />
               <label 
