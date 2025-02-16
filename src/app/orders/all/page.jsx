@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-const tabs = ['All', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
+const tabs = ['All', 'To Approve', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
