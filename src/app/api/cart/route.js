@@ -1,6 +1,6 @@
-import connectToDatabase from "C://Users//jeric//projects_all//datablitz//lib//db.js";
-import Cart from "C:/Users/jeric/projects_all/datablitz/models/cart.js"; 
-import Product from "C:/Users/jeric/projects_all/datablitz/models/product.js"; 
+import connectToDatabase from "../../../../lib/db.js"; // Import the connectToDatabase function
+import Cart from "../../../../models/cart.js"; 
+import Product from "../../../../models/product.js"; 
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";  // Ensure mongoose is imported
 
