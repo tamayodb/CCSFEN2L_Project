@@ -54,9 +54,9 @@ export default function Peripherals() {
     // ✅ Filter by Ratings
     if (filters.ratings.length > 0) {
       filtered = filtered.filter((product) =>
-        filters.ratings.some((rating) => product.rating >= rating)
+        product.rating && filters.ratings.some((rating) => product.rating >= rating)
       );
-    }
+    }    
 
     setFilteredProducts(filtered);
   }, [filters, products]);
