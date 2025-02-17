@@ -6,6 +6,7 @@ export default function Peripherals() {
   const [products, setProducts] = useState([]); // All products from API
   const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products
   const [brands, setBrands] = useState([]); // Unique brands list
+  const [categories, setCategories] = useState([]); // Unique categories list
   const [filters, setFilters] = useState({
     category: [],
     brand: "",
@@ -24,6 +25,10 @@ export default function Peripherals() {
         // Extract unique brands from `tag.brand`
         const uniqueBrands = [...new Set(data.map((p) => p.tag?.brand).filter(Boolean))];
         setBrands(uniqueBrands);
+
+        // ✅ Extract unique categories from `tag.category`
+        const uniqueCategories = [...new Set(data.flatMap((p) => p.tag?.category || []))];
+        setCategories(uniqueCategories); // <-- Set categories dynamically
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -101,20 +106,9 @@ export default function Peripherals() {
 
             {/* Category Filter */}
             <div className="mb-4">
-              <h3 className="font-medium">Category</h3>
+              <h3 className="font-medium">Categories</h3>
               <ul className="space-y-2 mt-2">
-                {[
-                  "Mouse",
-                  "Keyboard",
-                  "Headset",
-                  "Microphone",
-                  "Webcam",
-                  "Laptop",
-                  "Mouse Pad",
-                  "Gaming Chairs",
-                  "Speaker",
-                  "Monitor",
-                ].map((category) => (
+                {categories.map((category) => (
                   <li key={category}>
                     <input
                       type="checkbox"
@@ -126,6 +120,7 @@ export default function Peripherals() {
                 ))}
               </ul>
             </div>
+
 
             {/* Brand Filter */}
             <div className="mb-4">
