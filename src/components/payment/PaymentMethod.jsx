@@ -1,4 +1,3 @@
-// /components/payment/PaymentMethod.js
 "use client";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -21,7 +20,7 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
     const token = localStorage.getItem("token");
     if (token) {
       const decodedToken = JSON.parse(atob(token.split('.')[1]));  // Decode the JWT token
-      setUserId(decodedToken.id);  // Assuming JWT contains user ID under 'id'
+      setUserId(decodedToken.userId);  // Assuming JWT contains user ID under 'userId'
     } else {
       setErrorMessage("Unauthorized: No token found");
     }
@@ -46,16 +45,15 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
     try {
       const orderData = {
         user_id: userId,
-        product_id: products.map((p) => p.id),
-        quantity: products.map((p) => p.qty),
+        cart: JSON.stringify(products.map((p) => ({ id: p.id, qty: p.qty }))),
         address,
         totalAmount: finalPrice,
-        paymentMode: "COD",
+        paymentMode: "Cash on Delivery",
       };
 
       const response = await fetch("/api/payment/paymentgateway", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("token")}` },
         body: JSON.stringify(orderData),
       });
 
