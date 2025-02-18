@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation"; // import useRouter
 import Image from "next/image";
 
 const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
@@ -14,6 +14,8 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
   const [userId, setUserId] = useState("");  // State for storing user ID
 
   const tabs = ["COD", "Credit/Debit Card", "Payment Center/E-Wallet", "Online Banking", "Linked Bank Account"];
+
+  const router = useRouter(); // Initialize useRouter hook
 
   useEffect(() => {
     // Fetch and decrypt JWT token to get user ID
@@ -62,6 +64,10 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
         throw new Error(data.error || "Failed to place order");
       }
       setSuccessMessage("Order placed successfully!");
+      
+      // After successful order placement, navigate to the orders page
+      router.push("/orders/all");
+
     } catch (error) {
       setErrorMessage(error.message);
     } finally {

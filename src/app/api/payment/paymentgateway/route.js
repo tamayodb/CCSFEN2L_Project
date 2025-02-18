@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectToDatabase from "../../../../../lib/db";
 import Order from "../../../../../models/order";
-import Customer from "../../../../../models/accounts";  // Assuming you have a Customer model
-import jwt from "jsonwebtoken";  // For JWT token verification
+import Customer from "../../../../../models/accounts"; // Assuming you have a Customer model
+import jwt from "jsonwebtoken"; // For JWT token verification
 
 // Helper function to verify JWT token
 async function verifyToken(req) {
@@ -14,7 +14,7 @@ async function verifyToken(req) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Your secret key
-    return { userId: decoded.userId };  // Assuming the JWT payload has a userId field
+    return { userId: decoded.userId }; // Assuming the JWT payload has a userId field
   } catch (err) {
     return { error: "Invalid or expired token", status: 401 };
   }
@@ -31,18 +31,21 @@ export async function POST(req) {
     }
 
     // Fetch the user from the Customer collection
-    const user = await Customer.findById(auth.userId, "username contact_num address");
+    const user = await Customer.findById(
+      auth.userId,
+      "username contact_num address"
+    );
     if (!user) {
       console.log("User Not Found:", auth.userId);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const body = await req.json();  // Get the request body
+    const body = await req.json(); // Get the request body
     const { cart, address, totalAmount, paymentMode } = body;
 
     // Decode the URI encoded cart items (product_id and quantity)
-    const decodedCart = JSON.parse(decodeURIComponent(cart));  // Decode and parse the cart items
-    
+    const decodedCart = JSON.parse(decodeURIComponent(cart)); // Decode and parse the cart items
+
     // Get the total amount by summing the prices of products (you can adjust this logic as needed)
     let totalAmountCalculated = 0;
     const productIds = [];
@@ -64,15 +67,15 @@ export async function POST(req) {
     // Prepare the order data
     const newOrder = new Order({
       _id: new mongoose.Types.ObjectId(),
-      user_id: auth.userId,  // Using user_id from token
+      user_id: auth.userId, // Using user_id from token
       product_id: productIds,
       quantity: quantities,
-      order_date: new Date().toLocaleDateString("en-GB", { 
-        day: "numeric", 
-        month: "short", 
-        year: "numeric" 
-      }).replace(/(\d{1,2})-(\w{3})-(\d{4})/, "$1-$2-$3"),  // Adjusted date format to 1-Jan-2025
-      totalAmount: totalAmount || totalAmountCalculated,  // Use totalAmount from frontend or calculate
+      order_date: new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }), // Date formatted as 30-Jan-2025
+      totalAmount: totalAmount || totalAmountCalculated, // Use totalAmount from frontend or calculate
       address: fullAddress,
       paymentMode,
       status: "To Approve",
@@ -80,10 +83,15 @@ export async function POST(req) {
 
     // Save order to the database
     await newOrder.save();
-    return NextResponse.json({ message: "Order placed successfully", order: newOrder }, { status: 201 });
-
+    return NextResponse.json(
+      { message: "Order placed successfully", order: newOrder },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error placing order:", error);
-    return NextResponse.json({ error: "Something went wrong", details: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong", details: error.message },
+      { status: 500 }
+    );
   }
 }
