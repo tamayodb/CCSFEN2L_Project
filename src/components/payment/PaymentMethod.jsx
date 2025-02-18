@@ -1,8 +1,10 @@
+// /components/payment/PaymentMethod.js
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
-const PaymentComponent = ({ products = [], shippingFee = 0, userId, address }) => {
+const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
   const totalProductPrice = products.reduce((total, product) => total + product.price * product.qty, 0);
   const finalPrice = totalProductPrice + shippingFee;
 
@@ -10,8 +12,20 @@ const PaymentComponent = ({ products = [], shippingFee = 0, userId, address }) =
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [userId, setUserId] = useState("");  // State for storing user ID
 
   const tabs = ["COD", "Credit/Debit Card", "Payment Center/E-Wallet", "Online Banking", "Linked Bank Account"];
+
+  useEffect(() => {
+    // Fetch and decrypt JWT token to get user ID
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));  // Decode the JWT token
+      setUserId(decodedToken.id);  // Assuming JWT contains user ID under 'id'
+    } else {
+      setErrorMessage("Unauthorized: No token found");
+    }
+  }, []);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -64,9 +78,7 @@ const PaymentComponent = ({ products = [], shippingFee = 0, userId, address }) =
         {tabs.map((tab) => (
           <button
             key={tab}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap ${
-              activeTab === tab ? "bg-[#F4D35E] text-black" : "bg-white text-gray-500 border border-[#F4D35E] hover:bg-gray-100"
-            }`}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === tab ? "bg-[#F4D35E] text-black" : "bg-white text-gray-500 border border-[#F4D35E] hover:bg-gray-100"}`}
             onClick={() => handleTabClick(tab)}
           >
             {tab}
