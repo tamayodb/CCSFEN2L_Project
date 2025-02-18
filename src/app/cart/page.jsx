@@ -34,11 +34,12 @@ export default function Page() {
       try {
         const response = await fetch("/api/cart");
         const data = await response.json();
-        setRecentlyViewed(data.slice(0, 6));
+        console.log("Recently Viewed Data:", data); // Check the data format here
+        setRecentlyViewed(data.slice(0, 6)); // If the data is correctly formatted, this will work
       } catch (error) {
         console.error("Error fetching recently viewed products:", error);
       }
-    }
+    }    
 
     fetchCart();
     fetchRecentlyViewed();
@@ -160,27 +161,31 @@ export default function Page() {
       {/* Recently Ordered */}
       <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-lg font-bold mb-6">Recently Ordered</h2>
-        <div className="flex justify-between gap-6">
-          {recentlyViewed.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center"
-              style={{ width: "23%" }}
-            >
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={96}
-                height={96}
-                className="object-contain mb-4"
-              />
-              <p className="text-sm font-bold text-gray-800 mb-2">{item.name}</p>
-              <p className="text-sm text-blue-600 font-semibold">
-                ₱{item.price.toLocaleString()}
-              </p>
-            </div>
-          ))}
-        </div>
+        {recentlyViewed.length === 0 ? (
+          <p>No recently viewed items available.</p> // Handle empty data
+        ) : (
+          <div className="flex justify-between gap-6">
+            {recentlyViewed.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center"
+                style={{ width: "23%" }}
+              >
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={96}
+                  height={96}
+                  className="object-contain mb-4"
+                />
+                <p className="text-sm font-bold text-gray-800 mb-2">{item.name}</p>
+                <p className="text-sm text-blue-600 font-semibold">
+                  ₱{item.price.toLocaleString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
         <div>
           <AssuranceSection />
         </div>
