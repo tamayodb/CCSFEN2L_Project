@@ -2,7 +2,7 @@ import connectToDatabase from "../../../../lib/db.js"; // Import the connectToDa
 import Cart from "../../../../models/cart.js"; 
 import Product from "../../../../models/product.js"; 
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";  // Ensure mongoose is imported
+import mongoose from "mongoose"; 
 
 export async function GET() {
     try {

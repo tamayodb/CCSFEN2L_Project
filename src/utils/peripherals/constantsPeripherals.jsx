@@ -1,5 +1,5 @@
 import dbConnect from "../db";
-import Product from "../models/Product";
+import Product from "@/models/product/product";
 
 export async function getPeripheralProducts() {
   await dbConnect();
