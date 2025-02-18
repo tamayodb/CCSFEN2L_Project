@@ -64,18 +64,32 @@ export async function POST(req) {
     // Set the address from the user's customer document
     const fullAddress = `${user.address.street_num}, ${user.address.barangay}, ${user.address.city}, ${user.address.zip_code}`;
 
-    // Prepare the order data
+    const orderDate = new Date();
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const formattedDate = `${orderDate.getDate().toString().padStart(2, "0")}-${
+      monthNames[orderDate.getMonth()]
+    }-${orderDate.getFullYear()}`;
+
     const newOrder = new Order({
       _id: new mongoose.Types.ObjectId(),
-      user_id: auth.userId, // Using user_id from token
+      user_id: auth.userId,
       product_id: productIds,
       quantity: quantities,
-      order_date: new Date().toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }), // Date formatted as 30-Jan-2025
-      totalAmount: totalAmount || totalAmountCalculated, // Use totalAmount from frontend or calculate
+      order_date: formattedDate, // Correctly formatted date
+      totalAmount: totalAmount || totalAmountCalculated,
       address: fullAddress,
       paymentMode,
       status: "To Approve",
