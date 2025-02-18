@@ -10,6 +10,7 @@ export default function Page() {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [selectedItems, setSelectedItems] = useState({});
   const [total, setTotal] = useState(0);
+  const [errorMessage, setErrorMessage] = useState(""); // State for error message
 
   useEffect(() => {
     async function fetchCart() {
@@ -75,9 +76,14 @@ export default function Page() {
   const handleCheckout = () => {
     const selectedCartItems = cartItems.filter((item) => selectedItems[item.id]);
     
-    // Debug log to check if quantity is present
-    console.log("Selected items with quantity:", selectedCartItems);
+    if (selectedCartItems.length === 0) {
+      setErrorMessage("Please select at least one item to checkout."); // Set error message if no items are selected
+      return;
+    }
   
+    // Reset error message if items are selected
+    setErrorMessage("");
+    
     const encodedData = encodeURIComponent(JSON.stringify(selectedCartItems));
     router.push(`/payment?cart=${encodedData}`);
   };
@@ -139,6 +145,9 @@ export default function Page() {
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h2 className="text-lg font-bold mb-4">Total</h2>
           <p className="text-lg font-bold">₱{total.toLocaleString()}</p>
+          {errorMessage && (
+            <p className="text-red-500 text-sm mt-2">{errorMessage}</p> // Display error message if there are no selected items
+          )}
           <button
             onClick={handleCheckout} // Add the handleCheckout function to the button
             className="mt-4 bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md w-full"
