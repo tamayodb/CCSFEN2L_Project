@@ -14,7 +14,7 @@ const OrderManagement = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("/api/orders");
+      const response = await axios.get("/api/admin");
       setOrders(response.data);
     } catch (error) {
       setError("Failed to fetch orders");
@@ -25,7 +25,7 @@ const OrderManagement = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.put(`/api/orders/${orderId}`, { status: newStatus });
+      await axios.put(`/api/admin/${orderId}`, { status: newStatus });
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === orderId ? { ...order, status: newStatus } : order
@@ -44,7 +44,7 @@ const OrderManagement = () => {
     "To Ship",
     "To Receive",
     "Completed",
-    "Cancel",
+    "Cancelled",
   ];
 
   return (
@@ -86,7 +86,7 @@ const OrderManagement = () => {
                           )}
                         </ul>
                       </td>
-                      <td className="border p-2">${order.totalAmount}</td>
+                      <td className="border p-2">₱{order.totalAmount}</td>
                       <td className="border p-2">
                         <select
                           value={order.status}

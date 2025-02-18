@@ -1,42 +1,34 @@
 import { NextResponse } from "next/server";
-import connectToDatabase from "../../../../lib/db";
-import Order from "../../../../models/order";
-import Product from "../../../../models/product";
-import mongoose from "mongoose";
+import connectToDatabase from "../../../../lib/db"; // Your existing connection utility
+import Order from "../admin/order"; // Your existing Order model
 
 export async function GET() {
   try {
-    await connectToDatabase();
-    
-    // Fetch all orders
-    const orders = await Order.find({}).lean();
+    await connectToDatabase(); // Use your existing connection function
 
-    // Fetch product details for each order
-    const updatedOrders = await Promise.all(
-      orders.map(async (order) => {
-        const productDetails = await Promise.all(
-          order.product_id.map(async (productId, index) => {
-            try {
-              const product = await Product.findById(
-                mongoose.Types.ObjectId(productId)  // Ensure ObjectId conversion
-              ).lean();
-              return product
-                ? { name: product.productName, quantity: order.quantity[index] }
-                : { name: "Unknown Product", quantity: order.quantity[index] };
-            } catch (error) {
-              console.error("Error fetching product:", error);
-              return { name: "Unknown Product", quantity: order.quantity[index] };
-            }
-          })
-        );
+    // Fetch all orders and populate product details
+    const orders = await Order.find({})
+      .populate("product_id", "productName price photo") // Populate product details
+      .lean();
 
-        return { ...order, items: productDetails };
-      })
-    );
+    // Map orders to include items with product details
+    const updatedOrders = orders.map((order) => {
+      const items = order.product_id.map((product, index) => ({
+        name: product?.productName || "Unknown Product",
+        quantity: order.quantity[index],
+        price: product?.price || 0,
+        photo: product?.photo?.[0] || "", // Use the first photo if available
+      }));
+
+      return { ...order, items }; // Attach items array to each order
+    });
 
     return NextResponse.json(updatedOrders, { status: 200 });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return NextResponse.json({ message: "Failed to fetch orders" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to fetch orders" },
+      { status: 500 }
+    );
   }
 }
