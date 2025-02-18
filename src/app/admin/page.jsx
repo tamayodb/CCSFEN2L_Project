@@ -39,7 +39,13 @@ const OrderManagement = () => {
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p>{error}</p>;
 
-  const statuses = ["To Approve", "To Ship", "To Receive", "Completed", "Cancel"];
+  const statuses = [
+    "To Approve",
+    "To Ship",
+    "To Receive",
+    "Completed",
+    "Cancel",
+  ];
 
   return (
     <div className="p-4">
@@ -60,30 +66,50 @@ const OrderManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {orders.filter(order => order.status === status).map((order) => (
-                  <tr key={order._id} className="border">
-                    <td className="border p-2">{order._id}</td>
-                    <td className="border p-2">{order.user_id}</td>
-                    <td className="border p-2">{order.order_date}</td>
-                    <td className="border p-2">{order.product_id.join(", ")}</td>
-                    <td className="border p-2">${order.totalAmount}</td>
-                    <td className="border p-2">
-                      <select
-                        value={order.status}
-                        onChange={(e) => updateOrderStatus(order._id, e.target.value)}
-                        className="p-1 border"
-                      >
-                        {statuses.map((s) => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
+                {orders
+                  .filter((order) => order.status === status)
+                  .map((order) => (
+                    <tr key={order._id} className="border">
+                      <td className="border p-2">{order._id}</td>
+                      <td className="border p-2">{order.user_id}</td>
+                      <td className="border p-2">{order.order_date}</td>
+                      <td className="border p-2">
+                        <ul>
+                          {order.items && order.items.length > 0 ? (
+                            order.items.map((item, index) => (
+                              <li key={index}>
+                                {item.name} - Qty: {item.quantity}
+                              </li>
+                            ))
+                          ) : (
+                            <p>No items found</p>
+                          )}
+                        </ul>
+                      </td>
+                      <td className="border p-2">${order.totalAmount}</td>
+                      <td className="border p-2">
+                        <select
+                          value={order.status}
+                          onChange={(e) =>
+                            updateOrderStatus(order._id, e.target.value)
+                          }
+                          className="p-1 border"
+                        >
+                          {statuses.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
-            {orders.filter(order => order.status === status).length === 0 && (
-              <p className="text-gray-500 text-center p-4">No orders in this category.</p>
+            {orders.filter((order) => order.status === status).length === 0 && (
+              <p className="text-gray-500 text-center p-4">
+                No orders in this category.
+              </p>
             )}
           </div>
         </div>
