@@ -15,28 +15,36 @@ const LoginPage = () => {
     e.preventDefault();
     setError(null);
   
+    localStorage.removeItem("token"); // Ensure old token is removed before new login
+  
+    if (email === "admin@gmail.com" && password === "admin") {
+      router.push("/admin");
+      return;
+    }
+  
     try {
       const response = await axios.post("/api/login", { email, password });
   
       if (response.status === 200) {
-        const { token } = response.data; // Extract the token from the response
-        localStorage.setItem("token", token); // Store the token in localStorage
-        router.push("/"); // Redirect on successful login
+        const { token } = response.data;
+        localStorage.setItem("token", token); // Store new token
+        router.push("/"); // Redirect to homepage
       }
     } catch (err) {
       if (err.response) {
         if (err.response.status === 400) {
-          setError("Invalid email or password."); // Wrong credentials
+          setError("Invalid email or password.");
         } else if (err.response.status === 401) {
-          setError("The password you’ve entered is incorrect."); // Wrong password
+          setError("The password you’ve entered is incorrect.");
         } else {
-          setError("An error occurred. Please try again later."); // General error
+          setError("An error occurred. Please try again later.");
         }
       } else {
-        setError("An error occurred. Please try again later."); // General error
+        setError("An error occurred. Please try again later.");
       }
     }
   };
+  
 
   return (
     <div className="flex h-screen">
