@@ -1,11 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 
 export default function SpecificCollectible() {
   const params = useParams();
-  const router = useRouter();
   const category = "collectibles"; // ✅ Hardcoded category
   const [id, setId] = useState(null);
   const [product, setProduct] = useState(null);
@@ -40,17 +39,6 @@ export default function SpecificCollectible() {
     fetchProduct();
   }, [id]);
 
-  const handleProceedToPayment = () => {
-    if (!product) return;
-    const cartData = [{
-      id: id,
-      qty: quantity
-    }];
-
-    const encodedData = encodeURIComponent(JSON.stringify(cartData));
-    router.push(`/payment?cart=${encodedData}`);
-  };
-
   const handleShowMore = () => {
     descriptionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -70,6 +58,37 @@ export default function SpecificCollectible() {
       </div>
     );
   }
+
+  const handleAddToCart = async () => {
+    try {
+      const response = await fetch('/api/cart/Add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: product._id,
+          user_id: '679e1945c4de6188e9e44574',
+          quantity: quantity,
+        })        
+      });
+  
+      if (!response.ok) throw new Error('Failed to add to cart');
+      alert('Item added to cart!');
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong');
+    }
+  };  
+
+  const handleProceedToPayment = () => {
+    if (!product) return;
+    const cartData = [{
+      id: id,
+      qty: quantity
+    }];
+
+    const encodedData = encodeURIComponent(JSON.stringify(cartData));
+    router.push(`/payment?cart=${encodedData}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -137,10 +156,13 @@ export default function SpecificCollectible() {
               </div>
 
               <div className="flex space-x-6">
-                <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600">
-                  Add to Cart
-                </button>
-                <button onClick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+              <button
+              onClick={handleAddToCart}
+                className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600"
+              >
+                Add to Cart
+              </button>
+                <button onclick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                   Buy Now
                 </button>
               </div>

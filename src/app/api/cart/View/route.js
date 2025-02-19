@@ -1,12 +1,13 @@
-import connectToDatabase from "../../../../lib/db.js"; // Import the connectToDatabase function
-import Cart from "../../../../models/cart.js"; 
-import Product from "../../../../models/product.js"; 
+import connectToDatabase from "../../../../../lib/db.js"; // Import the connectToDatabase function
+import Cart from "../../../../../models/cart.js"; 
+import Product from "../../../../../models/product.js"; 
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";  // Ensure mongoose is imported
+import mongoose from "mongoose"; 
 
 export async function GET() {
     try {
         await connectToDatabase();
+        
         const user_id = "679e1945c4de6188e9e44574"; // Static user ID for now
         console.log("Using User ID:", user_id);
 
