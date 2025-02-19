@@ -58,7 +58,7 @@ const OrderManagement = () => {
               <thead>
                 <tr className="bg-gray-100">
                   <th className="border p-2">Order ID</th>
-                  <th className="border p-2">User ID</th>
+                  <th className="border p-2">User</th>
                   <th className="border p-2">Order Date</th>
                   <th className="border p-2">Items</th>
                   <th className="border p-2">Total Amount</th>
@@ -71,7 +71,13 @@ const OrderManagement = () => {
                   .map((order) => (
                     <tr key={order._id} className="border">
                       <td className="border p-2">{order._id}</td>
-                      <td className="border p-2">{order.user_id}</td>
+                      <td className="border p-2">
+                        <p className="text-sm font-semibold">{order.customerName}</p>
+                        <p className="text-xs text-gray-600">{order.contactNumber}</p>
+                        <p className="text-xs text-gray-600">
+                          {order.address?.street_num}, {order.address?.barangay}, {order.address?.city}, {order.address?.zip_code}
+                        </p>
+                      </td>
                       <td className="border p-2">{order.order_date}</td>
                       <td className="border p-2">
                         <ul>
@@ -90,9 +96,7 @@ const OrderManagement = () => {
                       <td className="border p-2">
                         <select
                           value={order.status}
-                          onChange={(e) =>
-                            updateOrderStatus(order._id, e.target.value)
-                          }
+                          onChange={(e) => updateOrderStatus(order._id, e.target.value)}
                           className="p-1 border"
                         >
                           {statuses.map((s) => (
@@ -107,9 +111,7 @@ const OrderManagement = () => {
               </tbody>
             </table>
             {orders.filter((order) => order.status === status).length === 0 && (
-              <p className="text-gray-500 text-center p-4">
-                No orders in this category.
-              </p>
+              <p className="text-gray-500 text-center p-4">No orders in this category.</p>
             )}
           </div>
         </div>
