@@ -75,7 +75,12 @@ export default function Page() {
 
   // Function to handle the checkout and navigate to the payment page
   const handleCheckout = () => {
-    const selectedCartItems = cartItems.filter((item) => selectedItems[item.id]);
+    const selectedCartItems = cartItems
+    .filter((item) => selectedItems[item.id])
+    .map((item) => ({
+      id: item.id,
+      qty: item.quantity, // Extract quantity
+    }));
     
     if (selectedCartItems.length === 0) {
       setErrorMessage("Please select at least one item to checkout."); // Set error message if no items are selected
