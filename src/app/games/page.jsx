@@ -6,6 +6,8 @@ export default function Games() {
   const [products, setProducts] = useState([]); // All products
   const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products
   const [brands, setBrands] = useState([]); // Unique brands list
+  const [categories, setCategories] = useState([]); // Unique categories list
+  const [platforms, setPlatforms] = useState([]); // Unique platforms list
   const [filters, setFilters] = useState({
     platform: [],
     brand: "",
@@ -25,6 +27,14 @@ export default function Games() {
         // Extract unique brands from `tag.brand`
         const uniqueBrands = [...new Set(data.map((p) => p.tag?.brand).filter(Boolean))];
         setBrands(uniqueBrands);
+
+        // ✅ Extract unique categories from `tag.category`
+        const uniqueCategories = [...new Set(data.flatMap((p) => p.tag?.category || []))];
+        setCategories(uniqueCategories); // <-- Set categories dynamically
+
+        // ✅ Extract unique platforms from `tag.platform`
+        const uniquePlatforms = [...new Set(data.flatMap((p) => p.tag?.platform || []))];
+        setPlatforms(uniquePlatforms); // <-- Set platforms dynamically
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -62,7 +72,7 @@ export default function Games() {
     // ✅ Filter by Ratings
     if (filters.ratings.length > 0) {
       filtered = filtered.filter((product) =>
-        filters.ratings.some((rating) => product.rating >= rating)
+        product.rating && filters.ratings.some((rating) => product.rating >= rating)
       );
     }
 
@@ -121,8 +131,7 @@ export default function Games() {
             <div className="mb-4">
               <h3 className="font-medium">Platform</h3>
               <ul className="space-y-2 mt-2">
-                {["XBOX", "PlayStation", "PC/Android", "Nintendo Switch"].map(
-                  (platform) => (
+                {platforms.map((platform) => (
                     <li key={platform}>
                       <input
                         type="checkbox"
@@ -140,20 +149,7 @@ export default function Games() {
             <div className="mb-4">
               <h3 className="font-medium">Categories</h3>
               <ul className="space-y-2 mt-2">
-                {[
-                  "Action",
-                  "Adventure",
-                  "Casual",
-                  "Fighting",
-                  "Puzzle",
-                  "Rhythm",
-                  "Racing",
-                  "Sports",
-                  "Simulation",
-                  "Shooter",
-                  "Sci-Fi",
-                  "Role-Playing",
-                ].map((category) => (
+                {categories.map((category) => (
                   <li key={category}>
                     <input
                       type="checkbox"

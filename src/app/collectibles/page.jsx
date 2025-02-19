@@ -6,6 +6,7 @@ export default function Collectibles() {
   const [products, setProducts] = useState([]); // All products
   const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products
   const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [filters, setFilters] = useState({
     category: [], // Selected categories
     price: 10000,
@@ -24,6 +25,10 @@ export default function Collectibles() {
         // Extract unique brands from `tag.brand`
         const uniqueBrands = [...new Set(data.map((p) => p.tag?.brand).filter(Boolean))];
         setBrands(uniqueBrands);
+
+        // ✅ Extract unique categories from `tag.category`
+        const uniqueCategories = [...new Set(data.flatMap((p) => p.tag?.category || []))];
+        setCategories(uniqueCategories); // <-- Set categories dynamically
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -54,7 +59,7 @@ export default function Collectibles() {
     // ✅ Filter by Ratings
     if (filters.ratings.length > 0) {
       filtered = filtered.filter((product) =>
-        filters.ratings.some((rating) => product.rating >= rating)
+        product.rating && filters.ratings.some((rating) => product.rating >= rating)
       );
     }
 
@@ -101,16 +106,9 @@ export default function Collectibles() {
 
             {/* ✅ Category Filter */}
             <div className="mb-4">
-              <h3 className="font-medium">Category</h3>
+              <h3 className="font-medium">Categories</h3>
               <ul className="space-y-2 mt-2">
-                {[
-                  "Action Figure",
-                  "Amiibo",
-                  "Badge",
-                  "Rubber Straps",
-                  "Cards",
-                  "Plush",
-                ].map((category) => (
+                {categories.map((category) => (
                   <li key={category}>
                     <input
                       type="checkbox"
