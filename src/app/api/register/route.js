@@ -6,7 +6,14 @@ import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
     await connectToDatabase(); // Establish database connection
-    const { email, password } = await request.json();
+    const { 
+      email, 
+      password,
+      username,
+      contact_num,
+      address
+    } = await request.json();
+
     // Check if email and password are provided
     if (!email || !password) {
       return NextResponse.json(
@@ -23,9 +30,18 @@ export async function POST(request) {
       );
     }
     const hashPassword = await bcrypt.hash(password, 10);
+    // Create new account with all fields
     const newAccount = new account({
       email,
       password: hashPassword,
+      username: username || "",
+      contact_num: contact_num || "",
+      address: {
+        street_num: address?.street_num || "",
+        barangay: address?.barangay || "",
+        city: address?.city || "",
+        zip_code: address?.zip_code || null,
+      }
     });
     await newAccount.save();
     const response = NextResponse.json(
