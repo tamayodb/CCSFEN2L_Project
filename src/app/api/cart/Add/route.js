@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import connectToDatabase from "../../../../../lib/db.js"; // Import the connectToDatabase function
 import Cart from "../../../../../models/cart.js";
 import Product from "../../../../../models/product.js";
@@ -7,9 +8,41 @@ import mongoose from "mongoose";
 export async function GET() {
     try {
         await connectToDatabase();
-        
-        const user_id = "679e1945c4de6188e9e44574"; // Static user ID for now
+
+        // Get the token from the request headers
+        const token = req.headers.get('authorization')?.split(' ')[1];
+
+        if (!token) {
+        return new Response(JSON.stringify({ message: 'Unauthorized' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+        });
+        }
+
+        // Verify the token and get the user ID
+        try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Adjust secret as needed
+        const user = await Customer.findById(decoded.userId);
+
+        if (!user) {
+            return new Response(JSON.stringify({ message: 'User not found' }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        // Pass decoded user ID
+        const user_id = decoded.userId;
         console.log("Using User ID:", user_id);
+
+        // Continue with your logic here
+
+        } catch (err) {
+        return new Response(JSON.stringify({ message: 'Invalid token' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+        });
+        }
 
         const userIdObjectId = new mongoose.Types.ObjectId(user_id);
         
