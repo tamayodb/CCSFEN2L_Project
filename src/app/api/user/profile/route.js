@@ -89,6 +89,7 @@ export async function PUT(req) {
       {
         $set: {
           username: userData.username,
+          name: userData.name,
           email: userData.email,
           contact_num: userData.contact_num,
           address: {

@@ -6,7 +6,8 @@ import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
     await connectToDatabase(); // Establish database connection
-    const { 
+    const {
+      name, 
       email, 
       password,
       username,
@@ -33,6 +34,7 @@ export async function POST(request) {
     // Create new account with all fields
     const newAccount = new account({
       email,
+      name: name || "",
       password: hashPassword,
       username: username || "",
       contact_num: contact_num || "",

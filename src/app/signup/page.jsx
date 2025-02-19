@@ -27,6 +27,7 @@ const SignupPage = () => {
         email,
         password,
         username: "",
+        name: "",
         contact_num: "",
         address: {
           street_num: "",

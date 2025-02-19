@@ -85,6 +85,7 @@ export default function Profile() {
     const missingFields = [];
   
     if (!username) missingFields.push("Username");
+    if (!name) missingFields.push("Name");
     if (!email) missingFields.push("Email Address");
     if (!barangay) missingFields.push("Barangay");
     if (!street_num) missingFields.push("Street");
@@ -112,6 +113,7 @@ export default function Profile() {
         },
         body: JSON.stringify({
           username,
+          name,
           email,
           contact_num,
           address: {
@@ -128,6 +130,7 @@ export default function Profile() {
 
       setIsEditing(false);
       setIsEditingUsername(false);
+      setIsEditingName(false);
       setIsEditingEmail(false);
       setIsEditingBarangay(false);
       setIsEditingCity(false);
