@@ -15,7 +15,7 @@ export default function Page() {
   useEffect(() => {
     async function fetchCart() {
       try {
-        const response = await fetch("/api/cart");
+        const response = await fetch("/api/cart/View");
         const data = await response.json();
         setCartItems(data);
 
@@ -32,7 +32,7 @@ export default function Page() {
 
     async function fetchRecentlyViewed() {
       try {
-        const response = await fetch("/api/cart");
+        const response = await fetch("/api/cart/View");
         const data = await response.json();
         console.log("Recently Viewed Data:", data); // Check the data format here
         setRecentlyViewed(data.slice(0, 6)); // If the data is correctly formatted, this will work
