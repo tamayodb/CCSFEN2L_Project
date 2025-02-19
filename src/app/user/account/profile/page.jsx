@@ -11,7 +11,6 @@ export default function Profile() {
   const [street_num, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [zip_code, setZipCode] = useState('');
-  const [imagePreview, setImagePreview] = useState('');
 
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -23,6 +22,7 @@ export default function Profile() {
   const [isEditingZipCode, setIsEditingZipCode] = useState(false);
 
   const [showContactNum, setShowPhone] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -54,6 +54,29 @@ export default function Profile() {
         setStreet(userData.address?.street_num || '');
         setCity(userData.address?.city || '');
         setZipCode(userData.address?.zip_code || '');
+        
+        // Improved image handling
+        try {
+          if (userData.name) {
+            const imagePath = `/user/${encodeURIComponent(userData.name)}.jpg`;
+            const timestamp = new Date().getTime();
+
+            // Test if image exists
+            const testImage = new Image();
+            testImage.onload = () => {
+              setImagePreview(`${imagePath}?t=${timestamp}`);
+            };
+            testImage.onerror = () => {
+              setImagePreview('/user/default.png');
+            };
+            testImage.src = `${imagePath}?t=${timestamp}`;
+          } else {
+            setImagePreview('/user/default.png');
+          }
+        } catch (imgError) {
+          console.error('Error checking user image:', imgError);
+          setImagePreview('/public/user/default.png');
+        }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -62,22 +85,47 @@ export default function Profile() {
     fetchUserData();
   }, []);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.size > 1024 * 1024) {
-        alert('File size must be less than 1MB');
-        return;
+    if (!file) return;
+    if (file.size > 1024 * 1024) {
+      alert('File size must be less than 1MB');
+      return;
+    }
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      alert('Only JPEG and PNG files are allowed');
+      return;
+    }
+
+    // Make sure we have a name to use for the file
+    if (!name) {
+      alert('Please set your name first before uploading a profile picture');
+      return;
+    }
+
+    try {
+      // Use the user's name as the filename
+      const filename = `${name}.jpg`;
+
+      const response = await fetch('/api/user/upload-image', {
+        method: 'POST',
+        headers: {
+          'x-filename': filename,
+          'Content-Type': file.type,
+        },
+        body: await file.arrayBuffer(), // Send raw binary data
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upload image');
       }
-      if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        alert('Only JPEG and PNG files are allowed');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      // Add timestamp to prevent browser caching
+      setImagePreview(`/user/${encodeURIComponent(name)}.jpg?t=${new Date().getTime()}`);
+      alert('Profile picture updated successfully');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert(`Failed to upload image: ${error.message}`);
     }
   };
 
@@ -406,14 +454,22 @@ export default function Profile() {
       <div className="w-1/3">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex flex-col items-center justify-center space-y-4">
+          // Updated Image Preview Section
             <div className="w-48 h-48 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
               {imagePreview ? (
-                <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
+                <img 
+                src={imagePreview ? imagePreview.replace('/public/', '/') : '/user/default.png'} 
+                alt="Profile" 
+                className="w-full h-full object-cover" 
+                onError={(e) => {
+                  e.target.onerror = null; 
+                  e.target.src = '/user/default.png';
+                }} 
+              />
               ) : (
-                /* User Circle Icon using Tailwind SVG */
-                <svg className="w-32 h-32 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <div className="text-gray-400 flex items-center justify-center w-full h-full">
+                  Loading...
+                </div>
               )}
             </div>
             
@@ -429,7 +485,7 @@ export default function Profile() {
                 htmlFor="image-upload" 
                 className="cursor-pointer inline-flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
               >
-                Set Photo
+                Upload Photo
               </label>
             </div>
 
