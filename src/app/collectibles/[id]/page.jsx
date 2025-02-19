@@ -79,6 +79,17 @@ export default function SpecificCollectible() {
     }
   };  
 
+  const handleProceedToPayment = () => {
+    if (!product) return;
+    const cartData = [{
+      id: id,
+      qty: quantity
+    }];
+
+    const encodedData = encodeURIComponent(JSON.stringify(cartData));
+    router.push(`/payment?cart=${encodedData}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto p-8">
@@ -151,7 +162,7 @@ export default function SpecificCollectible() {
               >
                 Add to Cart
               </button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+                <button onclick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                   Buy Now
                 </button>
               </div>
