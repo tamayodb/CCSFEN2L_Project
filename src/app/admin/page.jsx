@@ -25,7 +25,7 @@ const OrderManagement = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.put(`/api/admin/${orderId}`, { status: newStatus });
+      await axios.put(`/api/admin/${orderId}`, { status: newStatus }); // Updated API path
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === orderId ? { ...order, status: newStatus } : order
