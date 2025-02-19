@@ -1,13 +1,8 @@
 /** @type {import('next').NextConfig} */
+// next.config.mjs
 const nextConfig = {
     images: {
-      remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: 'drive.google.com',
-        },
-      ],
+      domains: ['lh3.google.com','drive.google.com'], // Add the domain for Google images
     },
   };
-
 export default nextConfig;

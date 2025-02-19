@@ -1,12 +1,14 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from "react";
 import PeripheralGrid from "@/components/peripherals/peripheralGrid";
 
 export default function Peripherals() {
   const [products, setProducts] = useState([]); // All products from API
   const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products
+  const [brands, setBrands] = useState([]); // Unique brands list
   const [filters, setFilters] = useState({
     category: [],
+    brand: "",
     price: 100000,
     ratings: [],
   });
@@ -18,6 +20,10 @@ export default function Peripherals() {
         const data = await response.json();
         setProducts(data);
         setFilteredProducts(data); // Set initial filtered products
+
+        // Extract unique brands from `tag.brand`
+        const uniqueBrands = [...new Set(data.map((p) => p.tag?.brand).filter(Boolean))];
+        setBrands(uniqueBrands);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -37,10 +43,15 @@ export default function Peripherals() {
       );
     }
 
-    // Filter by Price
+    // ✅ Filter by Brand
+    if (filters.brand) {
+      filtered = filtered.filter((product) => product.tag?.brand === filters.brand);
+    }
+
+    // ✅ Filter by Price
     filtered = filtered.filter((product) => product.price <= filters.price);
 
-    // Filter by Ratings
+    // ✅ Filter by Ratings
     if (filters.ratings.length > 0) {
       filtered = filtered.filter((product) =>
         filters.ratings.some((rating) => product.rating >= rating)
@@ -58,6 +69,11 @@ export default function Peripherals() {
         ? prev.category.filter((c) => c !== category)
         : [...prev.category, category],
     }));
+  };
+
+  // 🔹 Handle Brand Change
+  const handleBrandChange = (event) => {
+    setFilters((prev) => ({ ...prev, brand: event.target.value }));
   };
 
   // 🔹 Handle Price Change
@@ -109,6 +125,23 @@ export default function Peripherals() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            {/* Brand Filter */}
+            <div className="mb-4">
+              <h3 className="font-medium">Brand</h3>
+              <select
+                value={filters.brand}
+                onChange={handleBrandChange}
+                className="w-full border rounded p-2 bg-white"
+              >
+                <option value="">All Brands</option>
+                {brands.map((brand) => (
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Price Filter */}

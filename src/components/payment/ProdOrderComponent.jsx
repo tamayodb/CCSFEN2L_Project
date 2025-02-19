@@ -2,10 +2,10 @@
 import React from "react";
 import ProductRow from "../../components/payment/ProductRow";
 
-const ProdOrderComponent = ({ products = [] }) => { // Default to empty array if products is undefined
-  const shippingCost = 40; // Static shipping cost
+const ProdOrderComponent = ({ products = [] }) => {
+  const shippingCost = 40;
 
-  // Calculate total price, making sure products is not empty
+  // Calculate total price
   const totalPrice = products.reduce((total, product) => total + product.price * product.qty, 0) + shippingCost;
 
   return (
@@ -15,11 +15,11 @@ const ProdOrderComponent = ({ products = [] }) => { // Default to empty array if
           Products Ordered
         </h2>
 
-        {/* Map through products and render ProductRow for each */}
+        {/* Map through products */}
         {products.length > 0 ? (
-          products.map((product) => (
+          products.map((product, index) => (
             <ProductRow
-              key={product.id}
+              key={product.id || index} // Use product.id or fallback to index
               itemName={product.itemName}
               qty={product.qty}
               price={product.price}
@@ -30,7 +30,6 @@ const ProdOrderComponent = ({ products = [] }) => { // Default to empty array if
           <p>No products available.</p>
         )}
 
-        {/* Separator Line */}
         <div className="border-t-2 border-[#F4D35E] my-4"></div>
 
         {/* Shipping Option */}
