@@ -11,11 +11,11 @@ const LeftNavigationBar = () => {
             Profile
           </Link>
         </li>
-        <li>
+        {/*<li>
           <Link href="/user/account/payment" className="block p-2 hover:bg-gray-200 rounded">
             Payment
           </Link>
-        </li>        
+        </li>*/}        
         <li>
           <Link href="/user/account/changepassword" className="block p-2 hover:bg-gray-200 rounded">
             Change Password
@@ -26,11 +26,12 @@ const LeftNavigationBar = () => {
             Privacy
           </Link>
         </li>
-        <li>
+        {/* Right section - Image upload (1/3)
+        <li> 
           <Link href="/user/account/notification" className="block p-2 hover:bg-gray-200 rounded">
             Notification
           </Link>
-        </li>
+        </li>*/}
       </ul>
     </nav>
   );
