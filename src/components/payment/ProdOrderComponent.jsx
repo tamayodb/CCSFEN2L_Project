@@ -3,7 +3,7 @@ import React from "react";
 import ProductRow from "../../components/payment/ProductRow";
 
 const ProdOrderComponent = ({ products = [] }) => {
-  const shippingCost = 40;
+  const shippingCost = 200;
 
   // Calculate total price
   const totalPrice = products.reduce((total, product) => total + product.price * product.qty, 0) + shippingCost;
