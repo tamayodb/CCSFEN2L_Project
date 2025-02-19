@@ -1,11 +1,13 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function SpecificProduct() {
   const params = useParams();
+  const router = useRouter();
+
   const category = "peripherals";
   const [id, setId] = useState(null);
   const [product, setProduct] = useState(null);
@@ -51,6 +53,16 @@ export default function SpecificProduct() {
 
     fetchProduct();
   }, [id]);
+  const handleProceedToPayment = () => {
+    if (!product) return;
+    const cartData = [{
+      id: id,
+      qty: quantity
+    }];
+
+    const encodedData = encodeURIComponent(JSON.stringify(cartData));
+    router.push(`/payment?cart=${encodedData}`);
+  };
 
   // Update recently viewed product IDs
   useEffect(() => {
@@ -204,7 +216,7 @@ export default function SpecificProduct() {
                 <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600">
                   Add to Cart
                 </button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+                <button onClick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                   Buy Now
                 </button>
               </div>

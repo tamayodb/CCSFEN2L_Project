@@ -16,6 +16,6 @@ const ReviewSchema = new mongoose.Schema({
   comment: { type: String },
 }, { collection: "Reviews" });
 
-const Review = mongoose.models.Review || mongoose.model("Reviews", ReviewSchema);
+const Review = mongoose.models.Review || mongoose.model("Review", ReviewSchema);
 
 export default Review;

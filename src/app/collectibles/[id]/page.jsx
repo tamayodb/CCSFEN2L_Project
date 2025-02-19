@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function SpecificCollectible() {
   const params = useParams();
+  const router = useRouter();
   const category = "collectibles"; // ✅ Hardcoded category
   const [id, setId] = useState(null);
   const [product, setProduct] = useState(null);
@@ -38,6 +39,17 @@ export default function SpecificCollectible() {
 
     fetchProduct();
   }, [id]);
+
+  const handleProceedToPayment = () => {
+    if (!product) return;
+    const cartData = [{
+      id: id,
+      qty: quantity
+    }];
+
+    const encodedData = encodeURIComponent(JSON.stringify(cartData));
+    router.push(`/payment?cart=${encodedData}`);
+  };
 
   const handleShowMore = () => {
     descriptionRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -128,7 +140,7 @@ export default function SpecificCollectible() {
                 <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600">
                   Add to Cart
                 </button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+                <button onClick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                   Buy Now
                 </button>
               </div>
