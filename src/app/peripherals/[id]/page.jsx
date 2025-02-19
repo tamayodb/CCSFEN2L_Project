@@ -130,6 +130,26 @@ export default function SpecificProduct() {
     );
   }
 
+  const handleAddToCart = async () => {
+    try {
+      const response = await fetch('/api/cart/Add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: product._id,
+          user_id: '679e1945c4de6188e9e44574',
+          quantity: quantity,
+        })        
+      });
+  
+      if (!response.ok) throw new Error('Failed to add to cart');
+      alert('Item added to cart!');
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong');
+    }
+  };  
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto p-8">
@@ -213,7 +233,10 @@ export default function SpecificProduct() {
                 </button>
               </div>
               <div className="flex space-x-6">
-                <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600">
+                <button
+                onClick={handleAddToCart}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600"
+                >
                   Add to Cart
                 </button>
                 <button onClick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
