@@ -11,7 +11,7 @@ export async function GET(req) {
         const searchQuery = url.searchParams.get("query") || "";
         const category = url.searchParams.get("category") || "";
         const minPrice = parseFloat(url.searchParams.get("minPrice")) || 0;
-        const maxPrice = parseFloat(url.searchParams.get("maxPrice")) || 10000;
+        const maxPrice = parseFloat(url.searchParams.get("maxPrice")) || 100000;
         const ratings = url.searchParams.getAll("ratings").map(Number);
 
         console.log("🔍 Query Params:", { searchQuery, category, minPrice, maxPrice, ratings });
