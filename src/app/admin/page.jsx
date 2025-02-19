@@ -77,12 +77,12 @@ const OrderManagement = () => {
                         <ul>
                           {order.items && order.items.length > 0 ? (
                             order.items.map((item, index) => (
-                              <li key={index}>
-                                {item.name} - Qty: {item.quantity}
+                              <li key={index} className="text-xs">
+                                {item.name} - <span className="font-bold">Qty: {item.quantity}</span>
                               </li>
                             ))
                           ) : (
-                            <p>No items found</p>
+                            <p className="text-xs">No items found</p>
                           )}
                         </ul>
                       </td>
