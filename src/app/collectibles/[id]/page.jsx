@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function SpecificCollectible() {
   const params = useParams();
+  const router = useRouter();
   const category = "collectibles"; // ✅ Hardcoded category
   const [id, setId] = useState(null);
   const [product, setProduct] = useState(null);
@@ -39,6 +40,17 @@ export default function SpecificCollectible() {
     fetchProduct();
   }, [id]);
 
+  const handleProceedToPayment = () => {
+    if (!product) return;
+    const cartData = [{
+      id: id,
+      qty: quantity
+    }];
+
+    const encodedData = encodeURIComponent(JSON.stringify(cartData));
+    router.push(`/payment?cart=${encodedData}`);
+  };
+
   const handleShowMore = () => {
     descriptionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -46,7 +58,7 @@ export default function SpecificCollectible() {
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
-        <p className="text-gray-600 text-lg">Loading collectible details...</p>
+        <p className="text-gray-600 text-lg">Loading game details...</p>
       </div>
     );
   }
@@ -77,17 +89,6 @@ export default function SpecificCollectible() {
       console.error(error);
       alert('Something went wrong');
     }
-  };  
-
-  const handleProceedToPayment = () => {
-    if (!product) return;
-    const cartData = [{
-      id: id,
-      qty: quantity
-    }];
-
-    const encodedData = encodeURIComponent(JSON.stringify(cartData));
-    router.push(`/payment?cart=${encodedData}`);
   };
 
   return (
@@ -156,13 +157,13 @@ export default function SpecificCollectible() {
               </div>
 
               <div className="flex space-x-6">
-              <button
-              onClick={handleAddToCart}
-                className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600"
-              >
-                Add to Cart
-              </button>
-                <button onclick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+                <button
+                onClick={handleAddToCart}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600"
+                >
+                  Add to Cart
+                </button>
+                <button onClick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                   Buy Now
                 </button>
               </div>
