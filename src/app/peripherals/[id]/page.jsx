@@ -131,24 +131,37 @@ export default function SpecificProduct() {
   }
 
   const handleAddToCart = async () => {
-    try {
-      const response = await fetch('/api/cart/Add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_id: product._id,
-          user_id: '679e1945c4de6188e9e44574',
-          quantity: quantity,
-        })        
-      });
-  
-      if (!response.ok) throw new Error('Failed to add to cart');
-      alert('Item added to cart!');
-    } catch (error) {
-      console.error(error);
-      alert('Something went wrong');
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.error("No token found, redirect to login or handle accordingly");
+        return;
     }
-  };  
+
+    try {
+        const response = await fetch("/api/cart/Add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                product_id: product._id,
+                quantity: quantity,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data.message || "Failed to add to cart");
+
+        console.log("Item added by user_id:", data.user_id);
+        alert("Item added to cart!");
+    } catch (error) {
+        console.error(error);
+        alert("Something went wrong");
+    }
+  };
+ 
 
   return (
     <div className="min-h-screen bg-gray-50">

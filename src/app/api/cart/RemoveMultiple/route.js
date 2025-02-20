@@ -21,46 +21,44 @@ export async function DELETE(request) {
         }
 
         const user_id = decoded.userId;
-        console.log("User ID from token (Removing from Cart):", user_id);
+        console.log("User ID from token (Removing Multiple Items from Cart):", user_id);
 
-        const { product_id } = await request.json();
+        const { product_ids } = await request.json();
 
-        const userIdObjectId = new mongoose.Types.ObjectId(user_id);
-        const productIdObjectId = new mongoose.Types.ObjectId(product_id);
-
-        const cartItem = await Cart.findOne({ user_id: userIdObjectId, product_id: productIdObjectId });
-
-        if (!cartItem) {
-            return NextResponse.json({ message: 'Item not found in cart' }, { status: 404 });
+        if (!Array.isArray(product_ids) || product_ids.length === 0) {
+            return NextResponse.json({ message: 'Invalid product IDs' }, { status: 400 });
         }
 
-        await Cart.deleteOne({ _id: cartItem._id });
+        const userIdObjectId = new mongoose.Types.ObjectId(user_id);
+        const productObjectIds = product_ids.map(id => new mongoose.Types.ObjectId(id));
 
-        console.log(`Removed from Cart - User ID: ${user_id}, Product ID: ${product_id}`);
+        const result = await Cart.deleteMany({ user_id: userIdObjectId, product_id: { $in: productObjectIds } });
 
-        return NextResponse.json({ message: 'Item removed from cart successfully' }, { status: 200 });
+        console.log(`Removed from Cart - User ID: ${user_id}, Product IDs: ${product_ids}`);
+
+        return NextResponse.json({ message: 'Items removed from cart successfully', deletedCount: result.deletedCount }, { status: 200 });
     } catch (error) {
-        console.error("Error removing item from cart:", error);
+        console.error("Error removing items from cart:", error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
-export function handleRemoveItem(productId, token) {
+export function handleRemoveMultipleItems(productIds, token) {
     return fetch('/api/cart', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ product_id: productId })
+        body: JSON.stringify({ product_ids: productIds })
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Failed to remove item from cart');
+            throw new Error('Failed to remove items from cart');
         }
         return response.json();
     })
     .catch(error => {
-        console.error('Error removing item:', error);
+        console.error('Error removing items:', error);
     });
 }
