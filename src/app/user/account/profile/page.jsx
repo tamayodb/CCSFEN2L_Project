@@ -1,5 +1,6 @@
 "use client";
 
+import jwt, { decode } from 'jsonwebtoken';
 import { useState, useEffect } from 'react';
 
 export default function Profile() {
@@ -11,6 +12,7 @@ export default function Profile() {
   const [street_num, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [zip_code, setZipCode] = useState('');
+  const [userID, setUserID] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -32,6 +34,10 @@ export default function Profile() {
           console.error('No token found');
           return;
         }
+        
+        // Decode the token to get the userID
+        const decoded = jwt.decode(token); // Use a JWT library to decode the token
+        const userID = decoded.userId; // Extract userID from the token
 
         const response = await fetch('/api/user/profile', {
           method: 'GET',
@@ -46,6 +52,7 @@ export default function Profile() {
 
         const userData = await response.json();
 
+        setUserID(userID);
         setEmail(userData.email || '');
         setUsername(userData.username || '');
         setName(userData.name || '');
@@ -54,28 +61,23 @@ export default function Profile() {
         setStreet(userData.address?.street_num || '');
         setCity(userData.address?.city || '');
         setZipCode(userData.address?.zip_code || '');
-        
-        // Improved image handling
-        try {
-          if (userData.name) {
-            const imagePath = `/user/${encodeURIComponent(userData.name)}.jpg`;
-            const timestamp = new Date().getTime();
 
-            // Test if image exists
-            const testImage = new Image();
-            testImage.onload = () => {
-              setImagePreview(`${imagePath}?t=${timestamp}`);
-            };
-            testImage.onerror = () => {
-              setImagePreview('/user/default.png');
-            };
-            testImage.src = `${imagePath}?t=${timestamp}`;
-          } else {
+        // Use userID to load the profile image
+        if (userID) {
+          const imagePath = `/user/${userID}.jpg`; // Use userID as the filename
+          const timestamp = new Date().getTime();
+
+          // Test if image exists
+          const testImage = new Image();
+          testImage.onload = () => {
+            setImagePreview(`${imagePath}?t=${timestamp}`);
+          };
+          testImage.onerror = () => {
             setImagePreview('/user/default.png');
-          }
-        } catch (imgError) {
-          console.error('Error checking user image:', imgError);
-          setImagePreview('/public/user/default.png');
+          };
+          testImage.src = `${imagePath}?t=${timestamp}`;
+        } else {
+          setImagePreview('/user/default.png');
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -96,16 +98,16 @@ export default function Profile() {
       alert('Only JPEG and PNG files are allowed');
       return;
     }
-
-    // Make sure we have a name to use for the file
-    if (!name) {
-      alert('Please set your name first before uploading a profile picture');
+    
+    // Make sure we have user to use for the file
+    if (!userID) {
+      alert('User ID not found. Please refresh the page and try again.');
       return;
     }
 
     try {
-      // Use the user's name as the filename
-      const filename = `${name}.jpg`;
+      // Use the user's ID as the filename
+      const filename = `${userID}.jpg`; // Use userID instead of name
 
       const response = await fetch('/api/user/upload-image', {
         method: 'POST',
@@ -121,7 +123,7 @@ export default function Profile() {
         throw new Error(errorData.message || 'Failed to upload image');
       }
       // Add timestamp to prevent browser caching
-      setImagePreview(`/user/${encodeURIComponent(name)}.jpg?t=${new Date().getTime()}`);
+      setImagePreview(`/user/${encodeURIComponent(filename)}.jpg?t=${new Date().getTime()}`);
       alert('Profile picture updated successfully');
     } catch (error) {
       console.error('Error uploading image:', error);

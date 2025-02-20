@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import Customer from '../../../../../models/accounts'; // Your user model
 import connectToDatabase from '../../../../../lib/db'; // Your DB connection
 
@@ -14,6 +14,11 @@ export async function GET(req) {
   try {
     await connectToDatabase();
 
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
+    }
+
     // Get the token from the request headers
     const token = req.headers.get('authorization')?.split(' ')[1];
     if (!token) {
@@ -26,6 +31,7 @@ export async function GET(req) {
     // Verify the token and get the user ID
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Replace with your token verification logic
     const user = await Customer.findById(decoded.userId);
+    
 
     if (!user) {
       return new Response(JSON.stringify({ message: 'User not found' }), {
@@ -33,7 +39,6 @@ export async function GET(req) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-
     // Return the user data
     return new Response(
       JSON.stringify({
