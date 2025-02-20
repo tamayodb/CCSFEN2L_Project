@@ -30,20 +30,18 @@ export async function GET(req) {
     const user_id = decoded.userId.toString();
     console.log('User ID:', user_id);
 
-    // Get the most recent 6 orders
-    const recentOrders = await Order.find({ user_id })
-      .sort({ order_date: -1 })
-      .limit(6)
-      .lean();
+    // Fetch all orders for the user
+    const allOrders = await Order.find({ user_id }).lean();
 
-    console.log('Fetched Orders:', recentOrders);
-
-    if (!recentOrders.length) {
+    if (!allOrders.length) {
       return NextResponse.json([], { status: 200 });
     }
 
+    // Shuffle orders and pick 6 random ones
+    const shuffledOrders = allOrders.sort(() => 0.5 - Math.random()).slice(0, 6);
+
     // Collect all product IDs from these orders (may have duplicates)
-    const productIds = recentOrders.flatMap((order) => order.product_id);
+    const productIds = shuffledOrders.flatMap((order) => order.product_id);
 
     // Fetch product details for all these IDs
     const products = await Product.find({ _id: { $in: productIds } })
@@ -53,8 +51,8 @@ export async function GET(req) {
     // Create a map of products by ID for quick lookup
     const productMap = new Map(products.map((product) => [product._id.toString(), product]));
 
-    // Build response: products grouped by order and keep the order sequence
-    const orderedProducts = recentOrders.flatMap((order) =>
+    // Build response: products grouped by order
+    const orderedProducts = shuffledOrders.flatMap((order) =>
       order.product_id.map((productId) => {
         const product = productMap.get(productId.toString());
         return product
@@ -72,7 +70,7 @@ export async function GET(req) {
 
     return NextResponse.json(orderedProducts, { status: 200 });
   } catch (error) {
-    console.error('Error fetching recent ordered products:', error);
+    console.error('Error fetching random ordered products:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import Swal from 'sweetalert2';
 
 export default function SpecificProduct() {
   const params = useParams();
@@ -137,31 +138,40 @@ export default function SpecificProduct() {
         return;
     }
 
-    try {
-        const response = await fetch("/api/cart/Add", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                product_id: product._id,
-                quantity: quantity,
-            }),
-        });
+      try {
+          const response = await fetch("/api/cart/Add", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                  product_id: product._id,
+                  quantity: quantity,
+              }),
+          });
 
-        const data = await response.json();
+          const data = await response.json();
 
-        if (!response.ok) throw new Error(data.message || "Failed to add to cart");
+          if (!response.ok) throw new Error(data.message || "Failed to add to cart");
 
-        console.log("Item added by user_id:", data.user_id);
-        alert("Item added to cart!");
-    } catch (error) {
-        console.error(error);
-        alert("Something went wrong");
-    }
+          console.log("Item added by user_id:", data.user_id);
+          Swal.fire({
+              icon: 'success',
+              title: 'Added to Cart!',
+              text: 'Your item has been successfully added.',
+              timer: 2000,
+              showConfirmButton: false,
+          });
+      } catch (error) {
+          console.error(error);
+          Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Something went wrong!',
+          });
+      }
   };
- 
 
   return (
     <div className="min-h-screen bg-gray-50">
