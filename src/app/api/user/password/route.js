@@ -11,6 +11,35 @@ const verifyToken = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET);
 };
 
+// GET method to fetch current password (hashed)
+export async function GET(req) {
+  try {
+    await connectToDatabase();
+    
+    const token = req.headers.get("authorization")?.split(" ")[1];
+    const decoded = verifyToken(token);
+    
+    const user = await Customer.findById(decoded.userId);
+    if (!user) {
+      return new Response(JSON.stringify({ message: "User not found" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    
+    return new Response(JSON.stringify({ currentPassword: user.password }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error fetching current password:", error);
+    return new Response(JSON.stringify({ message: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+}
+
 // POST method to verify the current password
 export async function POST(req) {
   if (req.method !== "POST") {

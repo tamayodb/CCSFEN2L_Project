@@ -454,7 +454,7 @@ export default function Profile() {
       <div className="w-1/3">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex flex-col items-center justify-center space-y-4">
-          // Updated Image Preview Section
+          
             <div className="w-48 h-48 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
               {imagePreview ? (
                 <img 
