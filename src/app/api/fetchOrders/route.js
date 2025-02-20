@@ -47,7 +47,7 @@ export async function GET(req) {
 
     // Fetch product details for all these IDs
     const products = await Product.find({ _id: { $in: productIds } })
-      .select('productName price photo')
+      .select('productName price photo tag.type')  // <-- Added `category`
       .lean();
 
     // Create a map of products by ID for quick lookup
@@ -64,6 +64,7 @@ export async function GET(req) {
               name: product.productName,
               image: product.photo?.[0] || '',
               price: product.price,
+              type: product.tag?.type || 'unknown',  // <-- Added category
               orderDate: order.order_date,
             }
           : null;
