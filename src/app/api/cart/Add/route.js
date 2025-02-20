@@ -81,7 +81,23 @@ export async function GET() {
 export async function POST(request) {
     try {
         await connectToDatabase();
-        const { product_id, user_id, quantity } = await request.json();
+
+        const token = request.headers.get('authorization')?.split(' ')[1];
+        if (!token) {
+            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return NextResponse.json({ message: 'Invalid token' }, { status: 403 });
+        }
+
+        const user_id = decoded.userId;
+        console.log("User ID from token (Adding to Cart):", user_id);
+
+        const { product_id, quantity } = await request.json();
 
         const userIdObjectId = new mongoose.Types.ObjectId(user_id);
         const productIdObjectId = new mongoose.Types.ObjectId(product_id);
@@ -96,7 +112,10 @@ export async function POST(request) {
             await newCartItem.save();
         }
 
-        return NextResponse.json({ message: "Item added to cart successfully" }, { status: 201 });
+        console.log(`Added to Cart - User ID: ${user_id}, Product ID: ${product_id}, Quantity: ${quantity}`);
+
+        return NextResponse.json({ message: "Item added to cart successfully", user_id }, { status: 201 });
+
     } catch (error) {
         console.error("Error adding item to cart:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

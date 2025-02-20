@@ -14,21 +14,26 @@ export default function Page() {
 
   useEffect(() => {
     async function fetchCart() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found, redirect to login or handle accordingly");
+        return;
+      }
+    
       try {
-        const response = await fetch("/api/cart/View");
+        const response = await fetch("/api/cart/View", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+    
         const data = await response.json();
         setCartItems(data);
-
-        // Initialize selected state for each item as false
-        const initialSelection = data.reduce((acc, item) => {
-          acc[item.id] = false;
-          return acc;
-        }, {});
-        setSelectedItems(initialSelection);
       } catch (error) {
         console.error("Error fetching cart data:", error);
       }
-    }
+    }    
 
     async function fetchRecentlyViewed() {
       try {
