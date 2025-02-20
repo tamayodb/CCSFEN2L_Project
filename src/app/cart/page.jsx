@@ -343,10 +343,11 @@ export default function Page() {
             ))}
           </div>
         )}
-        <div>
+      </div>
+      
+      <div>
           <AssuranceSection />
         </div>
-      </div>
     </div>
   );
 }
