@@ -1,126 +1,77 @@
 "use client";
-import React, { useState } from "react";
-import Image from "next/image";  // Importing Image component
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation"; // import useRouter
+import Image from "next/image";
 
-const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
-  const totalProductPrice = products.reduce((total, product) => total + (product.price * product.qty), 0);
+const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
+  const totalProductPrice = products.reduce((total, product) => total + product.price * product.qty, 0);
   const finalPrice = totalProductPrice + shippingFee;
 
   const [activeTab, setActiveTab] = useState("COD");
-  const [selectedWallet, setSelectedWallet] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [userId, setUserId] = useState("");  // State for storing user ID
 
-  const tabs = [
-    "COD",
-    "Credit/Debit Card",
-    "Payment Center/E-Wallet",
-    "Online Banking",
-    "Linked Bank Account",
-  ];
+  const tabs = ["COD", "Credit/Debit Card", "Payment Center/E-Wallet", "Online Banking", "Linked Bank Account"];
 
-  const wallets = [
-    { id: "GCash", label: "GCash", logo: "/payment/Gcashlogo.png" },
-    { id: "Maya", label: "Maya", logo: "/payment/Mayalogo.png" },
-  ];
+  const router = useRouter(); // Initialize useRouter hook
+
+  useEffect(() => {
+    // Fetch and decrypt JWT token to get user ID
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));  // Decode the JWT token
+      setUserId(decodedToken.userId);  // Assuming JWT contains user ID under 'userId'
+    } else {
+      setErrorMessage("Unauthorized: No token found");
+    }
+  }, []);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
-    setSelectedWallet(""); // Reset selected wallet when switching tabs
+    setErrorMessage("");
+    setSuccessMessage("");
   };
 
-  const handleWalletSelection = (wallet) => {
-    setSelectedWallet(wallet);
-  };
+  const placeOrder = async () => {
+    if (activeTab !== "COD") {
+      setErrorMessage("Only Cash on Delivery is supported.");
+      return;
+    }
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "COD":
-        return <p className="text-sm">You will pay the courier upon delivery.</p>;
-      case "Credit/Debit Card":
-        return (
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Card Number"
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-            <div className="flex space-x-4">
-              <input
-                type="text"
-                placeholder="Expiration Date (MM/YY)"
-                className="w-1/2 p-2 border border-gray-300 rounded-md"
-              />
-              <input
-                type="text"
-                placeholder="CVV"
-                className="w-1/2 p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            <input
-              type="text"
-              placeholder="Cardholder Name"
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
-          </div>
-        );
-      case "Payment Center/E-Wallet":
-        return (
-          <div className="space-y-4">
-            {wallets.map((wallet) => (
-              <label
-                key={wallet.id}
-                className="flex items-center space-x-4 text-sm border border-gray-300 rounded-md p-2 hover:shadow-md cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="wallet"
-                  value={wallet.id}
-                  checked={selectedWallet === wallet.id}
-                  onChange={() => handleWalletSelection(wallet.id)}
-                  className="form-radio text-blue-500"
-                />
-                <Image
-                  src={wallet.logo}
-                  alt={`${wallet.label} Logo`}
-                  width={32}  // Adjust the width and height as needed
-                  height={32}
-                  className="h-8 w-8"
-                />
-                <span className="font-medium">{wallet.label}</span>
-              </label>
-            ))}
-            {selectedWallet && (
-              <p className="text-sm mt-2">
-                Selected Wallet:{" "}
-                <span className="font-semibold">{selectedWallet}</span>
-              </p>
-            )}
-          </div>
-        );
-      case "Online Banking":
-        return (
-          <div className="space-y-4">
-            <select className="w-full p-2 border border-gray-300 rounded-md">
-              <option value="">Select Your Bank</option>
-              <option value="BPI">BPI</option>
-              <option value="BDO">BDO</option>
-              <option value="Metrobank">Metrobank</option>
-              <option value="UnionBank">UnionBank</option>
-            </select>
-            <p className="text-sm">
-              Once you confirm, you&apos;ll be redirected to your bank&apos;s website to
-              complete the payment.
-            </p>
-          </div>
-        );
-      case "Linked Bank Account":
-        return (
-          <p className="text-xs">
-            No linked bank accounts found. Please link a bank account in your
-            profile settings to use this option.
-          </p>
-        );
-      default:
-        return null;
+    setIsLoading(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const orderData = {
+        user_id: userId,
+        cart: JSON.stringify(products.map((p) => ({ id: p.id, qty: p.qty }))),
+        address,
+        totalAmount: finalPrice,
+        paymentMode: "Cash on Delivery",
+      };
+
+      const response = await fetch("/api/payment/paymentgateway", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("token")}` },
+        body: JSON.stringify(orderData),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to place order");
+      }
+      setSuccessMessage("Order placed successfully!");
+      
+      // After successful order placement, navigate to the orders page
+      router.push("/orders/all");
+
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -131,11 +82,7 @@ const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
         {tabs.map((tab) => (
           <button
             key={tab}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap 
-              ${activeTab === tab
-                ? "bg-[#F4D35E] text-black"
-                : "bg-white text-gray-500 border border-[#F4D35E] hover:bg-gray-100"
-              }`}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === tab ? "bg-[#F4D35E] text-black" : "bg-white text-gray-500 border border-[#F4D35E] hover:bg-gray-100"}`}
             onClick={() => handleTabClick(tab)}
           >
             {tab}
@@ -143,11 +90,13 @@ const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
         ))}
       </div>
 
-      <div className="mt-4">{renderTabContent()}</div>
+      {activeTab === "COD" && <p className="text-sm">You will pay the courier upon delivery.</p>}
+
+      {errorMessage && <p className="text-red-500 text-sm mt-2">{errorMessage}</p>}
+      {successMessage && <p className="text-green-500 text-sm mt-2">{successMessage}</p>}
 
       <div className="w-full h-[2px] bg-[#F4D35E] my-6"></div>
 
-      {/* Payment Summary */}
       <div className="mt-6 flex justify-between items-start">
         <div className="w-1/3"></div>
         <div className="w-1/3"></div>
@@ -168,8 +117,12 @@ const PaymentComponent = ({ products = [], shippingFee = 0 }) => {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button className="py-3 px-8 bg-[#F4D35E] text-[#0D3B66] font-semibold rounded-lg shadow-md hover:bg-[#F1C232] transition duration-300 w-1/4">
-          Place Order
+        <button
+          onClick={placeOrder}
+          className="py-3 px-8 bg-[#F4D35E] text-[#0D3B66] font-semibold rounded-lg shadow-md hover:bg-[#F1C232] transition duration-300 w-1/4"
+          disabled={isLoading}
+        >
+          {isLoading ? "Processing..." : "Place Order"}
         </button>
       </div>
     </div>

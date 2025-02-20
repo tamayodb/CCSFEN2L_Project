@@ -40,7 +40,7 @@ export default function DeliveryAddress() {
           : "No Address Available";
 
         setAddressData({
-          name: data.name || "No Name Available",
+          name: data.username || "No Name Available",  // Use `username` instead of `name`
           contactNumber: data.contact_num || "No Contact Available",
           address: formattedAddress,
         });

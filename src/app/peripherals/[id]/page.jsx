@@ -1,11 +1,13 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function SpecificProduct() {
   const params = useParams();
+  const router = useRouter();
+
   const category = "peripherals";
   const [id, setId] = useState(null);
   const [product, setProduct] = useState(null);
@@ -51,6 +53,16 @@ export default function SpecificProduct() {
 
     fetchProduct();
   }, [id]);
+  const handleProceedToPayment = () => {
+    if (!product) return;
+    const cartData = [{
+      id: id,
+      qty: quantity
+    }];
+
+    const encodedData = encodeURIComponent(JSON.stringify(cartData));
+    router.push(`/payment?cart=${encodedData}`);
+  };
 
   // Update recently viewed product IDs
   useEffect(() => {
@@ -117,6 +129,26 @@ export default function SpecificProduct() {
       </div>
     );
   }
+
+  const handleAddToCart = async () => {
+    try {
+      const response = await fetch('/api/cart/Add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: product._id,
+          user_id: '679e1945c4de6188e9e44574',
+          quantity: quantity,
+        })        
+      });
+  
+      if (!response.ok) throw new Error('Failed to add to cart');
+      alert('Item added to cart!');
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong');
+    }
+  };  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -201,10 +233,13 @@ export default function SpecificProduct() {
                 </button>
               </div>
               <div className="flex space-x-6">
-                <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600">
+                <button
+                onClick={handleAddToCart}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600"
+                >
                   Add to Cart
                 </button>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+                <button onClick={handleProceedToPayment} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                   Buy Now
                 </button>
               </div>

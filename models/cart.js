@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const CartSchema = new mongoose.Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -9,8 +11,7 @@ const CartSchema = new mongoose.Schema({
     ref: "Product",
     required: true,
   },
-  quantity: { type: Number, required: true, default: 1 }, // Default to 1 if not specified
-  totalPrice: { type: Number, required: true },
+  quantity: { type: Number, required: true, default: 1 } // Default to 1 if not specified
 }, { collection: 'Cart' });
 
 const Cart = mongoose.models.Cart || mongoose.model("Cart", CartSchema);

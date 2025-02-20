@@ -35,14 +35,22 @@ export async function GET(req) {
   }
 
   try {
-    const user = await Customer.findById(auth.userId, "address");
+    // Fetch username, contact_num, and address
+    const user = await Customer.findById(auth.userId, "username contact_num address");
 
     if (!user) {
       console.log("User Not Found:", auth.userId);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ address: user.address }, { status: 200 });
+    return NextResponse.json(
+      {
+        username: user.username, 
+        contact_num: user.contact_num, 
+        address: user.address
+      }, 
+      { status: 200 }
+    );
   } catch (err) {
     console.error("Database Error:", err.message);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
