@@ -35,7 +35,7 @@ export default function Page() {
       }
     }    
 
-    async function fetchRecentlyViewed() {
+    async function fetchRecentlyOrdered() {
       try {
         const response = await fetch("/api/cart/View");
         const data = await response.json();
@@ -47,7 +47,7 @@ export default function Page() {
     }    
 
     fetchCart();
-    fetchRecentlyViewed();
+    fetchRecentlyOrdered();
   }, []);
 
   const handleCheckboxChange = (id) => {
