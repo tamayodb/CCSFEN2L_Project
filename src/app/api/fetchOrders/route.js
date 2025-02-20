@@ -1,9 +1,8 @@
 import jwt from 'jsonwebtoken';
-import connectToDatabase from "../../../../../lib/db.js";
-import Order from "../../../../../models/order.js";
-import Product from "../../../../../models/product.js";
+import connectToDatabase from "../../../../lib/db.js";
+import Order from "../../../../models/order.js";
+import Product from "../../../../models/product.js";
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 
 export async function GET(req) {
   try {
@@ -28,36 +27,52 @@ export async function GET(req) {
       });
     }
 
-    const user_id = decoded.userId;
-    const userIdString = user_id.toString();
+    const user_id = decoded.userId.toString();
+    console.log('User ID:', user_id);
 
-    const recentOrders = await Order.find({ user_id: userIdString })
+    // Get the most recent 6 orders
+    const recentOrders = await Order.find({ user_id })
       .sort({ order_date: -1 })
       .limit(6)
       .lean();
+
+    console.log('Fetched Orders:', recentOrders);
 
     if (!recentOrders.length) {
       return NextResponse.json([], { status: 200 });
     }
 
-    const productIds = recentOrders.flatMap(order => order.product_id);
+    // Collect all product IDs from these orders (may have duplicates)
+    const productIds = recentOrders.flatMap((order) => order.product_id);
 
-    const uniqueProductIds = [...new Set(productIds)];
-
-    const products = await Product.find({ _id: { $in: uniqueProductIds } })
-      .select("productName price photo")
+    // Fetch product details for all these IDs
+    const products = await Product.find({ _id: { $in: productIds } })
+      .select('productName price photo')
       .lean();
 
-    const orderedProducts = products.map(product => ({
-      id: product._id.toString(),
-      name: product.productName,
-      image: product.photo?.[0] || "",
-      price: product.price,
-    }));
+    // Create a map of products by ID for quick lookup
+    const productMap = new Map(products.map((product) => [product._id.toString(), product]));
+
+    // Build response: products grouped by order and keep the order sequence
+    const orderedProducts = recentOrders.flatMap((order) =>
+      order.product_id.map((productId) => {
+        const product = productMap.get(productId.toString());
+        return product
+          ? {
+              orderId: order._id.toString(),
+              productId: product._id.toString(),
+              name: product.productName,
+              image: product.photo?.[0] || '',
+              price: product.price,
+              orderDate: order.order_date,
+            }
+          : null;
+      }).filter(Boolean)
+    );
 
     return NextResponse.json(orderedProducts, { status: 200 });
   } catch (error) {
-    console.error("Error fetching recent ordered products:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error('Error fetching recent ordered products:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

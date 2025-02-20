@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"; // Import useRouter
 export default function Page() {
   const router = useRouter(); // Initialize the router
   const [cartItems, setCartItems] = useState([]);
-  const [recentlyViewed, setRecentlyViewed] = useState([]);
+  const [recentlyOrdered, setRecentlyOrdered] = useState([]);
   const [selectedItems, setSelectedItems] = useState({});
   const [total, setTotal] = useState(0);
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
@@ -36,15 +36,34 @@ export default function Page() {
     }    
 
     async function fetchRecentlyOrdered() {
-      try {
-        const response = await fetch("/api/cart/View");
-        const data = await response.json();
-        console.log("Recently Viewed Data:", data); // Check the data format here
-        setRecentlyViewed(data.slice(0, 6)); // If the data is correctly formatted, this will work
-      } catch (error) {
-        console.error("Error fetching recently viewed products:", error);
+      const token = localStorage.getItem("token");
+    
+      if (!token) {
+        console.error("No token found. Please log in.");
+        return;
       }
-    }    
+    
+      try {
+        const response = await fetch("/api/fetchOrders", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error(`Failed to fetch recently ordered products: ${response.statusText}`);
+        }
+    
+        const data = await response.json();
+        console.log("Recently Ordered Products:", data);
+    
+        // Set state with the data (assuming you want to show all products per order)
+        setRecentlyOrdered(data.slice(0, 6));
+      } catch (error) {
+        console.error("Error fetching recently ordered products:", error);
+      }
+    }           
 
     fetchCart();
     fetchRecentlyOrdered();
@@ -299,11 +318,11 @@ export default function Page() {
       {/* Recently Ordered */}
       <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-lg font-bold mb-6">Recently Ordered</h2>
-        {recentlyViewed.length === 0 ? (
+        {recentlyOrdered.length === 0 ? (
           <p>No recently viewed items available.</p> // Handle empty data
         ) : (
           <div className="flex justify-between gap-6">
-            {recentlyViewed.map((item) => (
+            {recentlyOrdered.map((item) => (
               <div
                 key={item.id}
                 className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center"
