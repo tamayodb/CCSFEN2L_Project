@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import AssuranceSection from "@/components/homepage/AssuranceSection";
 import Image from "next/image";
 import { useRouter } from "next/navigation"; // Import useRouter
+import Link from "next/link";
 
 export default function Page() {
   const router = useRouter(); // Initialize the router
@@ -324,17 +325,21 @@ export default function Page() {
           <div className="flex justify-between gap-6">
             {recentlyOrdered.map((item) => (
               <div
-                key={item.id}
+                key={item.productID}
                 className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center"
                 style={{ width: "23%" }}
               >
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  width={96}
-                  height={96}
-                  className="object-contain mb-4"
-                />
+                <Link legacyBehavior href={`/${item.type.toLowerCase()}/${item.productId}/`} passHref>
+                  <a>
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      width={96}
+                      height={96}
+                      className="object-contain mb-4"
+                    />
+                  </a>
+                </Link>
                 <p className="text-sm font-bold text-gray-800 mb-2">{item.name}</p>
                 <p className="text-sm text-blue-600 font-semibold">
                   ₱{item.price.toLocaleString()}
@@ -343,10 +348,12 @@ export default function Page() {
             ))}
           </div>
         )}
-        <div>
+      </div>
+
+      
+      <div>
           <AssuranceSection />
         </div>
-      </div>
     </div>
   );
 }
