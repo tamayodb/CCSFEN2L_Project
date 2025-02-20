@@ -79,25 +79,59 @@ export default function Page() {
   };
 
   // Function to handle the checkout and navigate to the payment page
-  const handleCheckout = () => {
-    const selectedCartItems = cartItems
-    .filter((item) => selectedItems[item.id])
-    .map((item) => ({
-      id: item.id,
-      qty: item.quantity, // Extract quantity
-    }));
-    
-    if (selectedCartItems.length === 0) {
-      setErrorMessage("Please select at least one item to checkout."); // Set error message if no items are selected
+  const handleCheckout = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found, redirect to login or handle accordingly");
       return;
     }
   
-    // Reset error message if items are selected
-    setErrorMessage("");
-    
-    const encodedData = encodeURIComponent(JSON.stringify(selectedCartItems));
-    router.push(`/payment?cart=${encodedData}`);
-  };
+    const selectedCartItems = cartItems
+      .filter((item) => selectedItems[item.id])
+      .map((item) => ({
+        id: item.id,
+        qty: item.quantity,
+      }));
+  
+    if (selectedCartItems.length === 0) {
+      setErrorMessage("Please select at least one item to checkout.");
+      return;
+    }
+  
+    setErrorMessage(""); // Reset error message
+  
+    try {
+      // Make a DELETE request to remove selected items from the database
+      const response = await fetch("/api/cart/RemoveMultiple", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          product_ids: selectedCartItems.map((item) => item.id),
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to remove selected items from cart.");
+      }
+  
+      // Remove the selected items from state
+      setCartItems((prevItems) =>
+        prevItems.filter((item) => !selectedItems[item.id])
+      );
+  
+      setSelectedItems({}); // Reset selection after removing items
+  
+      // Proceed to payment page
+      const encodedData = encodeURIComponent(JSON.stringify(selectedCartItems));
+      router.push(`/payment?cart=${encodedData}`);
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      setErrorMessage("Failed to complete checkout. Please try again.");
+    }
+  };  
 
   const handleRemoveItem = async (productId) => {
     const token = localStorage.getItem("token");
