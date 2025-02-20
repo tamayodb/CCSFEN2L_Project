@@ -99,12 +99,75 @@ export default function Page() {
     router.push(`/payment?cart=${encodedData}`);
   };
 
+  const handleRemoveItem = async (productId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found, redirect to login or handle accordingly");
+      return;
+    }
+  
+    try {
+      const response = await fetch("/api/cart/Remove", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ product_id: productId }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to remove item from cart");
+      }
+  
+      // Update cartItems state after successful deletion
+      setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+  
+      // Optionally recalculate total after removing an item
+      setSelectedItems((prevSelected) => {
+        const updatedSelection = { ...prevSelected };
+        delete updatedSelection[productId];
+        calculateTotal(updatedSelection);
+        return updatedSelection;
+      });
+  
+      console.log("Item removed successfully");
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
+    }
+  };  
+
+  const handleIncreaseQuantity = (id) => {
+    setCartItems((prevItems) => {
+      const updatedItems = prevItems.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+      return updatedItems;
+    });
+  };
+  
+  const handleDecreaseQuantity = (id) => {
+    setCartItems((prevItems) => {
+      const updatedItems = prevItems.map((item) =>
+        item.id === id && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      );
+      return updatedItems;
+    });
+  };
+  
+  // Recalculate total when cartItems or selectedItems change
+  useEffect(() => {
+    calculateTotal(selectedItems);
+  }, [cartItems, selectedItems]);  
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-2xl font-bold mb-6">My Cart</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Cart Items */}
-        <div className="col-span-2 bg-white p-4 rounded-lg shadow-md">
+          {/* Cart Items */}
+          <div className="col-span-2 bg-white p-4 rounded-lg shadow-md">
           <div className="overflow-auto max-h-96">
             <table className="w-full text-left">
               <thead className="sticky top-0 bg-white">
@@ -118,8 +181,8 @@ export default function Page() {
                     />
                   </th>
                   <th className="py-2">Product</th>
-                  <th className="py-2">Price</th>
-                  <th className="py-2">Quantity</th>
+                  <th className="py-2 text-center">Quantity</th>
+                  <th className="py-2"></th>
                 </tr>
               </thead>
               <tbody>
@@ -141,10 +204,36 @@ export default function Page() {
                         height={64}
                         className="object-contain"
                       />
-                      <p>{item.name}</p>
+                      <div>
+                        <p>{item.name}</p>
+                        <p className="text-sm text-gray-500">₱{item.price.toLocaleString()}</p>
+                      </div>
                     </td>
-                    <td className="py-4">₱{item.price.toLocaleString()}</td>
-                    <td className="py-4">{item.quantity}</td>
+                    <td className="py-4 text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <button
+                          className="px-2 py-1 bg-gray-200 rounded"
+                          onClick={() => handleDecreaseQuantity(item.id)}
+                          disabled={item.quantity <= 1}
+                        >
+                          -
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button
+                          className="px-2 py-1 bg-gray-200 rounded"
+                          onClick={() => handleIncreaseQuantity(item.id)}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <button
+                        className="text-xs text-gray-500 hover:underline mt-1"
+                        onClick={() => handleRemoveItem(item.id)}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                    <td className="py-4"></td>
                   </tr>
                 ))}
               </tbody>
@@ -153,15 +242,20 @@ export default function Page() {
         </div>
 
         {/* Order Summary */}
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h2 className="text-lg font-bold mb-4">Total</h2>
-          <p className="text-lg font-bold">₱{total.toLocaleString()}</p>
+        <div className="bg-white p-4 rounded-lg shadow-md h-40 flex flex-col justify-between">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-bold">Total</h2>
+            <p className="text-lg font-bold">₱{total.toLocaleString()}</p>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Taxes and shipping are calculated at payment.
+          </p>
           {errorMessage && (
-            <p className="text-red-500 text-sm mt-2">{errorMessage}</p> // Display error message if there are no selected items
+            <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
           )}
           <button
-            onClick={handleCheckout} // Add the handleCheckout function to the button
-            className="mt-4 bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md w-full"
+            onClick={handleCheckout}
+            className="mt-auto bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md w-full"
           >
             Checkout
           </button>
