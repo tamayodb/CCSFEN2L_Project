@@ -63,19 +63,17 @@ export default function SearchPage() {
     // ✅ Filter by Type
     if (filters.type.length > 0) {
       filtered = filtered.filter((product) =>
-        Array.isArray(product.tag?.type) &&
-        product.tag.type.some((t) => filters.type.includes(t))
+        [].concat(product.tag?.type || []).some((t) => filters.type.includes(t))
       );
     }
 
     // ✅ Filter by Category
     if (filters.category.length > 0) {
       filtered = filtered.filter((product) =>
-        Array.isArray(product.tag?.category) &&
-        product.tag.category.some((cat) => filters.category.includes(cat))
+        [].concat(product.tag?.category || []).some((cat) => filters.category.includes(cat))
       );
-    }    
-
+    }
+  
     // ✅ Filter by Brand
     if (filters.brand) {
       filtered = filtered.filter((product) => product.tag?.brand === filters.brand);
@@ -86,10 +84,9 @@ export default function SearchPage() {
 
     if (filters.platform.length > 0) {
       filtered = filtered.filter((product) =>
-        Array.isArray(product.tag?.platform) &&
-        product.tag.platform.some((p) => filters.platform.includes(p))
+        [].concat(product.tag?.platform || []).some((p) => filters.platform.includes(p))
       );
-    }
+    }    
 
     // ✅ Filter by Ratings
     if (filters.ratings.length > 0) {
