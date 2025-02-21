@@ -2,9 +2,9 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const SearchCard = ({ name, price, image, slug }) => {
+const SearchCard = ({ name, price, type, image, slug }) => {
   return (
-    <Link legacyBehavior href={`/product/${slug}`}>
+    <Link legacyBehavior href={`/${type}/${slug}`}>
       <a className="relative bg-white rounded-xl shadow-lg p-4 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300 ease-in-out group">
         {/* Product Image */}
         <div className="flex justify-center items-center aspect-w-1 aspect-h-1 overflow-hidden rounded-md">

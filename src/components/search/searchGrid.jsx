@@ -19,6 +19,7 @@ const SearchGrid = ({ products }) => {
               key={product._id} // Use _id as the unique key
               name={product.productName} // Match MongoDB field
               price={product.price}
+              type = {product.tag.type.toLowerCase()}
               image={product.photo[0] || "/homepage/product_sample.webp"} // Ensure a valid image
               slug={product._id} // Use ObjectID for navigation
               stock={product.stock}

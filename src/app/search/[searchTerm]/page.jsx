@@ -10,62 +10,71 @@ export default function SearchPage() {
   const [products, setProducts] = useState([]); // All products from API
   const [filteredProducts, setFilteredProducts] = useState([]); // Filtered products
   const [brands, setBrands] = useState([]); // Unique brands list
+  const [types, setTypes] = useState([]); // Unique brands list
   const [categories, setCategories] = useState([]); // Unique categories list
+  const [platforms, setPlatforms] = useState([]); // Unique platforms list
   const [filters, setFilters] = useState({
     category: [],
     brand: "",
+    type: [],
     price: 100000,
     ratings: [],
+    platform: []
   });
-
-  // Extract search term from the URL
-  useEffect(() => {
-    const searchTerm = decodeURIComponent(pathname.split("/search/")[1] || "");
-    setSearchQuery(searchTerm);
-  }, [pathname]);
 
   // Fetch products from API
   useEffect(() => {
+    const searchTerm = decodeURIComponent(pathname.split("/search/")[1] || "");
+    setSearchQuery(searchTerm);
+    if (!searchTerm) return; // Avoid fetching when empty
+  
     async function fetchProducts() {
       try {
-        const response = await fetch("/api/search");
+        const response = await fetch(`/api/search?query=${encodeURIComponent(searchTerm)}`);
         const data = await response.json();
         setProducts(data);
-        setFilteredProducts(data); // Initial filtered products
-
-        // Extract unique brands
+        setFilteredProducts(data);
+  
         const uniqueBrands = [...new Set(data.map((p) => p.tag?.brand).filter(Boolean))];
         setBrands(uniqueBrands);
-
-        // Extract unique categories
+  
         const uniqueCategories = [...new Set(data.flatMap((p) => p.tag?.category || []))];
         setCategories(uniqueCategories);
+
+        const uniqueTypes = [...new Set(data.flatMap((p) => p.tag?.type || []))];
+        setTypes(uniqueTypes);
+
+        const uniquePlatforms = [...new Set(data.flatMap((p) => p.tag?.platform || []))];
+        setPlatforms(uniquePlatforms);
+
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     }
-
+  
     fetchProducts();
-  }, []);
+  }, [pathname]); // Reacts only to URL changes
+  
 
   // Apply Filters whenever filters change
   useEffect(() => {
     let filtered = products;
 
-    // 🔍 Filter by Search Query
-    if (searchQuery) {
-      const lowercasedQuery = searchQuery.toLowerCase();
+    // ✅ Filter by Type
+    if (filters.type.length > 0) {
       filtered = filtered.filter((product) =>
-        product.productName.toLowerCase().includes(lowercasedQuery)
+        Array.isArray(product.tag?.type) &&
+        product.tag.type.some((t) => filters.type.includes(t))
       );
     }
 
     // ✅ Filter by Category
     if (filters.category.length > 0) {
       filtered = filtered.filter((product) =>
+        Array.isArray(product.tag?.category) &&
         product.tag.category.some((cat) => filters.category.includes(cat))
       );
-    }
+    }    
 
     // ✅ Filter by Brand
     if (filters.brand) {
@@ -75,6 +84,13 @@ export default function SearchPage() {
     // ✅ Filter by Price
     filtered = filtered.filter((product) => product.price <= filters.price);
 
+    if (filters.platform.length > 0) {
+      filtered = filtered.filter((product) =>
+        Array.isArray(product.tag?.platform) &&
+        product.tag.platform.some((p) => filters.platform.includes(p))
+      );
+    }
+
     // ✅ Filter by Ratings
     if (filters.ratings.length > 0) {
       filtered = filtered.filter((product) =>
@@ -83,14 +99,24 @@ export default function SearchPage() {
     }
 
     setFilteredProducts(filtered);
-  }, [searchQuery, filters, products]);
+  }, [filters, products]);
+
+  // 🔹 Handle Type Change
+  const handleTypeChange = (type) => {
+    setFilters((prev) => ({
+      ...prev,
+      type: prev.type.includes(type)
+        ? prev.type.filter((p) => p !== type)
+        : [...prev.type, type],
+    }));
+  };
 
   // 🔹 Handle Category Change
   const handleCategoryChange = (category) => {
     setFilters((prev) => ({
       ...prev,
       category: prev.category.includes(category)
-        ? prev.category.filter((c) => c !== category)
+        ? prev.category.filter((cat) => cat !== category)
         : [...prev.category, category],
     }));
   };
@@ -104,6 +130,15 @@ export default function SearchPage() {
   const handlePriceChange = (event) => {
     setFilters((prev) => ({ ...prev, price: parseInt(event.target.value) }));
   };
+
+  const handlePlatformChange = (platform) => {
+    setFilters((prev) => ({
+      ...prev,
+      platform: prev.platform.includes(platform)
+        ? prev.platform.filter((p) => p !== platform)
+        : [...prev.platform, platform],
+    }));
+  };  
 
   // 🔹 Handle Ratings Change
   const handleRatingsChange = (rating) => {
@@ -126,6 +161,23 @@ export default function SearchPage() {
           {/* Filters Section */}
           <aside className="col-span-1 bg-white p-4 shadow-md rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Filters</h2>
+
+            {/* Type Filter */}
+            <div className="mb-4">
+              <h3 className="font-medium">Types</h3>
+              <ul className="space-y-2 mt-2">
+                {types.map((type) => (
+                  <li key={type}>
+                    <input
+                      type="checkbox"
+                      checked={filters.type.includes(type)}
+                      onChange={() => handleTypeChange(type)}
+                    />
+                    <label className="ml-2">{type}</label>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             {/* Category Filter */}
             <div className="mb-4">
@@ -159,6 +211,23 @@ export default function SearchPage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Platform Filter */}
+            <div className="mb-4">
+              <h3 className="font-medium">Platform</h3>
+              <ul className="space-y-2 mt-2">
+                {platforms.map((platform) => (
+                  <li key={platform}>
+                    <input
+                      type="checkbox"
+                      checked={filters.platform.includes(platform)}
+                      onChange={() => handlePlatformChange(platform)}
+                    />
+                    <label className="ml-2">{platform}</label>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {/* Price Filter */}

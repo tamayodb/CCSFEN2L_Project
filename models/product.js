@@ -9,6 +9,7 @@ const ProductSchema = new mongoose.Schema({
   tag: {
     type: { type: String }, // Type of product (e.g., "Games", "Electronics")
     category: [{ type: String }], // Categories (e.g., ["Peripherals", "Gaming"])
+    brand: { type: String},
     platform: [{ type: String }], // Platforms (e.g., ["Nintendo"])
   },
   brand: { type: String },
