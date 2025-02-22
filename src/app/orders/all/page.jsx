@@ -67,7 +67,7 @@ const OrdersPage = () => {
       const response = await fetch('/api/orders/cancel', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
         },
         body: JSON.stringify({ orderId }),
       });
@@ -203,10 +203,10 @@ const OrdersPage = () => {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-start mt-2">
+              <div className="flex justify-center mt-2 space-x-4">
                 {order.products.length > 1 && (
                   <button
-                    className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
+                    className="px-4 py-2 bg-blue-500 text-white rounded"
                     onClick={() => toggleExpandOrder(order._id)}
                   >
                     {expandedOrders[order._id] ? 'View Less' : 'View More'}
