@@ -318,9 +318,9 @@ export default function Page() {
 
       {/* Recently Ordered */}
       <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-lg font-bold mb-6">Recently Ordered</h2>
+        <h2 className="text-lg font-bold mb-6">Buy Again</h2>
         {recentlyOrdered.length === 0 ? (
-          <p>No recently viewed items available.</p> // Handle empty data
+          <p>No recently ordered items available.</p> // Handle empty data
         ) : (
           <div className="flex justify-between gap-6">
             {recentlyOrdered.map((item) => (
