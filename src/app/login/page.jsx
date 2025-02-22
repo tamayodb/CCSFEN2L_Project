@@ -22,7 +22,7 @@ const LoginPage = () => {
         const { token, userId } = response.data; // Extract the token and userId from the response
         localStorage.setItem("token", token); // Store the token in localStorage
         localStorage.setItem("userId", userId); // Store the userId in localStorage
-        router.push("/orders/all"); // Redirect to orders page on successful login
+        router.push("/"); // Redirect to orders page on successful login
       }
     } catch (err) {
       if (err.response) {
