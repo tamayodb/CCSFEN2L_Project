@@ -133,7 +133,7 @@ const OrdersPage = () => {
         <div className="space-y-4">
           {filteredOrders.map(order => (
             <div key={order._id} className="border rounded-lg p-4 bg-white shadow">
-              <h2 className="text-lg font-bold mb-2">Order ID: {order._id}</h2>
+              <h2 className="text-lg font-bold mb-2" style={{ color: '#155897' }}>Order ID: {order._id}</h2>
               <div className="text-sm text-gray-600 mb-2">
                 <p>Order Date: {order.order_date}</p>
                 <p>Status: {order.status}</p>
