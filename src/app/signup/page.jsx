@@ -15,17 +15,33 @@ const SignupPage = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     setError(null);
-
+  
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
+  
     try {
-      const response = await axios.post('/api/register', { email, password });
-        if (response.status === 201) {
-          router.push("/login"); // Redirect to home page after successful signup and login
-        }      
+      // Create userData with required fields and empty optional fields
+      const userData = {
+        email,
+        password,
+        username: "",
+        name: "",
+        contact_num: "",
+        address: {
+          street_num: "",
+          barangay: "",
+          city: "",
+          zip_code: null,
+        },
+      };
+  
+      const response = await axios.post('/api/register', userData);
+        
+      if (response.status === 201) {
+        router.push("/login");
+      }      
     } catch (err) {
       if (err.response) {
         if (err.response.status === 400) {

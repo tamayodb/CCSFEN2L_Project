@@ -27,7 +27,7 @@ export async function POST(request) {
     });
     // Return the token to the client
     return NextResponse.json(
-      { message: "Login successful", token }, // Include the token in the response
+      { message: "Login successful", token, userId: userExistence._id }, // Include the token and userId in the response
       { status: 200 }
     );
   } catch (err) {

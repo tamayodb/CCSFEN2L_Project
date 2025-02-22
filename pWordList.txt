@@ -1,6 +1,7 @@
-email                       password                    bcrypt password
-mikkel.tanhaus@gmail.com    pass1234                    $2a$10$6ZGPPfohFhnuFijC9HHsKeFQZs0rmbkC8MCEcCPINsAvsEAnoxWNq
-emily.johnson@example.com   emilyPass123                $2a$10$2le40QqP2NyJcdwwugQz1.l9QOzF10.2GYo57HH9cdYKt5dzZzo5y
-jane.doe@example.com        password567                 $2a$10$CjXEFVekMGvuyZH06oMb0us46dbG2pM9q9gjZ9NVcNB9RizPZBpea
-mark.twain@example.com      mtwain2025                  $2a$10$0UqYYaQn8I68rGAJp9OAaO/mVRA0cEsF2s2eadqIUczwE7XRc9kQy
-john.smith@example.com      securePass99                $2a$10$00pXflYVWxSf9FRQrEH2dOwmVf/8Tz42rnQZebaKrxHI5SUIkKjEu
+email                       password                    
+mikkel.tanhaus@gmail.com    pass1234                    
+emily.johnson@example.com   emilyPass123                
+jane.doe@example.com        password567                 
+mark.twain@example.com      mtwain2025                  
+john.smith@example.com      securePass99
+tempo@gmail.com             temp     

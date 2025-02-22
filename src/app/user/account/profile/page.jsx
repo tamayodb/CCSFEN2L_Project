@@ -1,5 +1,6 @@
 "use client";
 
+import jwt, { decode } from 'jsonwebtoken';
 import { useState, useEffect } from 'react';
 
 export default function Profile() {
@@ -11,7 +12,7 @@ export default function Profile() {
   const [street_num, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [zip_code, setZipCode] = useState('');
-  const [imagePreview, setImagePreview] = useState('');
+  const [userID, setUserID] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -23,20 +24,22 @@ export default function Profile() {
   const [isEditingZipCode, setIsEditingZipCode] = useState(false);
 
   const [showContactNum, setShowPhone] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Retrieve the token from localStorage
-        const token = localStorage.getItem('token'); // Assuming the token is stored as 'token'
+        const token = localStorage.getItem('token'); 
         if (!token) {
           console.error('No token found');
           return;
         }
+        
+        // Decode the token to get the userID
+        const decoded = jwt.decode(token); // Use a JWT library to decode the token
+        const userID = decoded.userId; // Extract userID from the token
 
-        // Fetch user data from the backend
-        const response = await fetch('/api/user', {
+        const response = await fetch('/api/user/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -49,7 +52,7 @@ export default function Profile() {
 
         const userData = await response.json();
 
-        // Populate the state with user data
+        setUserID(userID);
         setEmail(userData.email || '');
         setUsername(userData.username || '');
         setName(userData.name || '');
@@ -58,6 +61,24 @@ export default function Profile() {
         setStreet(userData.address?.street_num || '');
         setCity(userData.address?.city || '');
         setZipCode(userData.address?.zip_code || '');
+
+        // Use userID to load the profile image
+        if (userID) {
+          const imagePath = `/user/${userID}.jpg`; // Use userID as the filename
+          const timestamp = new Date().getTime();
+
+          // Test if image exists
+          const testImage = new Image();
+          testImage.onload = () => {
+            setImagePreview(`${imagePath}?t=${timestamp}`);
+          };
+          testImage.onerror = () => {
+            setImagePreview('/user/default.png');
+          };
+          testImage.src = `${imagePath}?t=${timestamp}`;
+        } else {
+          setImagePreview('/user/default.png');
+        }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -66,27 +87,51 @@ export default function Profile() {
     fetchUserData();
   }, []);
 
-  // Rest of the component code remains the same...
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.size > 1024 * 1024) {
-        alert('File size must be less than 1MB');
-        return;
+    if (!file) return;
+    if (file.size > 1024 * 1024) {
+      alert('File size must be less than 1MB');
+      return;
+    }
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      alert('Only JPEG and PNG files are allowed');
+      return;
+    }
+    
+    // Make sure we have user to use for the file
+    if (!userID) {
+      alert('User ID not found. Please refresh the page and try again.');
+      return;
+    }
+
+    try {
+      // Use the user's ID as the filename
+      const filename = `${userID}.jpg`; // Use userID instead of name
+
+      const response = await fetch('/api/user/upload-image', {
+        method: 'POST',
+        headers: {
+          'x-filename': filename,
+          'Content-Type': file.type,
+        },
+        body: await file.arrayBuffer(), // Send raw binary data
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upload image');
       }
-      if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        alert('Only JPEG and PNG files are allowed');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      // Add timestamp to prevent browser caching
+      setImagePreview(`/user/${encodeURIComponent(filename)}.jpg?t=${new Date().getTime()}`);
+      alert('Profile picture updated successfully');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert(`Failed to upload image: ${error.message}`);
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const missingFields = [];
   
     if (!username) missingFields.push("Username");
@@ -96,33 +141,56 @@ export default function Profile() {
     if (!street_num) missingFields.push("Street");
     if (!city) missingFields.push("City");
     if (!zip_code) missingFields.push("ZIP Code");
-    if (!showContactNum && !isEditing) missingFields.push("Phone Number");
+    if (!contact_num) missingFields.push("Phone Number");
   
     if (missingFields.length > 0) {
       alert(`Please fill in the following fields: ${missingFields.join(", ")}`);
-    } else {
-      handleSaveToFile();
-    }
-  };
+      return;
+    };
 
-  const handleSaveToFile = () => {
-    const fileContent = `
-      Username: ${username}
-      Name: ${name}
-      Email Address: ${email}
-      Billing Address:
-        Barangay: ${barangay}
-        Street: ${street_num}
-        City: ${city}
-        ZIP Code: ${zip_code}
-      Phone: ${showContactNum ? contact_num : "Hidden"}
-    `;
-  
-    const blob = new Blob([fileContent], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'profile_data.txt';
-    link.click();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('No authentication token found');
+        return;
+      }
+
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          name,
+          email,
+          contact_num,
+          address: {
+            street_num,
+            barangay,
+            city,
+            zip_code,
+          },
+        }),
+      });
+
+      alert('Profile updated successfully!');
+      window.location.reload(); 
+
+      setIsEditing(false);
+      setIsEditingUsername(false);
+      setIsEditingName(false);
+      setIsEditingEmail(false);
+      setIsEditingBarangay(false);
+      setIsEditingCity(false);
+      setIsEditingStreet(false);
+      setIsEditingZipCode(false);
+      
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
+    }
   };
 
   return (
@@ -150,16 +218,10 @@ export default function Profile() {
                 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (isEditing) {
-                      setIsEditingUsername(false);
-                    } else {
-                      setIsEditingUsername(true);
-                    }
-                  }}
+                  onClick={() => setIsEditingUsername(!isEditingUsername)}
                   className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
                 >
-                  {isEditing ? 'Save' : 'Edit'}
+                  {isEditingUsername ? 'Save' : 'Edit'}
                 </button>
               </div>
             </div>
@@ -184,13 +246,7 @@ export default function Profile() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (isEditingName) {
-                      setIsEditingName(false);
-                    } else {
-                      setIsEditingName(true);
-                    }
-                  }}
+                  onClick={() => setIsEditingName(!isEditingName)} 
                   className="flex items-center gap-2 px-3 py-1 text-sm border rounded-md hover:bg-gray-50"
                 >
                   {isEditingName ? 'Save' : 'Edit'}
@@ -400,14 +456,22 @@ export default function Profile() {
       <div className="w-1/3">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex flex-col items-center justify-center space-y-4">
+          
             <div className="w-48 h-48 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
               {imagePreview ? (
-                <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
+                <img 
+                src={imagePreview ? imagePreview.replace('/public/', '/') : '/user/default.png'} 
+                alt="Profile" 
+                className="w-full h-full object-cover" 
+                onError={(e) => {
+                  e.target.onerror = null; 
+                  e.target.src = '/user/default.png';
+                }} 
+              />
               ) : (
-                /* User Circle Icon using Tailwind SVG */
-                <svg className="w-32 h-32 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <div className="text-gray-400 flex items-center justify-center w-full h-full">
+                  Loading...
+                </div>
               )}
             </div>
             
@@ -423,7 +487,7 @@ export default function Profile() {
                 htmlFor="image-upload" 
                 className="cursor-pointer inline-flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
               >
-                Set Photo
+                Upload Photo
               </label>
             </div>
 
