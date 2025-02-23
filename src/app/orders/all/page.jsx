@@ -16,6 +16,8 @@ const OrdersPage = () => {
   const [ratingOrder, setRatingOrder] = useState(null);
   const [ratingProduct, setRatingProduct] = useState(null);
   const [rating, setRating] = useState(0);
+  const [showRatingMessage, setShowRatingMessage] = useState(false);
+  const [ratingMessage, setRatingMessage] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -55,11 +57,36 @@ const OrdersPage = () => {
     setRating(0);
   };
 
-  const submitRating = () => {
-    console.log(`Rating for product ${ratingProduct} in order ${ratingOrder}: ${rating}`);
-    setRatingOrder(null);
-    setRatingProduct(null);
-    setRating(0);
+  const submitRating = async () => {
+    if (rating === 0) {
+      setRatingMessage('Please select a rating before submitting.');
+      setShowRatingMessage(true);
+      setTimeout(() => setShowRatingMessage(false), 3000); // Show message for 3 seconds
+      return;
+    }
+
+    try {
+      const userId = localStorage.getItem("userId");
+          rating,
+          comment: '', // Add a comment field if needed
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response text:', errorText);
+        throw new Error('Failed to submit rating');
+      }
+
+      console.log(`Rating for product ${ratingProduct} in order ${ratingOrder}: ${rating}`);
+      setRatingOrder(null);
+      setRatingProduct(null);
+      setRating(0);
+      setShowRatingMessage(true);
+      setTimeout(() => setShowRatingMessage(false), 3000); // Show message for 3 seconds
+    } catch (error) {
+      console.error('Failed to submit rating:', error.message);
+    }
   };
 
   const cancelOrder = async (orderId) => {
@@ -244,6 +271,13 @@ const OrdersPage = () => {
               <button className="px-4 py-2 bg-red-500 text-white rounded mr-2" onClick={() => setRatingOrder(null)}>Cancel</button>
               <button className="px-4 py-2 bg-green-500 text-white rounded" onClick={submitRating}>Submit</button>
             </div>
+          </div>
+        </div>
+      )}
+      {showRatingMessage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-green-500 p-4 rounded-lg shadow-lg">
+            <p className="text-lg font-bold text-white">Rating submitted successfully!</p>
           </div>
         </div>
       )}
