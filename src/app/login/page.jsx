@@ -14,17 +14,18 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
-  
+
     localStorage.removeItem("token"); // Ensure old token is removed before new login
-  
+    localStorage.removeItem("userId"); // Ensure old userId is removed before new login
+
     if (email === "admin@gmail.com" && password === "admin") {
       router.push("/admin");
       return;
     }
-  
+
     try {
       const response = await axios.post("/api/login", { email, password });
-  
+
       if (response.status === 200) {
         const { token, userId } = response.data; // Extract the token and userId from the response
         localStorage.setItem("token", token); // Store the token in localStorage
@@ -45,7 +46,6 @@ const LoginPage = () => {
       }
     }
   };
-  
 
   return (
     <div className="flex h-screen">

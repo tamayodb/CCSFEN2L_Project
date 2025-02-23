@@ -83,6 +83,12 @@ export default function Navbar() {
     setIsExploreOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    router.push("/login");
+  };
+
   // Animation Variants
   const listItemVariants = {
     hidden: { opacity: 0, y: -10 },
@@ -212,6 +218,12 @@ export default function Navbar() {
               className="object-contain cursor-pointer"
             />
           </Link>
+          <button
+            onClick={handleLogout}
+            className="text-xs text-[#0D3B66] hover:underline"
+          >
+            Logout
+          </button>
         </div>
       </div>
 
@@ -238,7 +250,6 @@ export default function Navbar() {
       </motion.div>
 
       {/* Explore Dropdown */}
-      {/* Explore Dropdown */}
       {isExploreOpen && (
         <motion.div
           className="absolute top-full left-0 w-full bg-gray-100 shadow-lg z-40 pt-2 px-4 pb-4"
@@ -257,7 +268,7 @@ export default function Navbar() {
           </button>
           <div className="flex mt-4 mx-auto justify-center gap-28">
             {/* Categories Container */}
-            <div className="flex grid-cols-3 py-2 gap-28">
+            <div className="flex grid grid-cols-3 py-2 gap-28">
               {" "}
               {/* Compact the grid by reducing padding and adjusting*/}
               {exploreCategories.map((category) => (
