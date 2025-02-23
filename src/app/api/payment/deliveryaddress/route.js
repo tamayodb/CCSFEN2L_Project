@@ -36,7 +36,7 @@ export async function GET(req) {
 
   try {
     // Fetch username, contact_num, and address
-    const user = await Customer.findById(auth.userId, "username contact_num address");
+    const user = await Customer.findById(auth.userId, "name contact_num address");
 
     if (!user) {
       console.log("User Not Found:", auth.userId);
@@ -45,7 +45,7 @@ export async function GET(req) {
 
     return NextResponse.json(
       {
-        username: user.name, 
+        name: user.name, 
         contact_num: user.contact_num, 
         address: user.address
       }, 
