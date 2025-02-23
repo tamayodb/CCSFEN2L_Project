@@ -257,7 +257,7 @@ export default function Navbar() {
           </button>
           <div className="flex mt-4 mx-auto justify-center gap-28">
             {/* Categories Container */}
-            <div className="flex grid grid-cols-3 py-2 gap-28">
+            <div className="flex grid-cols-3 py-2 gap-28">
               {" "}
               {/* Compact the grid by reducing padding and adjusting*/}
               {exploreCategories.map((category) => (
