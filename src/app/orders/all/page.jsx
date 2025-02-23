@@ -18,6 +18,7 @@ const OrdersPage = () => {
   const [rating, setRating] = useState(0);
   const [showRatingMessage, setShowRatingMessage] = useState(false);
   const [ratingMessage, setRatingMessage] = useState('');
+  const [isErrorMessage, setIsErrorMessage] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -60,13 +61,22 @@ const OrdersPage = () => {
   const submitRating = async () => {
     if (rating === 0) {
       setRatingMessage('Please select a rating before submitting.');
+      setIsErrorMessage(true);
       setShowRatingMessage(true);
-      setTimeout(() => setShowRatingMessage(false), 3000); // Show message for 3 seconds
+      setTimeout(() => setShowRatingMessage(false), 1000); // Show message for 0.5 seconds
       return;
     }
 
     try {
       const userId = localStorage.getItem("userId");
+      const response = await fetch('/api/reviews/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_id: ratingProduct,
+          user_id: userId,
           rating,
           comment: '', // Add a comment field if needed
         }),
@@ -82,8 +92,10 @@ const OrdersPage = () => {
       setRatingOrder(null);
       setRatingProduct(null);
       setRating(0);
+      setRatingMessage('Rating submitted successfully!');
+      setIsErrorMessage(false);
       setShowRatingMessage(true);
-      setTimeout(() => setShowRatingMessage(false), 3000); // Show message for 3 seconds
+      setTimeout(() => setShowRatingMessage(false), 1000); // Show message for 1 second
     } catch (error) {
       console.error('Failed to submit rating:', error.message);
     }
@@ -254,21 +266,21 @@ const OrdersPage = () => {
       )}
       {ratingOrder && ratingProduct && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-bold mb-2">Rate Product</h3>
-            <div className="flex mb-2">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+            <h3 className="text-lg font-bold mb-4">Rate Product</h3>
+            <div className="flex mb-4 space-x-2">
               {[1, 2, 3, 4, 5].map(star => (
                 <span
                   key={star}
-                  className={`cursor-pointer text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-400'}`}
+                  className={`cursor-pointer text-3xl ${star <= rating ? 'text-yellow-500' : 'text-gray-400'}`}
                   onClick={() => setRating(star)}
                 >
                   ★
                 </span>
               ))}
             </div>
-            <div className="flex justify-end">
-              <button className="px-4 py-2 bg-red-500 text-white rounded mr-2" onClick={() => setRatingOrder(null)}>Cancel</button>
+            <div className="flex justify-end space-x-2">
+              <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={() => setRatingOrder(null)}>Cancel</button>
               <button className="px-4 py-2 bg-green-500 text-white rounded" onClick={submitRating}>Submit</button>
             </div>
           </div>
@@ -276,8 +288,8 @@ const OrdersPage = () => {
       )}
       {showRatingMessage && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-green-500 p-4 rounded-lg shadow-lg">
-            <p className="text-lg font-bold text-white">Rating submitted successfully!</p>
+          <div className={`p-4 rounded-lg shadow-lg ${isErrorMessage ? 'bg-red-500' : 'bg-green-500'}`}>
+            <p className="text-lg font-bold text-white">{ratingMessage}</p>
           </div>
         </div>
       )}
