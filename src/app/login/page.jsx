@@ -26,9 +26,10 @@ const LoginPage = () => {
       const response = await axios.post("/api/login", { email, password });
   
       if (response.status === 200) {
-        const { token } = response.data;
-        localStorage.setItem("token", token); // Store new token
-        router.push("/"); // Redirect to homepage
+        const { token, userId } = response.data; // Extract the token and userId from the response
+        localStorage.setItem("token", token); // Store the token in localStorage
+        localStorage.setItem("userId", userId); // Store the userId in localStorage
+        router.push("/"); // Redirect to orders page on successful login
       }
     } catch (err) {
       if (err.response) {
