@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import Swal from 'sweetalert2';
+import { FaStar, FaRegStar } from "react-icons/fa";
 
 export default function SpecificProduct() {
   const params = useParams();
@@ -20,6 +21,29 @@ export default function SpecificProduct() {
   const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
   const descriptionRef = useRef(null);
 
+  const [review, setReview] = useState([]);
+
+  useEffect(() => {
+    if (!id) return; // Ensure id is defined before fetching
+  
+    async function fetchReviews() {
+      try {
+        const response = await fetch(`/api/review/${id}`);
+        if (!response.ok) throw new Error("Failed to fetch reviews");
+  
+        const data = await response.json();
+        
+        // ✅ Ensure `reviews` is always an array
+        setReview(Array.isArray(data.reviews) ? data.reviews : []);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        setReview([]); // Prevent issues by setting an empty array
+      }
+    }
+  
+    fetchReviews();
+  }, [id]); 
+  
   // Get recently viewed product IDs from sessionStorage on mount
   useEffect(() => {
     const storedIds = JSON.parse(sessionStorage.getItem("recentlyViewed") || "[]");
@@ -54,6 +78,7 @@ export default function SpecificProduct() {
 
     fetchProduct();
   }, [id]);
+
   const handleProceedToPayment = () => {
     if (!product) return;
     const cartData = [{
@@ -173,6 +198,20 @@ export default function SpecificProduct() {
       }
   };
 
+  const getAverageRating = () => {
+    if (!Array.isArray(review) || review.length === 0) return "No ratings yet";
+  
+    const total = review.reduce((sum, review) => sum + review.rating, 0);
+    return (total / review.length).toFixed(1);
+  };
+  
+  const renderStars = () => {
+    const avg = parseFloat(getAverageRating());
+    return [...Array(5)].map((_, index) => (
+      index < avg ? <FaStar key={index} className="text-yellow-500" /> : <FaRegStar key={index} className="text-gray-400" />
+    ));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto p-8">
@@ -212,7 +251,9 @@ export default function SpecificProduct() {
           {/* Product Info */}
           <div className="space-y-6">
             <h1 className="text-3xl font-semibold text-gray-900">{product.productName}</h1>
-            <p className="text-xl text-gray-600">Category: {category}</p>
+            <div className="flex items-center">
+                {renderStars()} <span className="ml-2 text-gray-700">({getAverageRating()})</span>
+              </div>
             <p>
               <span className="mt-4 text-2xl font-bold text-blue-600">₱{product.price}.00</span>
               <span className={`ml-4 ${product.quantity > 0 ? "text-green-600" : "text-red-600"}`}>
@@ -286,16 +327,18 @@ export default function SpecificProduct() {
           <h2 className="text-2xl font-bold text-gray-800">Recently Viewed</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-6">
             {recentlyViewedProducts.map((item) => (
-              <Link key={item.id} href={`/peripherals/${item.id}`}>
+              <Link key={item.id || item._id} href={`/peripherals/${item.id || item._id}`}>
                 <div className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                   <Image
                     src={item.photo?.[0] || "/placeholder.jpg"}
                     alt={item.productName}
                     width={200}
                     height={200}
-                    className="object-cover rounded-lg"
+                    className="object-cover rounded-lg w-[200px] h-[200px]"
                   />
-                  <p className="mt-2 text-lg font-semibold text-gray-900">{item.productName}</p>
+                  <p className="mt-2 text-lg font-semibold text-gray-900 line-clamp-3">
+                    {item.productName}
+                  </p>
                   <p className="text-sm text-gray-600">₱{item.price}.00</p>
                 </div>
               </Link>
