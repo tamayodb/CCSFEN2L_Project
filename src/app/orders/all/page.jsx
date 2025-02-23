@@ -19,7 +19,12 @@ const OrdersPage = () => {
   const [showRatingMessage, setShowRatingMessage] = useState(false);
   const [ratingMessage, setRatingMessage] = useState('');
   const [isErrorMessage, setIsErrorMessage] = useState(false);
-  const [ratedProducts, setRatedProducts] = useState({});
+  const [ratedProducts, setRatedProducts] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem("ratedProducts")) || {};
+    }
+    return {};
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -90,7 +95,11 @@ const OrdersPage = () => {
       }
 
       console.log(`Rating for product ${ratingProduct} in order ${ratingOrder}: ${rating}`);
-      setRatedProducts((prev) => ({ ...prev, [ratingProduct]: true }));
+      setRatedProducts((prev) => {
+        const updated = { ...prev, [ratingProduct]: true };
+        localStorage.setItem("ratedProducts", JSON.stringify(updated)); // Save to localStorage
+        return updated;
+      });
       setRatingOrder(null);
       setRatingProduct(null);
       setRating(0);
