@@ -1,6 +1,6 @@
 import "./globals.css";
 import { poppins } from "../utils/fonts.jsx";
-import Navbar from "@/components/Navbar";
+import NavbarWrapper from "@/components/NavbarWrapper"; // Use a separate client component
 import Footer from "@/components/Footer";
 
 export const metadata = {
@@ -12,7 +12,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${poppins} pt-[40px]`}>
-        <Navbar />
+        <NavbarWrapper /> {/* Conditionally renders Navbar */}
         {children}
         <Footer />
       </body>

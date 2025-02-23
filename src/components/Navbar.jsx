@@ -8,6 +8,7 @@ import Link from "next/link";
 const exploreCategories = [
   {
     label: "Peripherals",
+    href: "/peripherals",
     items: [
       { label: "Mice", href: "/peripherals" },
       { label: "Keyboards", href: "/peripherals" },
@@ -20,6 +21,7 @@ const exploreCategories = [
   },
   {
     label: "Games",
+    href: "/games",
     items: [
       { label: "Action", href: "/games" },
       { label: "Adventure", href: "/games" },
@@ -32,6 +34,7 @@ const exploreCategories = [
   },
   {
     label: "Collectibles",
+    href: "/collectibles",
     items: [
       { label: "Action Figures", href: "/collectibles" },
       { label: "Amiibo", href: "/collectibles" },
@@ -81,6 +84,12 @@ export default function Navbar() {
   const handleCloseExplore = () => {
     clearTimeout(timeoutId); // Clear the timeout on close
     setIsExploreOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    router.push("/login");
   };
 
   // Animation Variants
@@ -212,6 +221,12 @@ export default function Navbar() {
               className="object-contain cursor-pointer"
             />
           </Link>
+          <button
+            onClick={handleLogout}
+            className="text-xs text-[#0D3B66] hover:underline"
+          >
+            Logout
+          </button>
         </div>
       </div>
 
@@ -237,7 +252,6 @@ export default function Navbar() {
         />
       </motion.div>
 
-      {/* Explore Dropdown */}
       {/* Explore Dropdown */}
       {isExploreOpen && (
         <motion.div
@@ -267,7 +281,7 @@ export default function Navbar() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 1 } }}
                   >
-                    {category.label}
+                    <Link href={category.href}>{category.label}</Link>
                   </motion.h3>
                   <motion.ul variants={containerVariants}>
                     {category.items.map((item) => (
