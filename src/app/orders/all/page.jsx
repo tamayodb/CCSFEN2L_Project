@@ -203,12 +203,13 @@ const OrdersPage = () => {
                       <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
                       <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
                     </div>
-                    {order.status === 'Completed' && !ratedProducts[order.product_id[index]] && (
+                    {order.status === 'Completed' && (
                       <button
-                        className="px-4 py-2 bg-yellow-500 text-white rounded"
-                        onClick={() => startRating(order._id, order.product_id[index])}
+                        className={`px-4 py-2 rounded ${ratedProducts[order.product_id[index]] ? 'bg-green-500 text-white' : 'bg-yellow-500 text-white'}`}
+                        disabled={ratedProducts[order.product_id[index]]}
+                        onClick={() => !ratedProducts[order.product_id[index]] && startRating(order._id, order.product_id[index])}
                       >
-                        Rate
+                        {ratedProducts[order.product_id[index]] ? 'Already Rated' : 'Rate'}
                       </button>
                     )}
                   </div>
@@ -233,12 +234,13 @@ const OrdersPage = () => {
                       <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
                       <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
                     </div>
-                    {order.status === 'Completed' && !ratedProducts[order.product_id[index + 1]] && (
+                    {order.status === 'Completed' && (
                       <button
-                        className="px-4 py-2 bg-yellow-500 text-white rounded"
-                        onClick={() => startRating(order._id, order.product_id[index + 1])}
+                        className={`px-4 py-2 rounded ${ratedProducts[order.product_id[index + 1]] ? 'bg-green-500 text-white' : 'bg-yellow-500 text-white'}`}
+                        disabled={ratedProducts[order.product_id[index + 1]]}
+                        onClick={() => !ratedProducts[order.product_id[index + 1]] && startRating(order._id, order.product_id[index + 1])}
                       >
-                        Rate
+                        {ratedProducts[order.product_id[index + 1]] ? 'Already Rated' : 'Rate'}
                       </button>
                     )}
                   </div>
