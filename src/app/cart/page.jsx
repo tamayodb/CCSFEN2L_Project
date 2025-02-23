@@ -35,7 +35,11 @@ export default function Page() {
         console.error("Error fetching cart data:", error);
       }
     }    
+    
+    fetchCart();
+  }, []);
 
+  useEffect(() => {
     async function fetchRecentlyOrdered() {
       const token = localStorage.getItem("token");
     
@@ -65,8 +69,6 @@ export default function Page() {
         console.error("Error fetching recently ordered products:", error);
       }
     }           
-
-    fetchCart();
     fetchRecentlyOrdered();
   }, []);
 
@@ -323,11 +325,11 @@ export default function Page() {
           <p>No recently ordered items available.</p> // Handle empty data
         ) : (
           <div className="flex justify-between gap-6">
-            {recentlyOrdered.map((item) => (
+            {recentlyOrdered.map((item, index) => (
               <div
-                key={item.productID}
+                key={item.productID || index}
                 className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center"
-                style={{ width: "23%" }}
+                style={{ width: "23%", minHeight: "200px" }} // Ensuring a fixed minimum height
               >
                 <Link legacyBehavior href={`/${item.type.toLowerCase()}/${item.productId}/`} passHref>
                   <a>
@@ -340,7 +342,9 @@ export default function Page() {
                     />
                   </a>
                 </Link>
-                <p className="text-sm font-bold text-gray-800 mb-2">{item.name}</p>
+                <p className="text-sm font-bold text-gray-800 mb-2 line-clamp-2 h-10">
+                  {item.name}
+                </p>
                 <p className="text-sm text-blue-600 font-semibold">
                   ₱{item.price.toLocaleString()}
                 </p>
@@ -348,9 +352,7 @@ export default function Page() {
             ))}
           </div>
         )}
-      </div>
-
-      
+      </div>    
       <div>
           <AssuranceSection />
         </div>
