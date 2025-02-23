@@ -2,7 +2,7 @@ import connectToDatabase from '../../../../lib/db';
 import Order from '../../../../models/order';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'DELETE') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -16,14 +16,14 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    if (order.status !== 'To Ship') {
-      return res.status(400).json({ error: 'Only orders with status "To Ship" can be cancelled' });
+    if (order.status !== 'To Ship' && order.status !== 'To Approve') {
+      return res.status(400).json({ error: 'Only orders with status "To Ship" or "To Approve" can be cancelled' });
     }
 
     order.status = 'Cancelled';
     await order.save();
 
-    res.status(200).json({ message: 'Order cancelled successfully' });
+    res.status(200).json({ message: 'Order status updated to Cancelled successfully' });
   } catch (error) {
     console.error('Failed to cancel order:', error.message);
     console.error('Error stack:', error.stack);

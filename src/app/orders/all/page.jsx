@@ -65,9 +65,9 @@ const OrdersPage = () => {
   const cancelOrder = async (orderId) => {
     try {
       const response = await fetch('/api/orders/cancel', {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
-        'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ orderId }),
       });
@@ -212,7 +212,7 @@ const OrdersPage = () => {
                     {expandedOrders[order._id] ? 'View Less' : 'View More'}
                   </button>
                 )}
-                {order.status === 'To Ship' && (
+                {(order.status === 'To Ship' || order.status === 'To Approve') && (
                   <button
                     className="px-4 py-2 bg-red-500 text-white rounded"
                     onClick={() => cancelOrder(order._id)}
