@@ -19,6 +19,7 @@ const OrdersPage = () => {
   const [showRatingMessage, setShowRatingMessage] = useState(false);
   const [ratingMessage, setRatingMessage] = useState('');
   const [isErrorMessage, setIsErrorMessage] = useState(false);
+  const [ratedProducts, setRatedProducts] = useState({});
   const router = useRouter();
 
   useEffect(() => {
@@ -63,7 +64,7 @@ const OrdersPage = () => {
       setRatingMessage('Please select a rating before submitting.');
       setIsErrorMessage(true);
       setShowRatingMessage(true);
-      setTimeout(() => setShowRatingMessage(false), 1000); // Show message for 0.5 seconds
+      setTimeout(() => setShowRatingMessage(false), 1000); // Show message for 1 second
       return;
     }
 
@@ -89,6 +90,7 @@ const OrdersPage = () => {
       }
 
       console.log(`Rating for product ${ratingProduct} in order ${ratingOrder}: ${rating}`);
+      setRatedProducts((prev) => ({ ...prev, [ratingProduct]: true }));
       setRatingOrder(null);
       setRatingProduct(null);
       setRating(0);
@@ -201,7 +203,7 @@ const OrdersPage = () => {
                       <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
                       <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
                     </div>
-                    {order.status === 'Completed' && (
+                    {order.status === 'Completed' && !ratedProducts[order.product_id[index]] && (
                       <button
                         className="px-4 py-2 bg-yellow-500 text-white rounded"
                         onClick={() => startRating(order._id, order.product_id[index])}
@@ -231,7 +233,7 @@ const OrdersPage = () => {
                       <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
                       <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
                     </div>
-                    {order.status === 'Completed' && (
+                    {order.status === 'Completed' && !ratedProducts[order.product_id[index + 1]] && (
                       <button
                         className="px-4 py-2 bg-yellow-500 text-white rounded"
                         onClick={() => startRating(order._id, order.product_id[index + 1])}
