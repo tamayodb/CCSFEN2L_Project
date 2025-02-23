@@ -1,5 +1,6 @@
 import connectToDatabase from '../../../../lib/db';
 import Review from '../../../../models/review';
+import Order from '../../../../models/order';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -19,6 +20,15 @@ export default async function handler(req, res) {
     });
 
     await newReview.save();
+
+    // Update the order to set isRated to true for the rated product
+    const order = await Order.findOneAndUpdate(
+      { "products.product_id": product_id, user_id: user_id },
+      { $set: { "products.$.isRated": true } }, // Mark product as rated
+      { new: true }
+    );
+
+    console.log("Updated order:", order);
 
     res.status(201).json({ message: 'Review created successfully' });
   } catch (error) {
