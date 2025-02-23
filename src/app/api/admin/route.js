@@ -15,7 +15,7 @@ export async function GET() {
       })
       .populate({
         path: "user_id", // Populate user details
-        select: "username contact_num address",
+        select: "name contact_num address",
         model: "Customer", // Ensure this matches your actual Mongoose model name
       })
       .lean();
@@ -33,7 +33,7 @@ export async function GET() {
       return {
         ...order,
         items,
-        customerName: order.user_id?.username || "Unknown User", // Use username from User collection
+        customerName: order.user_id?.name || "Unknown User", // Use username from User collection
         contactNumber: order.user_id?.contact_num || "No Contact", // Use contact number
         address: order.user_id?.address || {}, // Full address object
       };

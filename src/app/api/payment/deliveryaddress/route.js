@@ -45,7 +45,7 @@ export async function GET(req) {
 
     return NextResponse.json(
       {
-        username: user.username, 
+        username: user.name, 
         contact_num: user.contact_num, 
         address: user.address
       }, 
