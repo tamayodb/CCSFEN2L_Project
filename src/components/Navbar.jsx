@@ -8,6 +8,7 @@ import Link from "next/link";
 const exploreCategories = [
   {
     label: "Peripherals",
+    href: "/peripherals",
     items: [
       { label: "Mice", href: "/peripherals" },
       { label: "Keyboards", href: "/peripherals" },
@@ -20,6 +21,7 @@ const exploreCategories = [
   },
   {
     label: "Games",
+    href: "/games",
     items: [
       { label: "Action", href: "/games" },
       { label: "Adventure", href: "/games" },
@@ -32,6 +34,7 @@ const exploreCategories = [
   },
   {
     label: "Collectibles",
+    href: "/collectibles",
     items: [
       { label: "Action Figures", href: "/collectibles" },
       { label: "Amiibo", href: "/collectibles" },
@@ -278,7 +281,7 @@ export default function Navbar() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 1 } }}
                   >
-                    {category.label}
+                    <Link href={category.href}>{category.label}</Link>
                   </motion.h3>
                   <motion.ul variants={containerVariants}>
                     {category.items.map((item) => (
