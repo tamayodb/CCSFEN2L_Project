@@ -50,10 +50,12 @@ export async function POST(req) {
     let totalAmountCalculated = 0;
     const productIds = [];
     const quantities = [];
+    const isRated = []; // Initialize isRated array
 
     for (const item of decodedCart) {
       productIds.push(item.id);
       quantities.push(item.qty);
+      isRated.push(false); // Add false for each product
 
       // Here, fetch the product price based on productId if needed.
       // You may use your Product model to get product details.
@@ -88,6 +90,7 @@ export async function POST(req) {
       user_id: auth.userId,
       product_id: productIds,
       quantity: quantities,
+      isRated: isRated, // Add isRated array
       order_date: formattedDate, // Correctly formatted date
       totalAmount: totalAmount || totalAmountCalculated,
       address: fullAddress,
