@@ -193,25 +193,53 @@ export default function Page() {
     }
   };  
 
-  const handleIncreaseQuantity = (id) => {
-    setCartItems((prevItems) => {
-      const updatedItems = prevItems.map((item) =>
+  const handleIncreaseQuantity = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found, redirect to login or handle accordingly");
+      return;
+    }
+    
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      );
-      return updatedItems;
+      )
+    );
+  
+    await fetch("/api/cart/Update", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Replace with your token logic
+      },
+      body: JSON.stringify({ product_id: id, action: "increase" }),
     });
   };
   
-  const handleDecreaseQuantity = (id) => {
-    setCartItems((prevItems) => {
-      const updatedItems = prevItems.map((item) =>
+  const handleDecreaseQuantity = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found, redirect to login or handle accordingly");
+      return;
+    }
+
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
         item.id === id && item.quantity > 1
           ? { ...item, quantity: item.quantity - 1 }
           : item
-      );
-      return updatedItems;
+      )
+    );
+  
+    await fetch("/api/cart/Update", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ product_id: id, action: "decrease" }),
     });
-  };
+  };  
   
   // Recalculate total when cartItems or selectedItems change
   useEffect(() => {
