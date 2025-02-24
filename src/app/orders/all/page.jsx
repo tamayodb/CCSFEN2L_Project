@@ -22,24 +22,37 @@ const OrdersPage = () => {
   const [ratedProducts, setRatedProducts] = useState({});
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        console.log('Fetching orders for userId:', userId);
-        const response = await fetch(`/api/orders?userId=${userId}`);
-        const data = await response.json();
-        console.log('Fetched orders:', data);
-        setOrders(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-        setError('Failed to fetch orders');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await fetch(`/api/orders?userId=${userId}`);
+      const data = await response.json();
 
-    fetchOrders();
+      console.log("Fetched orders:", data); // Debugging
+
+      setOrders(Array.isArray(data) ? data : []);
+
+      // Extract rated products from API response
+      const ratedMap = {};
+      data.forEach(order => {
+        order.products.forEach((product, index) => {
+          if (order.isRated[index]) {
+            ratedMap[product._id] = true;
+          }
+        });
+      });
+
+      setRatedProducts(ratedMap); // Update state
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      setError('Failed to fetch orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders(); // Call it when the component mounts
   }, []);
 
   const toggleExpandOrder = (orderId) => {
@@ -50,7 +63,11 @@ const OrdersPage = () => {
   };
 
   const openProductDetails = (productId) => {
-    router.push(`/peripherals/${productId}`);
+    if (productId) {
+      router.push(`/peripherals/${productId}`);
+    } else {
+      console.error('Product ID is undefined');
+    }
   };
 
   const startRating = (orderId, productId) => {
@@ -98,6 +115,11 @@ const OrdersPage = () => {
       setIsErrorMessage(false);
       setShowRatingMessage(true);
       setTimeout(() => setShowRatingMessage(false), 1000); // Show message for 1 second
+
+      // Wait for MongoDB update
+      setTimeout(async () => {
+        await fetchOrders(); // Now it should have the updated isRated value
+      }, 1500);
     } catch (error) {
       console.error('Failed to submit rating:', error.message);
     }
@@ -183,7 +205,7 @@ const OrdersPage = () => {
                 <p>Payment Mode: {order.paymentMode}</p>
               </div>
               <div className="mb-4">
-                {order.products.slice(0, 1).map((product, index) => (
+                {order.products.slice(0, expandedOrders[order._id] ? order.products.length : 1).map((product, index) => (
                   <div key={index} className="flex items-center mb-4">
                     {product.photo && product.photo.length > 0 ? (
                       <Image
@@ -200,45 +222,16 @@ const OrdersPage = () => {
                     )}
                     <div className="flex-grow">
                       <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(order.product_id[index])}>{product.name}</h3>
-                      <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
+                      <p className="text-sm text-gray-600">Quantity: {order.quantity[index]}</p>
                       <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
                     </div>
-                    {order.status === 'Completed' && !ratedProducts[order.product_id[index]] && (
+                    {order.status === 'Completed' && (
                       <button
-                        className="px-4 py-2 bg-yellow-500 text-white rounded"
-                        onClick={() => startRating(order._id, order.product_id[index])}
+                        className={`px-4 py-2 rounded ${order.isRated[index] ? 'bg-green-500 text-white' : 'bg-yellow-500 text-white'}`}
+                        disabled={order.isRated[index]}
+                        onClick={() => !order.isRated[index] && startRating(order._id, order.product_id[index])}
                       >
-                        Rate
-                      </button>
-                    )}
-                  </div>
-                ))}
-                {expandedOrders[order._id] && order.products.slice(1).map((product, index) => (
-                  <div key={index} className="flex items-center mb-4">
-                    {product.photo && product.photo.length > 0 ? (
-                      <Image
-                        src={product.photo[0]}
-                        alt={product.name}
-                        width={48}
-                        height={48}
-                        className="object-cover rounded mr-4"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 flex items-center justify-center bg-gray-200 rounded mr-4">
-                        <span className="text-gray-600 text-sm">No Image</span>
-                      </div>
-                    )}
-                    <div className="flex-grow">
-                      <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(order.product_id[index + 1])}>{product.name}</h3>
-                      <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
-                      <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
-                    </div>
-                    {order.status === 'Completed' && !ratedProducts[order.product_id[index + 1]] && (
-                      <button
-                        className="px-4 py-2 bg-yellow-500 text-white rounded"
-                        onClick={() => startRating(order._id, order.product_id[index + 1])}
-                      >
-                        Rate
+                        {order.isRated[index] ? 'Already Rated' : 'Rate'}
                       </button>
                     )}
                   </div>

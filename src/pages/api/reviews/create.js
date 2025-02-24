@@ -1,5 +1,6 @@
 import connectToDatabase from '../../../../lib/db';
 import Review from '../../../../models/review';
+import Order from '../../../../models/order';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -19,6 +20,16 @@ export default async function handler(req, res) {
     });
 
     await newReview.save();
+
+    // Update the order to set isRated to true for the rated product
+    const order = await Order.findOne({ user_id: user_id, product_id: { $in: [product_id] } });
+    if (order) {
+      const productIndex = order.product_id.indexOf(product_id);
+      if (productIndex !== -1) {
+        order.isRated[productIndex] = true;
+        await order.save();
+      }
+    }
 
     res.status(201).json({ message: 'Review created successfully' });
   } catch (error) {
