@@ -29,9 +29,9 @@ const creators = [
   {
     name: "Jerico Lim",
     position: "COM223",
-    image: "/discover/dionela.jpg",
-    github: "https://github.com/jerico-lim",
-    linkedin: "https://www.linkedin.com/in/rodneyleiestrada/",
+    image: "/discover/Lim.jpg",
+    github: "https://github.com/vannicc",
+    linkedin: "https://www.linkedin.com/in/jerico-lim-457b8219a/",
   },
   {
     name: "Renaire Odarve",
