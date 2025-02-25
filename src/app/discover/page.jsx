@@ -7,7 +7,7 @@ const creators = [
   {
     name: "Michaela Angela Cailing",
     position: "COM223",
-    image: "/discover/dionela.jpg",
+    image: "/discover/ella.png",
     github: "https://github.com/michaela-cailing",
     linkedin:
       "https://www.linkedin.com/in/michaela-angela-e-cailing-a503332a2/",
