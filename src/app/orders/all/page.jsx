@@ -16,26 +16,43 @@ const OrdersPage = () => {
   const [ratingOrder, setRatingOrder] = useState(null);
   const [ratingProduct, setRatingProduct] = useState(null);
   const [rating, setRating] = useState(0);
+  const [showRatingMessage, setShowRatingMessage] = useState(false);
+  const [ratingMessage, setRatingMessage] = useState('');
+  const [isErrorMessage, setIsErrorMessage] = useState(false);
+  const [ratedProducts, setRatedProducts] = useState({});
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        console.log('Fetching orders for userId:', userId);
-        const response = await fetch(`/api/orders?userId=${userId}`);
-        const data = await response.json();
-        console.log('Fetched orders:', data);
-        setOrders(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-        setError('Failed to fetch orders');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await fetch(`/api/orders?userId=${userId}`);
+      const data = await response.json();
 
-    fetchOrders();
+      console.log("Fetched orders:", data); // Debugging
+
+      setOrders(Array.isArray(data) ? data : []);
+
+      // Extract rated products from API response
+      const ratedMap = {};
+      data.forEach(order => {
+        order.products.forEach((product, index) => {
+          if (order.isRated[index]) {
+            ratedMap[product._id] = true;
+          }
+        });
+      });
+
+      setRatedProducts(ratedMap); // Update state
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      setError('Failed to fetch orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders(); // Call it when the component mounts
   }, []);
 
   const toggleExpandOrder = (orderId) => {
@@ -46,7 +63,11 @@ const OrdersPage = () => {
   };
 
   const openProductDetails = (productId) => {
-    router.push(`/peripherals/${productId}`);
+    if (productId) {
+      router.push(`/peripherals/${productId}`);
+    } else {
+      console.error('Product ID is undefined');
+    }
   };
 
   const startRating = (orderId, productId) => {
@@ -55,19 +76,61 @@ const OrdersPage = () => {
     setRating(0);
   };
 
-  const submitRating = () => {
-    console.log(`Rating for product ${ratingProduct} in order ${ratingOrder}: ${rating}`);
-    setRatingOrder(null);
-    setRatingProduct(null);
-    setRating(0);
+  const submitRating = async () => {
+    if (rating === 0) {
+      setRatingMessage('Please select a rating before submitting.');
+      setIsErrorMessage(true);
+      setShowRatingMessage(true);
+      setTimeout(() => setShowRatingMessage(false), 1000); // Show message for 1 second
+      return;
+    }
+
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await fetch('/api/reviews/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_id: ratingProduct,
+          user_id: userId,
+          rating,
+          comment: '', // Add a comment field if needed
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response text:', errorText);
+        throw new Error('Failed to submit rating');
+      }
+
+      console.log(`Rating for product ${ratingProduct} in order ${ratingOrder}: ${rating}`);
+      setRatedProducts((prev) => ({ ...prev, [ratingProduct]: true }));
+      setRatingOrder(null);
+      setRatingProduct(null);
+      setRating(0);
+      setRatingMessage('Rating submitted successfully!');
+      setIsErrorMessage(false);
+      setShowRatingMessage(true);
+      setTimeout(() => setShowRatingMessage(false), 1000); // Show message for 1 second
+
+      // Wait for MongoDB update
+      setTimeout(async () => {
+        await fetchOrders(); // Now it should have the updated isRated value
+      }, 1500);
+    } catch (error) {
+      console.error('Failed to submit rating:', error.message);
+    }
   };
 
   const cancelOrder = async (orderId) => {
     try {
       const response = await fetch('/api/orders/cancel', {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
-        'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ orderId }),
       });
@@ -142,7 +205,7 @@ const OrdersPage = () => {
                 <p>Payment Mode: {order.paymentMode}</p>
               </div>
               <div className="mb-4">
-                {order.products.slice(0, 1).map((product, index) => (
+                {order.products.slice(0, expandedOrders[order._id] ? order.products.length : 1).map((product, index) => (
                   <div key={index} className="flex items-center mb-4">
                     {product.photo && product.photo.length > 0 ? (
                       <Image
@@ -159,45 +222,16 @@ const OrdersPage = () => {
                     )}
                     <div className="flex-grow">
                       <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(order.product_id[index])}>{product.name}</h3>
-                      <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
+                      <p className="text-sm text-gray-600">Quantity: {order.quantity[index]}</p>
                       <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
                     </div>
                     {order.status === 'Completed' && (
                       <button
-                        className="px-4 py-2 bg-yellow-500 text-white rounded"
-                        onClick={() => startRating(order._id, order.product_id[index])}
+                        className={`px-4 py-2 rounded ${order.isRated[index] ? 'bg-green-500 text-white' : 'bg-yellow-500 text-white'}`}
+                        disabled={order.isRated[index]}
+                        onClick={() => !order.isRated[index] && startRating(order._id, order.product_id[index])}
                       >
-                        Rate
-                      </button>
-                    )}
-                  </div>
-                ))}
-                {expandedOrders[order._id] && order.products.slice(1).map((product, index) => (
-                  <div key={index} className="flex items-center mb-4">
-                    {product.photo && product.photo.length > 0 ? (
-                      <Image
-                        src={product.photo[0]}
-                        alt={product.name}
-                        width={48}
-                        height={48}
-                        className="object-cover rounded mr-4"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 flex items-center justify-center bg-gray-200 rounded mr-4">
-                        <span className="text-gray-600 text-sm">No Image</span>
-                      </div>
-                    )}
-                    <div className="flex-grow">
-                      <h3 className="text-md font-bold cursor-pointer" onClick={() => openProductDetails(order.product_id[index + 1])}>{product.name}</h3>
-                      <p className="text-sm text-gray-600">Quantity: {product.quantity}</p>
-                      <p className="text-sm text-gray-600">Price: ₱{product.price}</p>
-                    </div>
-                    {order.status === 'Completed' && (
-                      <button
-                        className="px-4 py-2 bg-yellow-500 text-white rounded"
-                        onClick={() => startRating(order._id, order.product_id[index + 1])}
-                      >
-                        Rate
+                        {order.isRated[index] ? 'Already Rated' : 'Rate'}
                       </button>
                     )}
                   </div>
@@ -212,7 +246,7 @@ const OrdersPage = () => {
                     {expandedOrders[order._id] ? 'View Less' : 'View More'}
                   </button>
                 )}
-                {order.status === 'To Ship' && (
+                {(order.status === 'To Ship' || order.status === 'To Approve') && (
                   <button
                     className="px-4 py-2 bg-red-500 text-white rounded"
                     onClick={() => cancelOrder(order._id)}
@@ -227,23 +261,30 @@ const OrdersPage = () => {
       )}
       {ratingOrder && ratingProduct && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-bold mb-2">Rate Product</h3>
-            <div className="flex mb-2">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+            <h3 className="text-lg font-bold mb-4">Rate Product</h3>
+            <div className="flex mb-4 space-x-2">
               {[1, 2, 3, 4, 5].map(star => (
                 <span
                   key={star}
-                  className={`cursor-pointer text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-400'}`}
+                  className={`cursor-pointer text-3xl ${star <= rating ? 'text-yellow-500' : 'text-gray-400'}`}
                   onClick={() => setRating(star)}
                 >
                   ★
                 </span>
               ))}
             </div>
-            <div className="flex justify-end">
-              <button className="px-4 py-2 bg-red-500 text-white rounded mr-2" onClick={() => setRatingOrder(null)}>Cancel</button>
+            <div className="flex justify-end space-x-2">
+              <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={() => setRatingOrder(null)}>Cancel</button>
               <button className="px-4 py-2 bg-green-500 text-white rounded" onClick={submitRating}>Submit</button>
             </div>
+          </div>
+        </div>
+      )}
+      {showRatingMessage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className={`p-4 rounded-lg shadow-lg ${isErrorMessage ? 'bg-red-500' : 'bg-green-500'}`}>
+            <p className="text-lg font-bold text-white">{ratingMessage}</p>
           </div>
         </div>
       )}

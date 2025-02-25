@@ -14,7 +14,7 @@ const ReviewSchema = new mongoose.Schema({
   review_date: { type: Date, default: Date.now },
   rating: { type: Number, required: true, min: 1, max: 5 }, // Rating from 1 to 5
   comment: { type: String },
-}, { collection: "Reviews" });
+}, { collection: "Reviews", versionKey: false });
 
 const Review = mongoose.models.Review || mongoose.model("Review", ReviewSchema);
 
