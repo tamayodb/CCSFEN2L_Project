@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation"; // import useRouter
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
 const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
@@ -11,21 +11,56 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [userId, setUserId] = useState("");  // State for storing user ID
+  const [userId, setUserId] = useState("");
+  const [addressData, setAddressData] = useState({
+    name: "",
+    contactNumber: "",
+    address: "",
+  });
 
   const tabs = ["COD", "Credit/Debit Card", "Payment Center/E-Wallet", "Online Banking", "Linked Bank Account"];
 
-  const router = useRouter(); // Initialize useRouter hook
+  const router = useRouter();
 
   useEffect(() => {
-    // Fetch and decrypt JWT token to get user ID
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));  // Decode the JWT token
-      setUserId(decodedToken.userId);  // Assuming JWT contains user ID under 'userId'
-    } else {
-      setErrorMessage("Unauthorized: No token found");
-    }
+    const fetchAddress = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setErrorMessage("Unauthorized: No token found");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/payment/deliveryaddress", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to fetch address");
+        }
+
+        const formattedAddress = data.address
+          ? `${data.address.street_num || ""} ${data.address.barangay || ""}, ${data.address.city || ""} ${data.address.zip_code || ""}`.trim()
+          : "";
+
+        setAddressData({
+          name: data.name || "",
+          contactNumber: data.contact_num || "",
+          address: formattedAddress,
+        });
+      } catch (err) {
+        setErrorMessage(err.message);
+      }
+    };
+
+    fetchAddress();
   }, []);
 
   const handleTabClick = (tab) => {
@@ -40,6 +75,11 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
       return;
     }
 
+    if (!addressData.name || !addressData.contactNumber || !addressData.address) {
+      setErrorMessage("Please provide your name, contact number, and address before placing an order.");
+      return;
+    }
+
     setIsLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
@@ -48,7 +88,7 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
       const orderData = {
         user_id: userId,
         cart: JSON.stringify(products.map((p) => ({ id: p.id, qty: p.qty }))),
-        address,
+        address: addressData.address,
         totalAmount: finalPrice,
         paymentMode: "Cash on Delivery",
       };
@@ -65,7 +105,6 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
       }
       setSuccessMessage("Order placed successfully!");
       
-      // After successful order placement, navigate to the orders page
       router.push("/orders/all");
 
     } catch (error) {
@@ -74,6 +113,8 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
       setIsLoading(false);
     }
   };
+
+  const isPlaceOrderDisabled = !addressData.name || !addressData.contactNumber || !addressData.address;
 
   return (
     <div className="border border-gray-300 bg-white p-8 rounded-lg shadow-md w-full max-w-7xl mx-auto my-5">
@@ -120,11 +161,17 @@ const PaymentComponent = ({ products = [], shippingFee = 0, address }) => {
         <button
           onClick={placeOrder}
           className="py-3 px-8 bg-[#F4D35E] text-[#0D3B66] font-semibold rounded-lg shadow-md hover:bg-[#F1C232] transition duration-300 w-1/4"
-          disabled={isLoading}
+          disabled={isLoading || isPlaceOrderDisabled}
         >
           {isLoading ? "Processing..." : "Place Order"}
         </button>
       </div>
+
+      {isPlaceOrderDisabled && (
+        <p className="text-red-500 text-sm mt-2">
+          Please provide your name, contact number, and address before placing an order.
+        </p>
+      )}
     </div>
   );
 };
