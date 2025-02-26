@@ -33,17 +33,16 @@ export default function SpecificProduct() {
   
         const data = await response.json();
         
-        // ✅ Ensure `reviews` is always an array
         setReview(Array.isArray(data.reviews) ? data.reviews : []);
       } catch (error) {
         console.error("Error fetching reviews:", error);
-        setReview([]); // Prevent issues by setting an empty array
+        setReview([]); 
       }
     }
   
     fetchReviews();
   }, [id]); 
-  
+
   // Get recently viewed product IDs from sessionStorage on mount
   useEffect(() => {
     const storedIds = JSON.parse(sessionStorage.getItem("recentlyViewed") || "[]");
@@ -253,7 +252,7 @@ export default function SpecificProduct() {
             <h1 className="text-3xl font-semibold text-gray-900">{product.productName}</h1>
             <div className="flex items-center">
                 {renderStars()} <span className="ml-2 text-gray-700">({getAverageRating()})</span>
-              </div>
+            </div>
             <p>
               <span className="mt-4 text-2xl font-bold text-blue-600">₱{product.price}.00</span>
               <span className={`ml-4 ${product.quantity > 0 ? "text-green-600" : "text-red-600"}`}>
@@ -274,9 +273,9 @@ export default function SpecificProduct() {
               )}
             </p>
 
-            {/* Quantity and Actions */}
-            <div className="flex items-center mt-4 space-x-4">
-              <div className="flex items-center border border-gray-300 rounded-lg">
+ {/* Quantity and Actions */}
+ <div className="flex items-center mt-4 space-x-4">
+              <div className="flex items-center border border-gray-300 rounded-lg relative">
                 <button
                   onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
                   className="bg-gray-200 px-4 py-2 rounded-l-lg text-gray-700 hover:bg-gray-300"
@@ -290,15 +289,23 @@ export default function SpecificProduct() {
                   className="bg-[#f9fafb] w-16 text-center focus:outline-none"
                 />
                 <button
-                  onClick={() => setQuantity((prev) => prev + 1)}
-                  className="bg-gray-200 px-4 py-2 rounded-r-lg text-gray-700 hover:bg-gray-300"
+                  onClick={() => {
+                    if (quantity < product.quantity) {
+                      setQuantity((prev) => prev + 1);
+                    }
+                  }}
+                  className={`bg-gray-200 px-4 py-2 rounded-r-lg text-gray-700 hover:bg-gray-300 ${quantity >= product.quantity ? 'cursor-not-allowed opacity-50' : ''}`}
+                  disabled={quantity >= product.quantity}
                 >
                   +
                 </button>
               </div>
+              {quantity >= product.quantity && (
+                <p className="text-red-500 text-sm">You have reached the maximum available quantity.</p>
+              )}
               <div className="flex space-x-6">
                 <button
-                onClick={handleAddToCart}
+                  onClick={handleAddToCart}
                   className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600"
                 >
                   Add to Cart
