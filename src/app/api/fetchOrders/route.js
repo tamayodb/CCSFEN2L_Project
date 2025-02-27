@@ -37,37 +37,64 @@ export async function GET(req) {
       return NextResponse.json([], { status: 200 });
     }
 
-    // Shuffle orders and pick 6 random ones
-    const shuffledOrders = allOrders.sort(() => 0.5 - Math.random()).slice(0, 6);
+    // Extract all unique product IDs from all orders
+    const uniqueProductIds = new Set();
+    allOrders.forEach(order => {
+      order.product_id.forEach(id => {
+        uniqueProductIds.add(id.toString());
+      });
+    });
 
-    // Collect all product IDs from these orders (may have duplicates)
-    const productIds = shuffledOrders.flatMap((order) => order.product_id);
+    // Convert Set to Array
+    const uniqueProductIdsArray = Array.from(uniqueProductIds);
+    
+    // Shuffle the unique product IDs and take at most 6
+    const shuffledUniqueProductIds = uniqueProductIdsArray
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 6);
 
-    // Fetch product details for all these IDs
-    const products = await Product.find({ _id: { $in: productIds } })
-      .select('productName price photo tag.type')  // <-- Added `category`
+    // Fetch product details for the selected unique IDs
+    const products = await Product.find({ _id: { $in: shuffledUniqueProductIds } })
+      .select('productName price photo tag.type')
       .lean();
 
-    // Create a map of products by ID for quick lookup
-    const productMap = new Map(products.map((product) => [product._id.toString(), product]));
-
-    // Build response: products grouped by order
-    const orderedProducts = shuffledOrders.flatMap((order) =>
-      order.product_id.map((productId) => {
-        const product = productMap.get(productId.toString());
-        return product
-          ? {
-              orderId: order._id.toString(),
-              productId: product._id.toString(),
-              name: product.productName,
-              image: product.photo?.[0] || '',
-              price: product.price,
-              type: product.tag?.type || 'unknown',  // <-- Added category
-              orderDate: order.order_date,
-            }
-          : null;
-      }).filter(Boolean)
+    // Find which order each product came from (use the most recent order if multiple)
+    const productOrderMap = new Map();
+    
+    // Sort orders by date (newest first) to ensure we use the most recent order
+    const sortedOrders = [...allOrders].sort((a, b) => 
+      new Date(b.order_date) - new Date(a.order_date)
     );
+    
+    // Map each product to its order
+    for (const order of sortedOrders) {
+      for (const productId of order.product_id) {
+        const productIdStr = productId.toString();
+        // Only add if this product is in our shuffled selection and hasn't been mapped yet
+        if (shuffledUniqueProductIds.includes(productIdStr) && !productOrderMap.has(productIdStr)) {
+          productOrderMap.set(productIdStr, {
+            orderId: order._id.toString(),
+            orderDate: order.order_date
+          });
+        }
+      }
+    }
+
+    // Build the final response with no duplications
+    const orderedProducts = products.map(product => {
+      const productId = product._id.toString();
+      const orderInfo = productOrderMap.get(productId);
+      
+      return {
+        orderId: orderInfo?.orderId,
+        productId: productId,
+        name: product.productName,
+        image: product.photo?.[0] || '',
+        price: product.price,
+        type: product.tag?.type || 'unknown',
+        orderDate: orderInfo?.orderDate,
+      };
+    });
 
     return NextResponse.json(orderedProducts, { status: 200 });
   } catch (error) {
