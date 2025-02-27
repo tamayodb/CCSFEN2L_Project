@@ -317,82 +317,92 @@ export default function Page() {
           {/* Cart Items */}
           <div className="col-span-2 bg-white p-4 rounded-lg shadow-md">
           <div className="overflow-auto max-h-96">
-            <table className="w-full text-left">
-              <thead className="sticky top-0 bg-white">
-                <tr className="border-b">
-                  <th className="py-2">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox h-5 w-5 text-blue-600"
-                      onChange={handleCheckAll}
-                      checked={cartItems.every((item) => selectedItems[item.id])}
-                    />
-                  </th>
-                  <th className="py-2">Product</th>
-                  <th className="py-2 text-center">Quantity</th>
-                  <th className="py-2"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {cartItems.map((item) => (
-                  <tr key={item.id} className="border-b">
-                    <td className="py-4">
+            {cartItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <p className="text-lg font-medium text-gray-500">Your cart is empty</p>
+                <p className="text-sm text-gray-400 mt-1">Add some items to your cart to continue shopping</p>
+              </div>
+            ) : (
+              <table className="w-full text-left">
+                <thead className="sticky top-0 bg-white">
+                  <tr className="border-b">
+                    <th className="py-2">
                       <input
                         type="checkbox"
                         className="form-checkbox h-5 w-5 text-blue-600"
-                        checked={selectedItems[item.id] || false}
-                        onChange={() => handleCheckboxChange(item.id)}
+                        onChange={handleCheckAll}
+                        checked={cartItems.every((item) => selectedItems[item.id])}
                       />
-                    </td>
-                    <td className="py-4 flex items-center space-x-4">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        width={64}
-                        height={64}
-                        className="object-contain"
-                      />
-                      <div>
-                        <p>{item.name}</p>
-                        <p className="text-sm text-gray-500">₱{item.price.toLocaleString()}</p>
-                      </div>
-                    </td>
-                    <td className="py-4 text-center">
-                      <div className="flex items-center justify-center space-x-2">
-                        <button
-                          className="px-2 py-1 bg-gray-200 rounded"
-                          onClick={() => handleDecreaseQuantity(item.id)}
-                          disabled={item.quantity <= 1 || isUpdating}
-                        >
-                          -
-                        </button>
-                        
-                        <span>{item.quantity}</span>
-                        
-                        <button
-                          className={`px-2 py-1 rounded ${
-                            stockStatus[item.id]?.isOutOfStock 
-                              ? 'bg-gray-300 cursor-not-allowed' 
-                              : 'bg-gray-200'
-                          }`}
-                          onClick={() => handleIncreaseQuantity(item.id)}
-                          disabled={isUpdating || (stockStatus[item.id]?.isOutOfStock)}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <button
-                        className="text-xs text-gray-500 hover:underline mt-1"
-                        onClick={() => handleRemoveItem(item.id)}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                    <td className="py-4"></td>
+                    </th>
+                    <th className="py-2">Product</th>
+                    <th className="py-2 text-center">Quantity</th>
+                    <th className="py-2"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {cartItems.map((item) => (
+                    <tr key={item.id} className="border-b">
+                      <td className="py-4">
+                        <input
+                          type="checkbox"
+                          className="form-checkbox h-5 w-5 text-blue-600"
+                          checked={selectedItems[item.id] || false}
+                          onChange={() => handleCheckboxChange(item.id)}
+                        />
+                      </td>
+                      <td className="py-4 flex items-center space-x-4">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={64}
+                          height={64}
+                          className="object-contain"
+                        />
+                        <div>
+                          <p>{item.name}</p>
+                          <p className="text-sm text-gray-500">₱{item.price.toLocaleString()}</p>
+                        </div>
+                      </td>
+                      <td className="py-4 text-center">
+                        <div className="flex items-center justify-center space-x-2">
+                          <button
+                            className="px-2 py-1 bg-gray-200 rounded"
+                            onClick={() => handleDecreaseQuantity(item.id)}
+                            disabled={item.quantity <= 1 || isUpdating}
+                          >
+                            -
+                          </button>
+                          
+                          <span>{item.quantity}</span>
+                          
+                          <button
+                            className={`px-2 py-1 rounded ${
+                              stockStatus[item.id]?.isOutOfStock 
+                                ? 'bg-gray-300 cursor-not-allowed' 
+                                : 'bg-gray-200'
+                            }`}
+                            onClick={() => handleIncreaseQuantity(item.id)}
+                            disabled={isUpdating || (stockStatus[item.id]?.isOutOfStock)}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          className="text-xs text-gray-500 hover:underline mt-1"
+                          onClick={() => handleRemoveItem(item.id)}
+                        >
+                          Remove
+                        </button>
+                      </td>
+                      <td className="py-4"></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
