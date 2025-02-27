@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2"; 
 import { FaStar, FaRegStar } from "react-icons/fa";
 
 export default function SpecificCollectible() {
@@ -153,46 +153,59 @@ export default function SpecificCollectible() {
   }
 
   const handleAddToCart = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-          console.error("No token found, redirect to login or handle accordingly");
-          return;
-      }
-  
-        try {
-            const response = await fetch("/api/cart/Add", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    product_id: product._id,
-                    quantity: quantity,
-                }),
-            });
-  
-            const data = await response.json();
-  
-            if (!response.ok) throw new Error(data.message || "Failed to add to cart");
-  
-            console.log("Item added by user_id:", data.user_id);
-            Swal.fire({
-                icon: 'success',
-                title: 'Added to Cart!',
-                text: 'Your item has been successfully added.',
-                timer: 2000,
-                showConfirmButton: false,
-            });
-        } catch (error) {
-            console.error(error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Something went wrong!',
-            });
+    const token = localStorage.getItem("token");
+    if (!token) {
+        console.error("No token found, redirect to login or handle accordingly");
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/cart/Add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                product_id: product._id,
+                quantity: quantity,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Failed to add to cart");
         }
-    };
+
+        // Check if the server returned a warning about the quantity limit
+        if (data.warning) {
+            Swal.fire({
+                icon: "warning",
+                title: "Limit Reached",
+                text: `${data.message} Please check your cart items.`,
+            });
+            return; // Stop execution, do NOT update the cart
+        }
+
+        //  If no warning, proceed with success message
+        Swal.fire({
+            icon: 'success',
+            title: 'Added to Cart!',
+            text: 'Your item has been successfully added.',
+            timer: 2000,
+            showConfirmButton: false,
+        });
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+        });
+    }
+};
 
   const getAverageRating = () => {
     if (!Array.isArray(review) || review.length === 0) return "No ratings yet";
@@ -270,32 +283,38 @@ export default function SpecificCollectible() {
               )}
             </p>
 
-            {/* Quantity and Actions */}
-            <div className="flex items-center mt-4 space-x-4">
-              <div className="flex items-center border border-gray-300 rounded-lg">
-                <button
-                  onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-                  className="bg-gray-200 px-4 py-2 rounded-l-lg text-gray-700 hover:bg-gray-300"
-                >
-                  -
-                </button>
-                <input
-                  type="text"
-                  value={quantity}
-                  readOnly
-                  className="bg-[#f9fafb] w-16 text-center focus:outline-none"
-                />
-                <button
-                  onClick={() => setQuantity((prev) => prev + 1)}
-                  className="bg-gray-200 px-4 py-2 rounded-r-lg text-gray-700 hover:bg-gray-300"
-                >
-                  +
-                </button>
+          {/* Quantity and Actions */}
+          <div className="flex items-center mt-4 space-x-4">
+              <div className="flex flex-col items-center">
+                <div className="flex items-center border border-gray-300 rounded-lg relative">
+                  <button
+                    onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+                    className="bg-gray-200 px-4 py-2 rounded-l-lg text-gray-700 hover:bg-gray-300"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="text"
+                    value={quantity}
+                    readOnly
+                    className="bg-[#f9fafb] w-16 text-center focus:outline-none"
+                  />
+                  <button
+                    onClick={() => {
+                      if (quantity < product.quantity) {
+                        setQuantity((prev) => prev + 1);
+                      }
+                    }}
+                    className={`bg-gray-200 px-4 py-2 rounded-r-lg text-gray-700 hover:bg-gray-300 ${quantity >= product.quantity ? 'cursor-not-allowed opacity-50' : ''}`}
+                    disabled={quantity >= product.quantity}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-
               <div className="flex space-x-6">
                 <button
-                onClick={handleAddToCart}
+                  onClick={handleAddToCart}
                   className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-yellow-600"
                 >
                   Add to Cart
@@ -305,6 +324,9 @@ export default function SpecificCollectible() {
                 </button>
               </div>
             </div>
+            {quantity >= product.quantity && (
+                  <p className="text-red-500 text-sm mt-1">You have reached the maximum available quantity.</p>
+                )}
           </div>
         </div>
 
