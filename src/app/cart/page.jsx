@@ -11,7 +11,9 @@ export default function Page() {
   const [recentlyOrdered, setRecentlyOrdered] = useState([]);
   const [selectedItems, setSelectedItems] = useState({});
   const [total, setTotal] = useState(0);
-  const [errorMessage, setErrorMessage] = useState(""); // State for error message
+  const [errorMessage, setErrorMessage] = useState(""); 
+  const [stockStatus, setStockStatus] = useState({});
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     async function fetchCart() {
@@ -196,49 +198,111 @@ export default function Page() {
   const handleIncreaseQuantity = async (id) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      console.error("No token found, redirect to login or handle accordingly");
-      return;
+        console.error("No token found, redirect to login or handle accordingly");
+        return;
     }
     
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  
-    await fetch("/api/cart/Update", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Replace with your token logic
-      },
-      body: JSON.stringify({ product_id: id, action: "increase" }),
-    });
+    setIsUpdating(true);
+    
+    try {
+        // Make the API call first to check stock availability
+        const response = await fetch("/api/cart/Update", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ product_id: id, action: "increase" }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Update state only after successful API call
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.id === id ? { ...item, quantity: data.quantity } : item
+                )
+            );
+            
+            // Update stock status for this product
+            if (data.availableStock) {
+                setStockStatus(prev => ({
+                    ...prev,
+                    [id]: {
+                        availableStock: data.availableStock,
+                        isOutOfStock: data.isOutOfStock || false,
+                        message: data.message
+                    }
+                }));
+            }
+        } else {
+            // If operation failed due to stock issues
+            if (data.isOutOfStock) {
+                setStockStatus(prev => ({
+                    ...prev,
+                    [id]: {
+                        availableStock: data.availableStock || 0,
+                        isOutOfStock: true,
+                        message: data.message || 'Out of stock'
+                    }
+                }));
+            }
+        }
+      } catch (error) {
+          console.error("Error updating cart quantity:", error);
+      } finally {
+          setIsUpdating(false);
+      }
   };
-  
-  const handleDecreaseQuantity = async (id) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found, redirect to login or handle accordingly");
-      return;
-    }
 
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
-  
-    await fetch("/api/cart/Update", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ product_id: id, action: "decrease" }),
-    });
+  const handleDecreaseQuantity = async (id) => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+          console.error("No token found, redirect to login or handle accordingly");
+          return;
+      }
+      
+      setIsUpdating(true);
+      
+      try {
+          const response = await fetch("/api/cart/Update", {
+              method: "PATCH",
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ product_id: id, action: "decrease" }),
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+              setCartItems((prevItems) =>
+                  prevItems.map((item) =>
+                      item.id === id && item.quantity > 1
+                          ? { ...item, quantity: data.quantity }
+                          : item
+                  )
+              );
+              
+              // Update stock status for this product - decreasing always frees up stock
+              if (data.availableStock) {
+                  setStockStatus(prev => ({
+                      ...prev,
+                      [id]: {
+                          availableStock: data.availableStock,
+                          isOutOfStock: false,
+                          message: null
+                      }
+                  }));
+              }
+          }
+      } catch (error) {
+          console.error("Error updating cart quantity:", error);
+      } finally {
+          setIsUpdating(false);
+      }
   };  
   
   // Recalculate total when cartItems or selectedItems change
@@ -298,14 +362,21 @@ export default function Page() {
                         <button
                           className="px-2 py-1 bg-gray-200 rounded"
                           onClick={() => handleDecreaseQuantity(item.id)}
-                          disabled={item.quantity <= 1}
+                          disabled={item.quantity <= 1 || isUpdating}
                         >
                           -
                         </button>
+                        
                         <span>{item.quantity}</span>
+                        
                         <button
-                          className="px-2 py-1 bg-gray-200 rounded"
+                          className={`px-2 py-1 rounded ${
+                            stockStatus[item.id]?.isOutOfStock 
+                              ? 'bg-gray-300 cursor-not-allowed' 
+                              : 'bg-gray-200'
+                          }`}
                           onClick={() => handleIncreaseQuantity(item.id)}
+                          disabled={isUpdating || (stockStatus[item.id]?.isOutOfStock)}
                         >
                           +
                         </button>
@@ -352,21 +423,21 @@ export default function Page() {
         {recentlyOrdered.length === 0 ? (
           <p>No recently ordered items available.</p> // Handle empty data
         ) : (
-          <div className="flex justify-between gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {recentlyOrdered.map((item, index) => (
               <div
                 key={item.productID || index}
                 className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center"
-                style={{ width: "23%", minHeight: "200px" }} // Ensuring a fixed minimum height
+                style={{ minHeight: "200px" }} // Fixed minimum height without width constraint
               >
                 <Link legacyBehavior href={`/${item.type.toLowerCase()}/${item.productId}/`} passHref>
-                  <a>
+                  <a className="flex justify-center items-center h-24 w-full">
                     <Image
                       src={item.image}
                       alt={item.name}
                       width={96}
                       height={96}
-                      className="object-contain mb-4"
+                      className="object-contain"
                     />
                   </a>
                 </Link>
@@ -380,7 +451,7 @@ export default function Page() {
             ))}
           </div>
         )}
-      </div>    
+      </div>
       <div>
           <AssuranceSection />
         </div>

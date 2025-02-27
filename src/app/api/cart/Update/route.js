@@ -38,17 +38,38 @@ export async function PATCH(request) {
             return NextResponse.json({ message: 'Product not found' }, { status: 404 });
         }
 
+        let stockMessage = null;
+        let isOutOfStock = false;
+
         if (action === 'increase') {
-            cartItem.quantity += 1;
+            // Check if increasing would exceed available stock
+            if (cartItem.quantity + 1 > product.quantity) {
+                isOutOfStock = true;
+                stockMessage = 'Product is out of stock';
+                // Don't increase the quantity, just return the current state with a warning
+            } else {
+                cartItem.quantity += 1;
+                // Check if this was the last available item
+                if (cartItem.quantity === product.quantity) {
+                    stockMessage = 'You have all available items in your cart';
+                }
+            }
         } else if (action === 'decrease' && cartItem.quantity > 1) {
             cartItem.quantity -= 1;
         }
 
-        await cartItem.save();
+        if (!isOutOfStock) {
+            await cartItem.save();
+        }
 
-        console.log(`User ID: ${user_id}, Product Name: ${product.productName}, Quantity: ${cartItem.quantity}`);
+        console.log(`User ID: ${user_id}, Product Name: ${product.productName}, Quantity: ${cartItem.quantity}, Available Stock: ${product.quantity}`);
 
-        return NextResponse.json({ message: 'Cart updated successfully', quantity: cartItem.quantity }, { status: 200 });
+        return NextResponse.json({
+            message: isOutOfStock ? stockMessage : 'Cart updated successfully',
+            quantity: cartItem.quantity,
+            availableStock: product.quantity,
+            isOutOfStock
+        }, { status: isOutOfStock ? 400 : 200 });
     } catch (error) {
         console.error("Error updating cart quantity:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
