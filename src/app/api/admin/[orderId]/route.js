@@ -15,6 +15,12 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
+    const existingOrder = await Order.findById(orderId);
+
+    if (!existingOrder) {
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
+
     const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
 
     if (!updatedOrder) {
@@ -27,6 +33,15 @@ export async function PUT(req, { params }) {
         const productId = updatedOrder.product_id[i];
         const quantity = updatedOrder.quantity[i];
         await Product.findByIdAndUpdate(productId, { $inc: { quantity } });
+      }
+    }
+
+    // Decrement product quantity if order status changes from "Cancelled" to any other status
+    if (existingOrder.status === "Cancelled" && status !== "Cancelled") {
+      for (let i = 0; i < updatedOrder.product_id.length; i++) {
+        const productId = updatedOrder.product_id[i];
+        const quantity = updatedOrder.quantity[i];
+        await Product.findByIdAndUpdate(productId, { $inc: { quantity: -quantity } });
       }
     }
 
