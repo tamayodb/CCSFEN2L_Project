@@ -2,19 +2,20 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import connectToDatabase from "../../../../../lib/db";
 import Order from "../../../../../models/order";
-import Customer from "../../../../../models/accounts"; // Assuming you have a Customer model
-import jwt from "jsonwebtoken"; // For JWT token verification
+import Customer from "../../../../../models/accounts";
+import Product from "../../../../../models/product"; // Import the Product model
+import jwt from "jsonwebtoken";
 
 // Helper function to verify JWT token
 async function verifyToken(req) {
-  const token = req.headers.get("Authorization")?.split(" ")[1]; // Extract token from Authorization header
+  const token = req.headers.get("Authorization")?.split(" ")[1];
   if (!token) {
     return { error: "Token missing", status: 401 };
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Your secret key
-    return { userId: decoded.userId }; // Assuming the JWT payload has a userId field
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return { userId: decoded.userId };
   } catch (err) {
     return { error: "Invalid or expired token", status: 401 };
   }
@@ -40,27 +41,49 @@ export async function POST(req) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const body = await req.json(); // Get the request body
+    const body = await req.json();
     const { cart, address, totalAmount, paymentMode } = body;
 
-    // Decode the URI encoded cart items (product_id and quantity)
-    const decodedCart = JSON.parse(decodeURIComponent(cart)); // Decode and parse the cart items
+    // Decode the URI encoded cart items
+    const decodedCart = JSON.parse(decodeURIComponent(cart));
 
-    // Get the total amount by summing the prices of products (you can adjust this logic as needed)
-    let totalAmountCalculated = 0;
+    // Create arrays for order creation
     const productIds = [];
     const quantities = [];
-    const isRated = []; // Initialize isRated array
-
+    const isRated = [];
+    
+    // Check all products are available in the required quantities
+    const productUpdates = [];
     for (const item of decodedCart) {
+      const product = await Product.findById(item.id);
+      if (!product) {
+        return NextResponse.json({ error: `Product not found: ${item.id}` }, { status: 404 });
+      }
+      
+      if (product.quantity < item.qty) {
+        return NextResponse.json(
+          { 
+            error: "Insufficient inventory", 
+            product: product.productName, 
+            requested: item.qty, 
+            available: product.quantity 
+          }, 
+          { status: 400 }
+        );
+      }
+      
+      // Save product IDs and quantities for order
       productIds.push(item.id);
       quantities.push(item.qty);
-      isRated.push(false); // Add false for each product
-
-      // Here, fetch the product price based on productId if needed.
-      // You may use your Product model to get product details.
-      // const product = await Product.findById(item.id); // Assuming you have a Product model
-      // totalAmountCalculated += product.price * item.qty;
+      isRated.push(false);
+      
+      // Prepare the inventory update
+      productUpdates.push({
+        updateOne: {
+          filter: { _id: item.id },
+          update: { $inc: { quantity: -item.qty } }
+        }
+      });
     }
 
     // Set the address from the user's customer document
@@ -68,42 +91,54 @@ export async function POST(req) {
 
     const orderDate = new Date();
     const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
     const formattedDate = `${orderDate.getDate().toString().padStart(2, "0")}-${
       monthNames[orderDate.getMonth()]
     }-${orderDate.getFullYear()}`;
 
+    // Create new order document
     const newOrder = new Order({
       _id: new mongoose.Types.ObjectId(),
       user_id: auth.userId,
       product_id: productIds,
       quantity: quantities,
-      isRated: isRated, // Add isRated array
-      order_date: formattedDate, // Correctly formatted date
-      totalAmount: totalAmount || totalAmountCalculated,
+      isRated: isRated,
+      order_date: formattedDate,
+      totalAmount: totalAmount,
       address: fullAddress,
       paymentMode,
       status: "To Approve",
     });
 
-    // Save order to the database
-    await newOrder.save();
-    return NextResponse.json(
-      { message: "Order placed successfully", order: newOrder },
-      { status: 201 }
-    );
+    // Start a session to ensure atomicity of operations
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // Save the order
+      await newOrder.save({ session });
+      
+      // Update product quantities in a bulk operation
+      if (productUpdates.length > 0) {
+        await Product.bulkWrite(productUpdates, { session });
+      }
+      
+      // Commit the transaction
+      await session.commitTransaction();
+      session.endSession();
+      
+      return NextResponse.json(
+        { message: "Order placed successfully", order: newOrder },
+        { status: 201 }
+      );
+    } catch (transactionError) {
+      // If an error occurs, abort the transaction
+      await session.abortTransaction();
+      session.endSession();
+      throw transactionError;
+    }
   } catch (error) {
     console.error("Error placing order:", error);
     return NextResponse.json(
