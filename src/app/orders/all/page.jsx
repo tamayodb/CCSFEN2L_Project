@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Swal from 'sweetalert2'; // Import Swal
 
 const tabs = ['All', 'To Approve', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
 
@@ -22,7 +23,45 @@ const OrdersPage = () => {
   const [ratedProducts, setRatedProducts] = useState({});
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [cancelOrderId, setCancelOrderId] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Add authentication state
   const router = useRouter();
+
+  // Centralized authentication check function
+  const checkAuthentication = async (redirectOnFailure = true) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      if (redirectOnFailure) {
+        const result = await Swal.fire({
+          title: "Authentication Required",
+          text: "You need to log in or create an account to continue.",
+          icon: "warning",
+          confirmButtonText: "Go to Login"
+        });
+
+        if (result.isConfirmed) {
+          router.push("/login");
+        }
+      }
+      return false;
+    }
+
+    return true;
+  };
+
+  // Check authentication on initial load
+  useEffect(() => {
+    const initialize = async () => {
+      const authenticated = await checkAuthentication(true);
+      setIsAuthenticated(authenticated);
+
+      if (authenticated) {
+        fetchOrders(); // Call it when the component mounts
+      }
+    };
+
+    initialize();
+  }, []);
 
   const fetchOrders = async () => {
     try {
@@ -52,10 +91,6 @@ const OrdersPage = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchOrders(); // Call it when the component mounts
-  }, []);
 
   const toggleExpandOrder = (orderId) => {
     setExpandedOrders((prev) => ({
