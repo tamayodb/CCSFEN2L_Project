@@ -20,6 +20,8 @@ const OrdersPage = () => {
   const [ratingMessage, setRatingMessage] = useState('');
   const [isErrorMessage, setIsErrorMessage] = useState(false);
   const [ratedProducts, setRatedProducts] = useState({});
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [cancelOrderId, setCancelOrderId] = useState(null);
   const router = useRouter();
 
   const fetchOrders = async () => {
@@ -125,14 +127,19 @@ const OrdersPage = () => {
     }
   };
 
-  const cancelOrder = async (orderId) => {
+  const confirmCancelOrder = (orderId) => {
+    setCancelOrderId(orderId);
+    setShowCancelConfirmation(true);
+  };
+
+  const cancelOrder = async () => {
     try {
       const response = await fetch('/api/orders/cancel', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ orderId }),
+        body: JSON.stringify({ orderId: cancelOrderId }),
       });
 
       if (!response.ok) {
@@ -143,9 +150,11 @@ const OrdersPage = () => {
 
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order._id === orderId ? { ...order, status: 'Cancelled' } : order
+          order._id === cancelOrderId ? { ...order, status: 'Cancelled' } : order
         )
       );
+      setShowCancelConfirmation(false);
+      setCancelOrderId(null);
     } catch (error) {
       console.error('Failed to cancel order:', error.message);
     }
@@ -249,7 +258,7 @@ const OrdersPage = () => {
                 {(order.status === 'To Ship' || order.status === 'To Approve') && (
                   <button
                     className="px-4 py-2 bg-red-500 text-white rounded"
-                    onClick={() => cancelOrder(order._id)}
+                    onClick={() => confirmCancelOrder(order._id)}
                   >
                     Cancel Order
                   </button>
@@ -285,6 +294,18 @@ const OrdersPage = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className={`p-4 rounded-lg shadow-lg ${isErrorMessage ? 'bg-red-500' : 'bg-green-500'}`}>
             <p className="text-lg font-bold text-white">{ratingMessage}</p>
+          </div>
+        </div>
+      )}
+      {showCancelConfirmation && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+            <h3 className="text-lg font-bold mb-4">Confirm Cancellation</h3>
+            <p className="mb-4">Are you sure you want to cancel this order?</p>
+            <div className="flex justify-end space-x-2">
+              <button className="px-4 py-2 bg-gray-500 text-white rounded" onClick={() => setShowCancelConfirmation(false)}>No</button>
+              <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={cancelOrder}>Yes</button>
+            </div>
           </div>
         </div>
       )}

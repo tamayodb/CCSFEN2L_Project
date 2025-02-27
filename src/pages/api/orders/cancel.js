@@ -1,5 +1,6 @@
 import connectToDatabase from '../../../../lib/db';
 import Order from '../../../../models/order';
+import Product from '../../../../models/product'; // Import the Product model
 
 export default async function handler(req, res) {
   if (req.method !== 'DELETE') {
@@ -19,6 +20,16 @@ export default async function handler(req, res) {
     if (order.status !== 'To Ship' && order.status !== 'To Approve') {
       return res.status(400).json({ error: 'Only orders with status "To Ship" or "To Approve" can be cancelled' });
     }
+
+    // Increment the product quantities
+    const productUpdates = order.product_id.map((productId, index) => ({
+      updateOne: {
+        filter: { _id: productId },
+        update: { $inc: { quantity: order.quantity[index] } }
+      }
+    }));
+
+    await Product.bulkWrite(productUpdates);
 
     order.status = 'Cancelled';
     await order.save();
