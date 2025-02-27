@@ -2,77 +2,103 @@
 import React, { useEffect, useState } from "react";
 import AssuranceSection from "@/components/homepage/AssuranceSection";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Swal from "sweetalert2";
 
 export default function Page() {
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
   const [cartItems, setCartItems] = useState([]);
   const [recentlyOrdered, setRecentlyOrdered] = useState([]);
   const [selectedItems, setSelectedItems] = useState({});
   const [total, setTotal] = useState(0);
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
   const [stockStatus, setStockStatus] = useState({});
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    async function fetchCart() {
+  // Centralized authentication check function
+  const checkAuthentication = async (redirectOnFailure = true) => {
       const token = localStorage.getItem("token");
+      
       if (!token) {
-        console.error("No token found, redirect to login or handle accordingly");
-        return;
+          if (redirectOnFailure) {
+              const result = await Swal.fire({
+                  title: "Authentication Required",
+                  text: "You need to log in or create an account to continue.",
+                  icon: "warning",
+                  confirmButtonText: "Go to Login"
+                  // Removed showCancelButton
+              });
+
+              if (result.isConfirmed) {
+                  router.push("/login");
+              }
+          }
+          return false;
       }
-    
-      try {
-        const response = await fetch("/api/cart/View", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-    
-        const data = await response.json();
-        setCartItems(data);
-      } catch (error) {
-        console.error("Error fetching cart data:", error);
+      
+      return true;
+  };
+
+  // Check authentication on initial load
+  useEffect(() => {
+    const initialize = async () => {
+      const authenticated = await checkAuthentication(true);
+      setIsAuthenticated(authenticated);
+      
+      if (authenticated) {
+        fetchCart();
+        fetchRecentlyOrdered();
       }
-    }    
+    };
     
-    fetchCart();
+    initialize();
   }, []);
 
-  useEffect(() => {
-    async function fetchRecentlyOrdered() {
-      const token = localStorage.getItem("token");
+  // Fetch cart items
+  const fetchCart = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
     
-      if (!token) {
-        console.error("No token found. Please log in.");
-        return;
+    try {
+      const response = await fetch("/api/cart/View", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await response.json();
+      setCartItems(data);
+    } catch (error) {
+      console.error("Error fetching cart data:", error);
+    }
+  };
+  
+  // Fetch recently ordered items
+  const fetchRecentlyOrdered = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+  
+    try {
+      const response = await fetch("/api/fetchOrders", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch recently ordered products: ${response.statusText}`);
       }
-    
-      try {
-        const response = await fetch("/api/fetchOrders", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-    
-        if (!response.ok) {
-          throw new Error(`Failed to fetch recently ordered products: ${response.statusText}`);
-        }
-    
-        const data = await response.json();
-        console.log("Recently Ordered Products:", data);
-    
-        // Set state with the data (assuming you want to show all products per order)
-        setRecentlyOrdered(data.slice(0, 6));
-      } catch (error) {
-        console.error("Error fetching recently ordered products:", error);
-      }
-    }           
-    fetchRecentlyOrdered();
-  }, []);
+  
+      const data = await response.json();
+      setRecentlyOrdered(data.slice(0, 6));
+    } catch (error) {
+      console.error("Error fetching recently ordered products:", error);
+    }
+  };
 
   const handleCheckboxChange = (id) => {
     setSelectedItems((prev) => {
@@ -104,12 +130,9 @@ export default function Page() {
 
   // Function to handle the checkout and navigate to the payment page
   const handleCheckout = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found, redirect to login or handle accordingly");
-      return;
-    }
-  
+    const isAuthed = await checkAuthentication();
+    if (!isAuthed) return;
+    
     const selectedCartItems = cartItems
       .filter((item) => selectedItems[item.id])
       .map((item) => ({
@@ -125,6 +148,7 @@ export default function Page() {
     setErrorMessage(""); // Reset error message
   
     try {
+      const token = localStorage.getItem("token");
       // Make a DELETE request to remove selected items from the database
       const response = await fetch("/api/cart/RemoveMultiple", {
         method: "DELETE",
@@ -158,13 +182,11 @@ export default function Page() {
   };  
 
   const handleRemoveItem = async (productId) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found, redirect to login or handle accordingly");
-      return;
-    }
+    const isAuthed = await checkAuthentication();
+    if (!isAuthed) return;
   
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch("/api/cart/Remove", {
         method: "DELETE",
         headers: {
@@ -188,23 +210,19 @@ export default function Page() {
         calculateTotal(updatedSelection);
         return updatedSelection;
       });
-  
-      console.log("Item removed successfully");
     } catch (error) {
       console.error("Error removing item from cart:", error);
     }
   };  
 
   const handleIncreaseQuantity = async (id) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        console.error("No token found, redirect to login or handle accordingly");
-        return;
-    }
+    const isAuthed = await checkAuthentication();
+    if (!isAuthed) return;
     
     setIsUpdating(true);
     
     try {
+        const token = localStorage.getItem("token");
         // Make the API call first to check stock availability
         const response = await fetch("/api/cart/Update", {
             method: "PATCH",
@@ -249,66 +267,73 @@ export default function Page() {
                 }));
             }
         }
-      } catch (error) {
-          console.error("Error updating cart quantity:", error);
-      } finally {
-          setIsUpdating(false);
-      }
+    } catch (error) {
+        console.error("Error updating cart quantity:", error);
+    } finally {
+        setIsUpdating(false);
+    }
   };
 
   const handleDecreaseQuantity = async (id) => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-          console.error("No token found, redirect to login or handle accordingly");
-          return;
-      }
+    const isAuthed = await checkAuthentication();
+    if (!isAuthed) return;
       
-      setIsUpdating(true);
+    setIsUpdating(true);
       
-      try {
-          const response = await fetch("/api/cart/Update", {
-              method: "PATCH",
-              headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ product_id: id, action: "decrease" }),
-          });
-          
-          const data = await response.json();
-          
-          if (response.ok) {
-              setCartItems((prevItems) =>
-                  prevItems.map((item) =>
-                      item.id === id && item.quantity > 1
-                          ? { ...item, quantity: data.quantity }
-                          : item
-                  )
-              );
-              
-              // Update stock status for this product - decreasing always frees up stock
-              if (data.availableStock) {
-                  setStockStatus(prev => ({
-                      ...prev,
-                      [id]: {
-                          availableStock: data.availableStock,
-                          isOutOfStock: false,
-                          message: null
-                      }
-                  }));
-              }
-          }
-      } catch (error) {
-          console.error("Error updating cart quantity:", error);
-      } finally {
-          setIsUpdating(false);
-      }
+    try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("/api/cart/Update", {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ product_id: id, action: "decrease" }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.id === id && item.quantity > 1
+                        ? { ...item, quantity: data.quantity }
+                        : item
+                )
+            );
+            
+            // Update stock status for this product - decreasing always frees up stock
+            if (data.availableStock) {
+                setStockStatus(prev => ({
+                    ...prev,
+                    [id]: {
+                        availableStock: data.availableStock,
+                        isOutOfStock: false,
+                        message: null
+                    }
+                }));
+            }
+        }
+    } catch (error) {
+        console.error("Error updating cart quantity:", error);
+    } finally {
+        setIsUpdating(false);
+    }
   };  
   
   // Recalculate total when cartItems or selectedItems change
   useEffect(() => {
     calculateTotal(selectedItems);
   }, [cartItems, selectedItems]);  
+
+  // If not authenticated, show a simple loading or redirect state
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-lg">Checking authentication...</p>
+      </div>
+    );
+  }  
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
