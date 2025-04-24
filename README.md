@@ -21,7 +21,7 @@ This repository contains the user-side implementation of **Loop**, an e-commerce
 
 ---
 
-## 🔄 Workflow Overview
+## Workflow Overview
 1. Frontend (Next.js) sends API requests via Axios  
 2. Backend processes requests with Next.js API routes  
 3. Mongoose interacts with MongoDB Atlas  
